@@ -1,8 +1,6 @@
 /**
  * An object in an S3 bucket, ready for publication over the internet.
- * Be aware that terraform is not really good at this. It only uploads the file, but does
- * no really track it, nor deletes it. And there is something fishy with the dependency
- * on the bucket to.
+ * Be aware that terraform is not really good at this.
  * You can use clients to upload, like CyberDuck, or use the AWS Console.
  *
  * We require a directory in the main terraform project

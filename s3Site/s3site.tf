@@ -55,6 +55,18 @@ resource "aws_s3_bucket" "BUCKET" {
 EOT
 }
 
+resource "aws_route53_record" "DOMAIN_NAME" {
+  zone_id = "${var.zone_id}"
+  name = "${aws_s3_bucket.BUCKET.bucket}"
+  type = "ALIAS"
+
+  alias {
+    name = "${aws_s3_bucket.BUCKET.website_domain}"
+    zone_id = "${aws_s3_bucket.BUCKET.hosted_zone_id}"
+    evaluate_target_health = true
+  }
+}
+
 output "name" {
-  value = "${var.short-name}.${var.domain}"
+  value = "${aws_s3_bucket.BUCKET.bucket}"
 }
