@@ -61,7 +61,7 @@ resource "aws_route53_record" "DOMAIN_NAME" {
   type = "ALIAS"
 
   alias {
-    name = "${aws_s3_bucket.BUCKET.website_domain}"
+    name = "${aws_s3_bucket.BUCKET.website_endpoint}"
     zone_id = "${aws_s3_bucket.BUCKET.hosted_zone_id}"
     evaluate_target_health = true
   }
