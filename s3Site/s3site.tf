@@ -54,3 +54,7 @@ resource "aws_s3_bucket" "BUCKET" {
 }
 EOT
 }
+
+output "name" {
+  value = "${var.short-name}.${var.domain}"
+}
