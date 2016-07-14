@@ -21,12 +21,17 @@ variable "zone_id" {
   type = "string"
 }
 
+variable "index_document" {
+  type = "string"
+  default = "index.html"
+}
+
 resource "aws_s3_bucket" "BUCKET" {
   bucket = "${var.short-name}.${var.domain}"
   acl = "public-read"
 
   website {
-    index_document = "index.html"
+    index_document = "${var.index_document}"
   }
 
   versioning {
