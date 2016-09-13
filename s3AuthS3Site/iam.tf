@@ -12,6 +12,11 @@ resource aws_iam_user "IAM_USER" {
   name = "s3auth_${aws_s3_bucket.BUCKET.bucket}"
   path = "${var.user_path}"
   force_destroy = true
+}
+
+resource "aws_iam_user_policy" "IAM_USER_POLICY" {
+  name = "s3auth_${aws_s3_bucket.BUCKET.bucket}"
+  user = "${aws_iam_user.IAM_USER.name}"
   policy = <<EOF
 {
   "Statement": [
