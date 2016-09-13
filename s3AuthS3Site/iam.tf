@@ -36,6 +36,10 @@ resource "aws_iam_access_key" "ACCESS_KEY" {
   user = "${aws_iam_user.IAM_USER.name}"
 }
 
+output "KEY" {
+  value = "${aws_iam_access_key.ACCESS_KEY.id}"
+}
+
 output "SECRET" {
   value = "${aws_iam_access_key.ACCESS_KEY.secret}"
 }
