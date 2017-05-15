@@ -46,6 +46,18 @@ EOF
   type = "string"
 }
 
+variable "meta" {
+  type = "map"
+
+  description = <<EOF
+Terraform map of meta-information about the domain. This information, extended with the serial
+number, converted into JSON, is the payload of a TXT record meta-${var.domain_name}.
+The default is an empty map.
+EOF
+
+  default = {}
+}
+
 variable "ttl" {
   description = <<EOF
 Time-to-live in s. Used for SOA and the meta-information TXT record.
