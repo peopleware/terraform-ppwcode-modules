@@ -31,8 +31,7 @@
 resource "aws_route53_zone" "zone" {
   name    = "${var.short-name}.${var.parent-domain-name}"
   comment = "${var.description}"
-
-  tags = "${var.tags}"
+  tags    = "${var.tags}"
 }
 
 module "version" {
