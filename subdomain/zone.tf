@@ -12,27 +12,6 @@
  *       record, not a CNAME!
  */
 
-variable "short-name" {
-  type = "string"
-}
-
-variable "parent-domain-name" {
-  type = "string"
-}
-
-variable "parent-domain-zone_id" {
-  type = "string"
-}
-
-variable "description" {
-  type = "string"
-}
-
-variable "ttl" {
-  type = "string"
-  default = "60"
-}
-
 resource "aws_route53_zone" "ZONE" {
   name = "${var.short-name}.${var.parent-domain-name}"
   comment = "${var.description}"
