@@ -10,3 +10,6 @@ resource "aws_route53_record" "TXT-json" {
   ttl     = "${var.ttl}"
   records = "${list(jsonencode(var.payload))}"
 }
+
+
+// MUDO the above does not work; see https://github.com/hashicorp/terraform/issues/10048
