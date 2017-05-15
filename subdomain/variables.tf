@@ -56,8 +56,17 @@ variable "ttl" {
   type = "string"
 
   description = <<EOF
-TTL in s of the NS records in the zone of the parent domain for this subdomain.
+TTL in s of the NS and SOA records in the zone of the parent domain for this subdomain.
 EOF
 
   default = "60"
+}
+
+variable "serial" {
+  description = <<EOF
+The serial version of this build used in the SOA record, in the form YYYYMMDDnn.
+Be sure to increment nn on each deploy.
+EOF
+
+  default = "1"
 }
