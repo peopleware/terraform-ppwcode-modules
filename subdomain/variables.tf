@@ -15,6 +15,7 @@
  */
 
 variable "short-name" {
+  // TODO rename to short_name
   type = "string"
 
   description = <<EOF
@@ -24,6 +25,7 @@ EOF
 }
 
 variable "parent-domain-name" {
+  // TODO rename to parent_domain-fqdn
   type = "string"
 
   description = <<EOF
@@ -33,6 +35,7 @@ EOF
 }
 
 variable "parent-domain-zone_id" {
+  // TODO rename to parent_domain-zone_id
   type = "string"
 
   description = <<EOF
