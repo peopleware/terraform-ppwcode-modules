@@ -36,3 +36,11 @@ resource "aws_route53_record" "ns_delegation" {
      https://www.terraform.io/docs/providers/aws/r/route53_zone.html#name_servers */
   ttl = "${var.ttl}"
 }
+
+module "meta" {
+  source  = "../TXT-json"
+  zone_id = "${var.parent-domain-zone_id}"
+  name    = "meta-ns-${aws_route53_zone.zone.name}"
+  payload = "${module.version.I-meta_payload}"
+  ttl     = "${var.ttl}"
+}

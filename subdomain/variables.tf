@@ -71,11 +71,26 @@ EOF
   default = "1"
 }
 
+variable "meta" {
+  type = "map"
+
+  description = <<EOF
+Terraform map of meta-information about the domain. This information, extended with the serial
+number, converted into JSON, is the payload of a TXT record meta.${output.I-fqdn}, and
+of meta-ns-${output.I-fqdn} in the parent domain zone.
+The default is an empty map.
+EOF
+
+  default = {}
+}
+
 variable "tags" {
   type = "map"
+
   description = <<EOF
 Map of tags that will be attached to the AWS hosted zone for this subdomain.
 The default is empty.
 EOF
+
   default = {}
 }

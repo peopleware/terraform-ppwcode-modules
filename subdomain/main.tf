@@ -41,5 +41,6 @@ module "version" {
   domain_name    = "${aws_route53_zone.zone.name}"
   ns-domain_name = "${aws_route53_zone.zone.name_servers.0}"
   serial         = "${var.serial}"
+  meta           = "${var.meta}"
   ttl            = "${var.ttl}"
 }
