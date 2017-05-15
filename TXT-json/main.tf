@@ -8,5 +8,5 @@ resource "aws_route53_record" "TXT-json" {
   name    = "${var.name}"
   type    = "TXT"
   ttl     = "${var.ttl}"
-  records = "${jsonencode(var.payload)}"
+  records = "[${jsonencode(var.payload)}]"
 }
