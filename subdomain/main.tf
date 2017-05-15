@@ -28,7 +28,7 @@
  *       record, not a CNAME!
  */
 
-resource "aws_route53_zone" "ZONE" {
+resource "aws_route53_zone" "zone" {
   name    = "${var.short-name}.${var.parent-domain-name}"
   comment = "${var.description}"
 

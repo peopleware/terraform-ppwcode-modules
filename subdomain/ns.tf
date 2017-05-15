@@ -19,16 +19,16 @@
  * as NS records to the parent domain, with a given TTL.
  */
 
-resource "aws_route53_record" "NS_DELEGATION" {
+resource "aws_route53_record" "ns_delegation" {
   zone_id = "${var.parent-domain-zone_id}"
-  name    = "${aws_route53_zone.ZONE.name}"
+  name    = "${aws_route53_zone.zone.name}"
   type    = "NS"
 
   records = [
-    "${aws_route53_zone.ZONE.name_servers.0}",
-    "${aws_route53_zone.ZONE.name_servers.1}",
-    "${aws_route53_zone.ZONE.name_servers.2}",
-    "${aws_route53_zone.ZONE.name_servers.3}",
+    "${aws_route53_zone.zone.name_servers.0}",
+    "${aws_route53_zone.zone.name_servers.1}",
+    "${aws_route53_zone.zone.name_servers.2}",
+    "${aws_route53_zone.zone.name_servers.3}",
   ]
 
   /* There seems to be no other way to communicate this list.
