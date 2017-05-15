@@ -13,9 +13,8 @@
  */
 
 resource "aws_route53_zone" "ZONE" {
-  name = "${var.short-name}.${var.parent-domain-name}"
+  name    = "${var.short-name}.${var.parent-domain-name}"
   comment = "${var.description}"
 
-  tags {
-  }
+  tags {}
 }
