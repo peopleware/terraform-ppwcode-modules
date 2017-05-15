@@ -70,3 +70,12 @@ EOF
 
   default = "1"
 }
+
+variable "tags" {
+  type = "map"
+  description = <<EOF
+Map of tags that will be attached to the AWS hosted zone for this subdomain.
+The default is empty.
+EOF
+  default = {}
+}
