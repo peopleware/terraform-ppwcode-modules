@@ -16,10 +16,11 @@
 
 /**
  * Define a custom SOA record for the subdomain, if the appropriate variables are given.
- * Otherwise, fall back to the default.
- * The hostmaster will be hostmaster@${var.short-name}.${var.parent-domain-name}. You should make sure
+ *
+ * The hostmaster will be hostmaster@${var.domain_name}. You should make sure
  * that email address exists.
- * The first name server will be used as authorative name server.
+ * The authorative name server will be ${var.ns-domain_name}.
+ * The TTL of the SOA record will be ${var.ttl}
  *
  * We need a serial number, that is to be in the format YYYYMMDDnn, where nn is a 0 based, 2 digit
  * incremental number per day. The default is 1. This serial number should be tagged in the
@@ -27,9 +28,13 @@
  */
 
 resource "aws_route53_record" "soa" {
-  zone_id = "${aws_route53_zone.zone.zone_id}"
-  name    = "${var.short-name}.${var.parent-domain-name}"
+  zone_id = "${var.zone_id}"
+  name    = "${var.domain_name}"
   type    = "SOA"
-  records = ["${aws_route53_zone.zone.name_servers.0}. hostmaster.${var.short-name}.${var.parent-domain-name}. ${var.serial} 7200 900 1209600 86400"]
-  ttl     = "${var.ttl}"
+
+  records = [
+    "${var.ns-domain_name}. hostmaster.${var.domain_name}. ${var.serial} 7200 900 1209600 86400",
+  ]
+
+  ttl = "${var.ttl}"
 }
