@@ -13,3 +13,4 @@ resource "aws_route53_record" "TXT-json" {
 
 
 // MUDO the above does not work; see https://github.com/hashicorp/terraform/issues/10048
+// TODO switch to https://tools.ietf.org/html/rfc1464
