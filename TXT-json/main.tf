@@ -14,3 +14,34 @@ resource "aws_route53_record" "TXT-json" {
 
 // MUDO the above does not work; see https://github.com/hashicorp/terraform/issues/10048
 // TODO switch to https://tools.ietf.org/html/rfc1464
+
+/*
+NOTE might provide a workable path, courtesy of https://github.com/bugbuilder at https://gitter.im/bugbuilder, 2017-05-17 11:30
+variable "payload" {
+  type = "map"
+  default = {
+    foo = "bar"
+    baz = "qux"
+  }
+}
+
+data "template_file" "keys" {
+  count = "${length(keys(var.payload))}"
+
+  template = "\"$${key}\"=\"$${value}\""
+
+  vars {
+    key = "${element(keys(var.payload), count.index)}"
+    value = "${element(values(var.payload), count.index)}"
+  }
+}
+
+data "template_file" "merge" {
+  template = "${join(",", data.template_file.keys.*.rendered)}"
+}
+
+
+output "value" {
+value ="${list(data.template_file.merge.rendered)}"
+}
+*/
