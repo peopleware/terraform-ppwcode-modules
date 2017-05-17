@@ -23,6 +23,8 @@ module "meta" {
   source  = "../TXT-json"
   zone_id = "${var.zone_id}"
   name    = "meta.${var.domain_name}"
-  payload = "${merge(var.meta, map("serial", var.serial))}"
+  payload = "${concat(compact(var.meta), list("serial=${var.serial}"))}"
   ttl     = "${var.ttl}"
 }
+
+
