@@ -72,16 +72,17 @@ EOF
 }
 
 variable "meta" {
-  type = "map"
+  type = "list"
 
   description = <<EOF
-Terraform map of meta-information about the domain. This information, extended with the serial
-number, converted into JSON, is the payload of a TXT record meta.${output.I-fqdn}, and
-of meta-ns-${output.I-fqdn} in the parent domain zone.
-The default is an empty map.
+List of strings, in the format "PROPERTY_NAME=PROPERTY_VALUE" that represent meta-information about the domain.
+This information, extended with the serial number, is the payload of a TXT records meta.${output.I-fqdn}, and
+of meta-ns-${output.I-fqdn} in the parent domain zone..
+The result are structured TXT records with the meta-information, following https://tools.ietf.org/html/rfc1464.
+The default is an empty list.
 EOF
 
-  default = {}
+  default = []
 }
 
 variable "tags" {

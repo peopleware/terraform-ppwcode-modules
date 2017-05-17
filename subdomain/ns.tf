@@ -37,10 +37,10 @@ resource "aws_route53_record" "ns_delegation" {
   ttl = "${var.ttl}"
 }
 
-module "meta" {
-  source  = "../TXT-json"
+resource "aws_route53_record" "meta_ns" {
   zone_id = "${var.parent-domain-zone_id}"
   name    = "meta-ns-${aws_route53_zone.zone.name}"
-  payload = "${module.version.I-meta_payload}"
+  type    = "TXT"
   ttl     = "${var.ttl}"
+  records = "${module.version.I-meta_payload}"
 }
