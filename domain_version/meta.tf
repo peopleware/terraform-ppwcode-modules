@@ -15,16 +15,14 @@
  */
 
 /**
- * A TXT record, called `meta.${var.domain_name}`, that has a map containing meta information in JSON format
- * as payload, extended with `serial = ${var.serial}`.
+ * A TXT record, called `meta.${var.domain_name}`, that has given ${var.meta} as payload,
+ * extended with `serial=${var.serial}`. This follows following https://tools.ietf.org/html/rfc1464.
  */
 
-module "meta" {
-  source  = "../TXT-json"
+resource "aws_route53_record" "meta" {
   zone_id = "${var.zone_id}"
-  name    = "meta.${var.domain_name}"
-  payload = "${concat(compact(var.meta), list("serial=${var.serial}"))}"
-  ttl     = "${var.ttl}"
+  name = "meta.${var.domain_name}"
+  type = "TXT"
+  ttl = "${var.ttl}"
+  records = "${concat(compact(var.meta), list("serial=${var.serial}"))}"
 }
-
-

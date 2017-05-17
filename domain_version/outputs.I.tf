@@ -15,8 +15,8 @@
  */
 
 /**
- * The full meta payload as a map, including the serial.
+ * The full meta payload as a list, including the serial.
  */
 output "I-meta_payload" {
-  value = "${merge(var.meta, map("serial", var.serial))}"
+  value = "${concat(compact(var.meta), list("serial=${var.serial}"))}"
 }
