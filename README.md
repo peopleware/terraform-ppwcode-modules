@@ -5,7 +5,7 @@ You import the modules from Github, as described [in the documentation][Terrafor
 Use the format for public Github repositories, using the "double-slash" to refer to the correct
 subdirectory.
 
-    module "consul" {
+    module "MODULE_INSTANCE_NAME" {
         source = "github.com/peopleware/terraform-ppwcode-modules//MODULE_NAME"
     }
 
