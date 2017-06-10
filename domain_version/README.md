@@ -23,7 +23,8 @@ _This program does not push the tag._
 
 Planning or applying this module will fail if the highest git repository this module is used in,
 is not clean, if the `branch` contains the string `"prod"`, `"staging"` or `"test"`. The comparison
-is done case-insensitive.
+is done case-insensitive. In other branches, `meta` will contain an alphabetically sorted, comma-separated
+list of the names of all the files that are new, modified or deleted.
 
 [RFC 1464]: https://tools.ietf.org/html/rfc1464
 [RFC 6763 section 6]: https://tools.ietf.org/html/rfc6763#section-6
