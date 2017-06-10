@@ -15,14 +15,15 @@
  */
 
 data "external" "calculated_meta" {
-  depends_on = [
-    "data.external.node_modules"]
-
   program = [
     "node",
     "${path.module}/mata.js",
     "next-meta"
   ]
+
+  query = {
+    domain = "${var.domain_name}"
+  }
 }
 
 data "null_data_source" "meta" {
