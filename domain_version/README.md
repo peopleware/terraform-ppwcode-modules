@@ -11,11 +11,19 @@ The meta information is
 * information about the highest git repository this module is used in:
   * `repo`: the URL of the `origin` remote,
   * `sha`: the current SHA,
+  * `branch`: the name of the current branch,
 * `serial`: the serial used in the SOA record,
 
 and all the key / value keys found in the map input variable `additional_meta`.
 
 All the meta information is offered in the output map `I-meta_payload`.
+
+The highest git repository this module is used in, is tagged with `serial/<META.serial>`.
+_This program does not push the tag._
+
+Planning or applying this module will fail if the highest git repository this module is used in,
+is not clean, if the `branch` contains the string `"prod"`, `"staging"` or `"test"`. The comparison
+is done case-insensitive.
 
 [RFC 1464]: https://tools.ietf.org/html/rfc1464
 [RFC 6763 section 6]: https://tools.ietf.org/html/rfc6763#section-6
