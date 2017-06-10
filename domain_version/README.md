@@ -13,7 +13,7 @@ The meta information is
   * `sha`: the current SHA,
 * `serial`: the serial used in the SOA record,
 
-and all the key / value keys found in the map input variable `additional-meta`.
+and all the key / value keys found in the map input variable `additional_meta`.
 
 All the meta information is offered in the output map `I-meta_payload`.
 

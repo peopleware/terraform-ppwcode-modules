@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
+data "external" "calculated_meta" {
+  depends_on = [
+    "data.external.node_modules"]
+
+  program = [
+    "node",
+    "${path.module}/mata.js",
+    "next-meta"
+  ]
+}
+
+data "null_data_source" "meta" {
+  inputs = "${merge(data.external.calculated_meta.result, var.additional_meta)}"
+}
+
 /**
  * A TXT record, called `meta.${var.domain_name}`, that has given ${var.meta} as payload,
  * extended with `serial=${var.serial}`. This follows following https://tools.ietf.org/html/rfc1464.
@@ -24,5 +39,5 @@ resource "aws_route53_record" "meta" {
   name = "meta.${var.domain_name}"
   type = "TXT"
   ttl = "${var.ttl}"
-  records = "${concat(compact(var.meta), list("serial=${var.serial}"))}"
+  records = "${formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs))}"
 }

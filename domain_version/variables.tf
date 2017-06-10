@@ -37,26 +37,16 @@ EOF
   type = "string"
 }
 
-variable "serial" {
-  description = <<EOF
-The serial version of this build used in the SOA record, in the form YYYYMMDDnn.
-Be sure to increment nn on each deploy.
-EOF
-
-  type = "string"
-}
-
-variable "meta" {
-  type = "list"
+variable "additional_meta" {
+  type = "map"
 
   description = <<EOF
-List of strings, in the format "PROPERTY_NAME=PROPERTY_VALUE" that represent meta-information about the domain.
-This information, extended with the serial number, is the payload of a TXT records meta-${var.domain_name}.
-The result are structured TXT records with the meta-information, following https://tools.ietf.org/html/rfc1464.
-The default is an empty list.
+Map with additional meta-information about the domain. This information will be added to the payload of the TXT
+records meta-${var.domain_name}, following https://tools.ietf.org/html/rfc1464, besides calculated meta-information.
+The default is an empty map. Entries in this map overwrite calculated entries. Values must be strings.
 EOF
 
-  default = []
+  default = {}
 }
 
 variable "ttl" {

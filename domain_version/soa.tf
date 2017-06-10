@@ -33,7 +33,7 @@ resource "aws_route53_record" "soa" {
   type    = "SOA"
 
   records = [
-    "${var.ns-domain_name}. hostmaster.${var.domain_name}. ${var.serial} 7200 900 1209600 86400",
+    "${var.ns-domain_name}. hostmaster.${var.domain_name}. ${data.external.calculated_meta.result.serial} 7200 900 1209600 86400",
   ]
 
   ttl = "${var.ttl}"

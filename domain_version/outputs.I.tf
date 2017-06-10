@@ -18,5 +18,5 @@
  * The full meta payload as a list, including the serial.
  */
 output "I-meta_payload" {
-  value = "${concat(compact(var.meta), list("serial=${var.serial}"))}"
+  value = "${data.null_data_source.meta.inputs}"
 }
