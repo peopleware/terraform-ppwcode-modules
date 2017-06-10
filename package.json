@@ -22,5 +22,13 @@
   "license": "Apache-2.0",
   "engines": {
     "node": ">=6.10.3"
+  },
+  "dependencies": {
+    "commander": "^2.9.0",
+    "moment": "^2.18.1",
+    "nodegit": "^0.18.3",
+    "pad": "^1.1.0",
+    "pkginfo": "^0.4.0",
+    "q": "^1.5.0"
   }
 }
