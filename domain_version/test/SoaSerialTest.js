@@ -118,10 +118,6 @@ describe("SoaSerial", function() {
         const result = SoaSerial.currentSoaSerial(domain);
         return result
           .then(soaSerial => {
-            console.log(soaSerial);
-            if (!(soaSerial instanceof SoaSerial)) {
-              throw new Error("resolution is not an SoaSerial");
-            }
             return SoaSerial.currentSoaSerialString(domain)
               .then(serial => {
                 if (soaSerial.serial !== serial) {
@@ -131,9 +127,9 @@ describe("SoaSerial", function() {
               });
           })
           .catch(err => {
-            /* domain does not exist, or there is no SOA record, or there is no internet connection, or
-             no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
-            console.log(err);
+            if (err instanceof ConditionError) {
+              throw err;
+            }
             return true;
           });
       });

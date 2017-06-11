@@ -254,7 +254,24 @@ SoaSerial.currentSoaSerial = new Contract({
         throw new Error("The serial of the domain is not in the form YYYYMMDDnn");
       }
       return SoaSerial.parse(serialString);
-    });
+    })
+    .then(
+      new Contract({
+        pre: [
+          soaSerial => soaSerial instanceof SoaSerial
+        ],
+        post: [(soaSerial, result) => result === soaSerial],
+        exception: [() => false]
+      }).implementation(soaSerial => soaSerial),
+      new Contract({
+        post: [() => false],
+        exception: [
+          (err) => true
+          /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+           no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
+        ]
+      }).implementation(err => {throw err;})
+    );
 });
 
 /**
