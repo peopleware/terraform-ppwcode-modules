@@ -240,6 +240,36 @@ SoaSerial.currentSoaSerial = new Contract({
 });
 
 /**
+ * Get the current SOA serial via DNS (which might not exists), and create the next one, for use
+ * at {@code at}. If no SOA record exists, the network is not available, or the serial is not in
+ * the format YYYYMMDDnn, an SoaSerial is created with sequence number 0.
+ * The promise is rejected if the current sequence number is already at 99, and {@code at} is at the same
+ * day in the UTC time zone as reflected by the current SOA serial.
+ *
+ * @param {string} domain - FQDN of the domain to get the current SOA record of
+ * @param {Date|moment.Moment} at - the time at which the resulting instance would be used
+ * @return {Promise<SoaSerial>} Promise for an SoaSerial instance, that can be used at {@code at},
+ *                              give the current state of the {@code domain} SOA in DNS
+ */
+SoaSerial.nextSoaSerial = new Contract({
+  pre: [
+    (domain, at) => typeof domain === "string",
+    (domain, at) => at instanceof Date || moment.isMoment(at)
+  ],
+  post: [
+    (domain, at, result) => Q.isPromiseAlike(result)
+    /* Contracts does not offer support for Promises yet */
+  ],
+  exception: [() => false]
+}).implementation(function(domain, at) {
+  return SoaSerial.currentSoaSerialString(domain)
+    .then(
+      (serial) => SoaSerial.serialRegExp.test(serial) ? SoaSerial.parse(serial).next(at) : new SoaSerial(at, 0),
+      (ignore) => new SoaSerial(at, 0)
+    );
+});
+
+/**
  * Return a new instance of {@link SoaSerial}, that can be used as the next SOA serial after {@code this}, at
  * {@code useAt}.
  * - If the UTC day-date part of {@link #at} is before the UTC day-date part of {@code useAt},
