@@ -208,7 +208,25 @@ SoaSerial.currentSoaSerialString = new Contract({
   exception: [() => false]
 }).implementation(function currentSoaSerialString(domain) {
   return Q.denodeify(dns.resolveSoa)(domain)
-          .then((soa) => "" + soa.serial);
+          .then((soa) => "" + soa.serial)
+          .then(
+            new Contract({
+              pre: [
+                serial => typeof serial === "string",
+                serial => /^\d+$/.test(serial)
+              ],
+              post: [(serial, result) => result === serial],
+              exception: [() => false]
+            }).implementation(serial => serial),
+            new Contract({
+              post: [() => false],
+              exception: [
+                (err) => true
+                /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+                 no DNS server can be contacted, … */
+              ]
+            }).implementation(err => {throw err;})
+          );
 });
 
 /**

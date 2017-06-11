@@ -101,22 +101,12 @@ describe("SoaSerial", function() {
   describe("currentSoaSerialString", function() {
     someDomains.forEach(function(domain) {
       it("should return a promise for \"" + domain + "\"", function() {
-        const result = SoaSerial.currentSoaSerialString(domain);
-        return result
-          .then(serial => {
-            console.log(serial);
-            if (typeof serial !== "string") {
-              throw new Error ("serial is not a string");
-            }
-            if (!/^\d+$/.test(serial)) {
-              throw new Error("serial is not only digits");
-            }
-            return true;
-          })
+        return SoaSerial
+          .currentSoaSerialString(domain)
           .catch(err => {
-            /* domain does not exist, or there is no SOA record, or there is no internet connection, or
-             no DNS server can be contacted, … */
-            console.log(err);
+            if (err instanceof ConditionError) {
+              throw err;
+            }
             return true;
           });
       });
