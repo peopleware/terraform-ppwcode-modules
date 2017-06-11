@@ -1,4 +1,5 @@
 const SoaSerial = require("../SoaSerial");
+const moment = require("moment");
 
 function validateInvariants(subject) {
   if (!subject.invariants) {
@@ -6,23 +7,42 @@ function validateInvariants(subject) {
   }
 }
 
+const someMoments = [
+  moment("20170611T161923.345Z"),
+  moment("20170611T161923.345+02:00"),
+  moment("20170611T161923.345-06:00"),
+  moment("20170611T011923.345+02:00"),
+  moment("20170611T221923.345-06:00")
+];
+
+const someDates = someMoments.map((m) => m.toDate());
+
+//noinspection MagicNumberJS
+const someSequenceNumbers = [0, 50, 99];
+
 const someSerials = [
   "2017061134",
   "2017061100",
-  "2017061199"
+  "2017061199",
+  "2017061034",
+  "2017061234",
+  "2016022934"
 ];
 
 describe("SoaSerial", function() {
   describe("constructor", function() {
-    [
-      {at: new Date(2017, 5, 11, 14, 58, 34, 234), sequenceNumber: 23}
-    ]
-    .forEach(function(parameters) {
-      it("should return a serial with the expected properties for \"" + JSON.stringify(parameters) + "\"", function() {
-        const result = new SoaSerial(parameters.at, parameters.sequenceNumber);
-        validateInvariants(result);
-      });
-    });
+    someMoments
+      .map(m => m.clone())
+      .concat(someDates)
+      .forEach((at) =>
+        someSequenceNumbers.forEach(function(sequenceNumber) {
+          it("should return a serial with the  expected properties for at === \"" + moment(at).toISOString() + "\" "
+             + "and sequenceNumber === " + sequenceNumber, function() {
+            const result = new SoaSerial(at, sequenceNumber);
+            validateInvariants(result);
+          });
+        })
+      );
   });
   describe("parse", function() {
     someSerials.forEach(function(serial) {
@@ -32,22 +52,22 @@ describe("SoaSerial", function() {
       });
     });
   });
-  describe("#next", function() {
+  describe("#next()", function() {
     someSerials
-      .map((serial) => function() {return new SoaSerial.parse(serial)})
-      .forEach(function(generateSubject) {
-        [
-          new Date(2017, 5, 11, 14, 58, 34, 234)
-        ]
-        .forEach(function(useAt) {
-          const subject = generateSubject();
-          it("should return a serial with the expected properties  for \""
-             + JSON.stringify(subject) + "\" with \"" + useAt + "\"", function() {
-            const result = subject.next(useAt);
-            validateInvariants(subject);
-            validateInvariants(result);
-          });
-        });
-      });
+      .map(serial => function() {return SoaSerial.parse(serial);})
+      .forEach(generateSubject =>
+        someMoments
+          .map(m => m.clone())
+          .concat(someDates)
+          .forEach(useAt => {
+            const subject = generateSubject();
+            it("should return a serial with the expected properties for \""
+               + JSON.stringify(subject) + "\" with useAt === \"" + moment(useAt).toISOString() + "\"", function() {
+              const result = subject.next(useAt);
+              validateInvariants(subject);
+              validateInvariants(result);
+            });
+          })
+      )
   });
 });
