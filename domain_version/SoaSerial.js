@@ -134,7 +134,7 @@ SoaSerial.constructorContract = new Contract({
         === moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern),
     (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
   ],
-  exceptions: [() => false]
+  exception: [() => false]
 });
 
 SoaSerial.yearPattern = "YYYY";
@@ -178,8 +178,8 @@ SoaSerial.parse = new Contract({
       (serial, result) => result instanceof SoaSerial,
       (serial, result) => result.serial === serial
     ],
-    exceptions: [() => false]
-  }).implementation(function(serial) {
+    exception: [() => false]
+  }).implementation(function parse(serial) {
     const parts = SoaSerial.serialRegExp.exec(serial);
     return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]));
   });
@@ -204,11 +204,11 @@ SoaSerial.prototype.next = new Contract({
     useAt => useAt instanceof Date || moment.isMoment(useAt)
   ],
   post: [],
-  exceptions: [
     (useAt, err) =>
       err instanceof Error
       && (this.at.isAfter(useAt, "day")
           || SoaSerial.maxSequenceNumber <= this.sequenceNumber)
+  exception: [
   ]
 }).implementation(function(useAt) {
   if (SoaSerial.maxSequenceNumber <= this.sequenceNumber) {
