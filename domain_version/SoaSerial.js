@@ -168,17 +168,17 @@ SoaSerial.parse = new Contract({
     pre: [
       (serial) => typeof serial === "string",
       (serial) => SoaSerial.detailedSerialRegExp.test(serial),
-      (serial, result) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]),
-      (serial, result) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]) <= SoaSerial.maxMonth,
-      (serial, result) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3]),
-      (serial, result) =>
+      (serial) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]),
+      (serial) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]) <= SoaSerial.maxMonth,
+      (serial) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3]),
+      (serial) =>
         Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3])
           <= moment(
                SoaSerial.detailedSerialRegExp.exec(serial)[1] + SoaSerial.detailedSerialRegExp.exec(serial)[2],
                SoaSerial.yearPattern + SoaSerial.monthPattern
              ).daysInMonth(),
-      (serial, result) => 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]),
-      (serial, result) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]) <= SoaSerial.maxSequenceNumber
+      (serial) => 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]),
+      (serial) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]) <= SoaSerial.maxSequenceNumber
     ],
     post: [
       (serial, result) => result instanceof SoaSerial,
