@@ -221,10 +221,10 @@ SoaSerial.currentSoaSerialString = new Contract({
  *         {@code domain}, retrieved via DNS
  */
 SoaSerial.currentSoaSerial = new Contract({
-  pre:       [
+  pre: [
     (domain) => typeof domain === "string",
   ],
-  post:      [
+  post: [
     (domain, result) => Q.isPromiseAlike(result)
     /* Contracts does not offer support for Promises yet */
   ],
