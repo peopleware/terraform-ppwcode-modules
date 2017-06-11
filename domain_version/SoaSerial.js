@@ -191,7 +191,7 @@ SoaSerial.parse = new Contract({
 
 /**
  * Return a Promise for the serial in the SOA record of {@code domain}, retrieved via DNS.
- * It is a precondition that the record exists, and network is available.
+ * The promise is rejected if the record does not exists, or the network is not available.
  * The result is not necessary in the format YYYYMMDDnn. This is recommendation, not an obligation.
  *
  * @param {string} domain - FQDN of the domain to get the SOA record of
@@ -213,8 +213,8 @@ SoaSerial.currentSoaSerialString = new Contract({
 
 /**
  * Return a Promise for the SoaSerial, based on the serial in the SOA record of {@code domain}, retrieved via DNS.
- * It is a precondition that the record exists, and network is available, and that the serial is in the format
- * YYYYMMDDnn.
+ * The promise is rejected if the record does not exists, or the network is not available, or the serial is not in
+ * the format YYYYMMDDnn.
  *
  * @param {string} domain - FQDN of the domain to get the SOA record of
  * @return {Promise<SoaSerial>} Promise for the SoaSerial, based on the serial string in the SOA record of
