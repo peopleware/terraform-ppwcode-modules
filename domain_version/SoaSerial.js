@@ -16,6 +16,8 @@
 
 const moment = require("moment");
 const pad = require("pad");
+const Q = require("q");
+const dns = require("dns");
 const Contract = require("@toryt/contracts-ii");
 
 class SoaSerial {
@@ -183,6 +185,28 @@ SoaSerial.parse = new Contract({
     const parts = SoaSerial.serialRegExp.exec(serial);
     return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]));
   });
+
+/**
+ * Return a Promise for the serial in the SOA record of {@code domain}, retrieved via DNS.
+ * It is a precondition that the record exists, and network is available.
+ * The result is not necessary in the format YYYYMMDDnn. This is recommendation, not an obligation.
+ *
+ * @param {string} domain - FQDN of the domain to get the SOA record of
+ * @return {Promise<string>} Promise for the serial string in the SOA record of {@code domain}, retrieved via DNS
+ */
+SoaSerial.currentSoaSerialString = new Contract({
+  pre: [
+    (domain) => typeof domain === "string",
+  ],
+  post: [
+    (domain, result) => Q.isPromiseAlike(result)
+    /* Contracts does not offer support for Promises yet */
+  ],
+  exception: [() => false]
+}).implementation(function currentSoaSerialString(domain) {
+  return Q.denodeify(dns.resolveSoa)(domain)
+          .then((soa) => "" + soa.serial);
+});
 
 /**
  * Return a new instance of {@link SoaSerial}, that can be used as the next SOA serial after {@code this}, at
