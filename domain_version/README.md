@@ -26,6 +26,30 @@ is not clean, if the `branch` contains the string `"prod"`, `"staging"` or `"tes
 is done case-insensitive. In other branches, `meta` will contain an alphabetically sorted, comma-separated
 list of the names of all the files that are new, modified or deleted.
 
+Testing
+=======
+
+Testing is done using [Mocha] and [Toryt Contracts].
+
+To run the tests, make sure you have installed [Mocha] globally:
+
+    > yarn global add mocha
+
+or
+    
+    > npm install --global mocha
+
+The tests can be run by executing
+
+    > yarn test
+
+or
+
+    > npm test
+
 [RFC 1464]: https://tools.ietf.org/html/rfc1464
 [RFC 6763 section 6]: https://tools.ietf.org/html/rfc6763#section-6
 [RFC 1912 section 2.2]: https://tools.ietf.org/html/rfc1912
+[Mocha]: https://mochajs.org
+[Toryt Contracts]: https://www.npmjs.com/package/@toryt/contracts-ii
+

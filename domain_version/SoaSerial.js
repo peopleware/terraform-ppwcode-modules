@@ -19,6 +19,38 @@ const pad = require("pad");
 
 class SoaSerial {
 
+  get invariants() {
+    return moment.isMoment(this.at)
+           && this.at.utcOffset() === 0
+           && this.at.utc().hours() === 0
+           && this.at.utc().minutes() === 0
+           && this.at.utc().seconds() === 0
+           && this.at.utc().milliseconds() === 0
+           && typeof this.year === "string"
+           && SoaSerial.yearRegExp.test(this.year)
+           && typeof this.month === "string"
+           && SoaSerial.monthRegExp.test(this.month)
+           && 1 <= Number.parseInt(this.month)
+           && Number.parseInt(this.month) <= SoaSerial.maxMonth
+           && typeof this.day === "string"
+           && SoaSerial.dayRegExp.test(this.day)
+           && 1 <= Number.parseInt(this.day)
+           && Number.parseInt(this.day) <= SoaSerial.maxDayInMonth[Number.parseInt(this.month) - 1]
+           && typeof this.serialStart === "string"
+           && this.serialStart === this.year + this.month + this.day
+           && typeof this.sequenceNumber === "number"
+           && 0 <= this.sequenceNumber
+           && this.sequenceNumber <= SoaSerial.maxSequenceNumber
+           && typeof this.serial === "string"
+           && this.serial === this.serialStart + pad(2, this.sequenceNumber, "0")
+           && JSON.parse(JSON.stringify(this)).at === JSON.parse(JSON.stringify(this.at))
+           && JSON.parse(JSON.stringify(this)).year === this.year
+           && JSON.parse(JSON.stringify(this)).month === this.month
+           && JSON.parse(JSON.stringify(this)).day === this.day
+           && JSON.parse(JSON.stringify(this)).sequenceNumber === this.sequenceNumber
+           && JSON.parse(JSON.stringify(this)).serial === this.serial;
+  }
+
   /**
    * Create a new {@code SoaSerial}, given the date of {@code at} and the {@sequenceNumber}.
    *
@@ -107,7 +139,6 @@ class SoaSerial {
     return new SoaSerial(useAt, this._at.isSame(useAt, "day") ? this.sequenceNumber + 1 : 0);
   }
 
-  //noinspection JSUnusedGlobalSymbols
   toJSON() {
     return {
       at:             this.at,
@@ -122,9 +153,18 @@ class SoaSerial {
 }
 
 SoaSerial.yearPattern = "YYYY";
+SoaSerial.yearRegExp = /^\d{4}$/;
 SoaSerial.monthPattern = "MM";
+SoaSerial.monthRegExp = /^\d{2}$/;
 SoaSerial.dayPattern = "DD";
+SoaSerial.dayRegExp = /^\d{2}$/;
 SoaSerial.isoDateWithoutDashesPattern = SoaSerial.yearPattern + SoaSerial.monthPattern + SoaSerial.dayPattern;
 SoaSerial.serialRegExp = /(\d{8})(\d{2})/;
+//noinspection MagicNumberJS
+SoaSerial.maxSequenceNumber = 99;
+//noinspection MagicNumberJS
+SoaSerial.maxMonth = 12;
+//noinspection MagicNumberJS
+SoaSerial.maxDayInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 module.exports = SoaSerial;
