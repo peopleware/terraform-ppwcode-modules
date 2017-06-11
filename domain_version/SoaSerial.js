@@ -203,14 +203,23 @@ SoaSerial.prototype.next = new Contract({
   pre: [
     useAt => useAt instanceof Date || moment.isMoment(useAt)
   ],
-  post: [],
-    (useAt, err) =>
-      err instanceof Error
-      && (this.at.isAfter(useAt, "day")
-          || SoaSerial.maxSequenceNumber <= this.sequenceNumber)
+  post: [
+    (useAt, result) => result instanceof SoaSerial,
+    (useAt, result) => result.serialStart === moment(useAt).utc().format(SoaSerial.isoDateWithoutDashesPattern),
+    function(useAt, result) {
+      return (result.serialStart === this.serialStart) || result.sequenceNumber === 0;
+    },
+    function(useAt, result) {
+      return (result.serialStart !== this.serialStart) || result.sequenceNumber === this.sequenceNumber + 1;
+    }
+  ],
   exception: [
+    function(useAt, err) {
+      return err instanceof Error
+        && (this.at.isAfter(useAt, "day") || SoaSerial.maxSequenceNumber <= this.sequenceNumber);
+    }
   ]
-}).implementation(function(useAt) {
+}).implementation(function next(useAt) {
   if (SoaSerial.maxSequenceNumber <= this.sequenceNumber) {
     throw new Error("Cannot create a next serial on useAt, "
                     + "because this serial already has the maximum sequence number for that day");
