@@ -36,7 +36,8 @@ class SoaSerial {
            && typeof this.day === "string"
            && SoaSerial.dayRegExp.test(this.day)
            && 1 <= Number.parseInt(this.day)
-           && Number.parseInt(this.day) <= SoaSerial.maxDayInMonth[Number.parseInt(this.month) - 1]
+           && Number.parseInt(this.day)
+              <= moment(this.year + this.month, SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth()
            && typeof this.serialStart === "string"
            && this.serialStart === this.year + this.month + this.day
            && typeof this.sequenceNumber === "number"
@@ -155,8 +156,6 @@ SoaSerial.detailedSerialRegExp = /^(\d{4})(\d{2})(\d{2})(\d{2})$/;
 SoaSerial.maxSequenceNumber = 99;
 //noinspection MagicNumberJS
 SoaSerial.maxMonth = 12;
-//noinspection MagicNumberJS
-SoaSerial.maxDayInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 /**
  * Construct an {@link SoaSerial} instance from the serial string as expected in a DNS SOA record.
@@ -174,7 +173,10 @@ SoaSerial.parse = new Contract({
       (serial, result) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3]),
       (serial, result) =>
         Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3])
-          <= SoaSerial.maxDayInMonth[Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2])],
+          <= moment(
+               SoaSerial.detailedSerialRegExp.exec(serial)[1] + SoaSerial.detailedSerialRegExp.exec(serial)[2],
+               SoaSerial.yearPattern + SoaSerial.monthPattern
+             ).daysInMonth(),
       (serial, result) => 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]),
       (serial, result) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]) <= SoaSerial.maxSequenceNumber
     ],
