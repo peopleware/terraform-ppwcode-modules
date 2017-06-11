@@ -307,6 +307,26 @@ SoaSerial.nextSoaSerial = new Contract({
     .then(
       (serial) => SoaSerial.serialRegExp.test(serial) ? SoaSerial.parse(serial).next(at) : new SoaSerial(at, 0),
       (ignore) => new SoaSerial(at, 0)
+    )
+    .then(
+      new Contract({
+        pre: [
+          soaSerial => soaSerial instanceof SoaSerial
+        ],
+        post: [(soaSerial, result) => result === soaSerial],
+        exception: [() => false]
+      }).implementation(soaSerial => soaSerial),
+      new Contract({
+        pre: [
+          err => true
+          /* current sequence number is already at 99, and {@code at} is at the same
+             day in the UTC time zone as reflected by the current SOA serial. */
+        ],
+        post: [() => false],
+        exception: [
+          (err1, err2) => err1 === err2
+        ]
+      }).implementation(err => {throw err;})
     );
 });
 

@@ -145,10 +145,6 @@ describe("SoaSerial", function() {
         return result
           .then(
             soaSerial => {
-              console.log("%s: next serial --> %s", domain, soaSerial.serial);
-              if (!(soaSerial instanceof SoaSerial)) {
-                throw new Error("resolution is not an SoaSerial");
-              }
               return SoaSerial.currentSoaSerial(domain)
                 .then(
                   currentSoaSerial => {
