@@ -31,15 +31,18 @@ class SoaSerial {
            && this.at.utc().milliseconds() === 0
            && typeof this.year === "string"
            && SoaSerial.yearRegExp.test(this.year)
+           && this.year === this.at.format(SoaSerial.yearPattern)
            && typeof this.month === "string"
            && SoaSerial.monthRegExp.test(this.month)
            && 1 <= Number.parseInt(this.month)
            && Number.parseInt(this.month) <= SoaSerial.maxMonth
+           && this.month === this.at.format(SoaSerial.monthPattern)
            && typeof this.day === "string"
            && SoaSerial.dayRegExp.test(this.day)
            && 1 <= Number.parseInt(this.day)
            && Number.parseInt(this.day)
               <= moment(this.year + this.month, SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth()
+           && this.day === this.at.format(SoaSerial.dayPattern)
            && typeof this.serialStart === "string"
            && this.serialStart === this.year + this.month + this.day
            && typeof this.sequenceNumber === "number"
