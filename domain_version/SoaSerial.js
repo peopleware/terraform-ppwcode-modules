@@ -107,28 +107,6 @@ class SoaSerial {
     return this.serialStart + pad(2, this.sequenceNumber, "0");
   }
 
-  /**
-   * Return a new instance of {@link SoaSerial}, that can be used as the next SOA serial after {@code this}, at
-   * {@code useAt}.
-   * - If the UTC day-date part of {@link #at} is before the UTC day-date part of {@code useAt},
-   *   the result has {@link at} === {@code useAt}, and its {@link #sequenceNumber} is 0.
-   * - If {@link #at} has the same UTC date as {@code useAt}, the result has the same {@link at} as {@code this}
-   *   (and thus the same {@link year()}, {@link month()}, and {@link #day()}, but its {@link #sequenceNumber} is the
-   *   successor of this' {@link #sequenceNumber}.
-   * - If there is a {@code currentSerial}, and its date part represents the UTC date of {@code at},
-   *   that date part followed by a 2-digit sequence number that is the successor of the sequence number in
-   *   {@code currentSerial}
-   *
-   * @param {Date|Moment} useAt - the time at which the resulting instance would be used
-   * @return {SoaSerial} Next SOA serial, to be used at {@code useAt}, given {@code this} as the current SOA serial
-   */
-  next(useAt) {
-    if (this._at.isAfter(useAt, "day")) {
-      throw new Error("Cannot create a next serial for useAt earlier than the day in the current serial");
-    }
-    return new SoaSerial(useAt, this._at.isSame(useAt, "day") ? this.sequenceNumber + 1 : 0);
-  }
-
   //noinspection JSUnusedGlobalSymbols
   toJSON() {
     return {
@@ -205,5 +183,43 @@ SoaSerial.parse = new Contract({
     const parts = SoaSerial.serialRegExp.exec(serial);
     return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]));
   });
+
+/**
+ * Return a new instance of {@link SoaSerial}, that can be used as the next SOA serial after {@code this}, at
+ * {@code useAt}.
+ * - If the UTC day-date part of {@link #at} is before the UTC day-date part of {@code useAt},
+ *   the result has {@link at} === {@code useAt}, and its {@link #sequenceNumber} is 0.
+ * - If {@link #at} has the same UTC date as {@code useAt}, the result has the same {@link at} as {@code this}
+ *   (and thus the same {@link year()}, {@link month()}, and {@link #day()}, but its {@link #sequenceNumber} is the
+ *   successor of this' {@link #sequenceNumber}.
+ * - If there is a {@code currentSerial}, and its date part represents the UTC date of {@code at},
+ *   that date part followed by a 2-digit sequence number that is the successor of the sequence number in
+ *   {@code currentSerial}
+ *
+ * @param {Date|Moment} useAt - the time at which the resulting instance would be used
+ * @return {SoaSerial} Next SOA serial, to be used at {@code useAt}, given {@code this} as the current SOA serial
+ */
+SoaSerial.prototype.next = new Contract({
+  pre: [
+    useAt => useAt instanceof Date || moment.isMoment(useAt)
+  ],
+  post: [],
+  exceptions: [
+    (useAt, err) =>
+      err instanceof Error
+      && (this.at.isAfter(useAt, "day")
+          || SoaSerial.maxSequenceNumber <= this.sequenceNumber)
+  ]
+}).implementation(function(useAt) {
+  if (SoaSerial.maxSequenceNumber <= this.sequenceNumber) {
+    throw new Error("Cannot create a next serial on useAt, "
+                    + "because this serial already has the maximum sequence number for that day");
+  }
+  if (this._at.isAfter(useAt, "day")) {
+    throw new Error("Cannot create a next serial for useAt earlier than the day in the current serial");
+  }
+
+  return new SoaSerial(useAt, this._at.isSame(useAt, "day") ? this.sequenceNumber + 1 : 0);
+});
 
 module.exports = SoaSerial;

@@ -1,5 +1,6 @@
 const SoaSerial = require("../SoaSerial");
 const moment = require("moment");
+const ConditionViolation = require("@toryt/contracts-ii/src/II/ConditionViolation");
 
 function validateInvariants(subject) {
   if (!subject.invariants) {
@@ -81,9 +82,16 @@ describe("SoaSerial", function() {
             const subject = generateSubject();
             it("should return a serial with the expected properties for \""
                + JSON.stringify(subject) + "\" with useAt === \"" + moment(useAt).toISOString() + "\"", function() {
-              const result = subject.next(useAt);
-              validateInvariants(subject);
-              validateInvariants(result);
+              try {
+                const result = subject.next(useAt);
+                validateInvariants(result);
+              }
+              catch (err) {
+                if (err instanceof ConditionViolation) {
+                  throw err;
+                }
+                validateInvariants(subject);
+              }
             });
           })
       )
