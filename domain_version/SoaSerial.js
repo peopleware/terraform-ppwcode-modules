@@ -143,7 +143,7 @@ class SoaSerial {
 
 }
 
-SoaSerial.contract =new Contract({
+SoaSerial.constructorContract = new Contract({
   pre: [
     (at, sequenceNumber) => at instanceof Date || moment.isMoment(at),
     (at, sequenceNumber) => typeof sequenceNumber === "number",
@@ -153,7 +153,7 @@ SoaSerial.contract =new Contract({
   post: [
     (at, sequenceNumber, result) =>
       result.at.format(SoaSerial.isoDateWithoutDashesPattern)
-        === moment(at).format(SoaSerial.isoDateWithoutDashesPattern),
+        === moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern),
     (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
   ],
   exceptions: [() => false]

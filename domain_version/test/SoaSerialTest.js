@@ -29,6 +29,22 @@ const someSerials = [
   "2016022934"
 ];
 
+// quick hack to test conditions
+function validateConditions(conditions, args) {
+  conditions.forEach(condition => {
+    let conditionResult;
+    try {
+      conditionResult = condition.apply(undefined, args);
+    }
+    catch (err) {
+      throw new Error("condition " + condition + " has an error: " + err);
+    }
+    if (!conditionResult) {
+      throw new Error("condition violation for: " + condition + " (" + JSON.stringify(args) + ")");
+    }
+  });
+}
+
 describe("SoaSerial", function() {
   describe("constructor", function() {
     someMoments
@@ -38,7 +54,9 @@ describe("SoaSerial", function() {
         someSequenceNumbers.forEach(function(sequenceNumber) {
           it("should return a serial with the  expected properties for at === \"" + moment(at).toISOString() + "\" "
              + "and sequenceNumber === " + sequenceNumber, function() {
+            validateConditions(SoaSerial.constructorContract.pre, [at, sequenceNumber]);
             const result = new SoaSerial(at, sequenceNumber);
+            validateConditions(SoaSerial.constructorContract.post, [at, sequenceNumber, result]);
             validateInvariants(result);
           });
         })
