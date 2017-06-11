@@ -18,7 +18,33 @@ const moment = require("moment");
 const pad = require("pad");
 const Contract = require("@toryt/contracts-ii");
 
-class SoaSerial {
+const SoaSerial = new Contract({
+  pre: [
+    (at, sequenceNumber) => at instanceof Date || moment.isMoment(at),
+    (at, sequenceNumber) => typeof sequenceNumber === "number",
+    (at, sequenceNumber) => 0 <= sequenceNumber,
+    (at, sequenceNumber) => sequenceNumber <= SoaSerial.maxSequenceNumber
+  ],
+  post: [
+    (at, sequenceNumber, result) =>
+      result.at.format(SoaSerial.isoDateWithoutDashesPattern)
+        === moment(at).format(SoaSerial.isoDateWithoutDashesPattern),
+    (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
+  ],
+  exceptions: [() => false]
+}).implementation(class SoaSerial {
+
+
+  /**
+   * Create a new {@code SoaSerial}, given the date of {@code at} and the {@sequenceNumber}.
+   *
+   * @param {Date|moment.Moment} at - the date at which this instance should be used
+   * @param {Number} sequenceNumber - the sequence number of the SOA serial within the day represented by {@code at}
+   */
+  constructor(at, sequenceNumber) {
+    this._at = moment.utc(at).startOf("day");
+    this.sequenceNumber = sequenceNumber;
+  }
 
   get invariants() {
     return moment.isMoment(this.at)
@@ -51,17 +77,6 @@ class SoaSerial {
            && JSON.parse(JSON.stringify(this)).day === this.day
            && JSON.parse(JSON.stringify(this)).sequenceNumber === this.sequenceNumber
            && JSON.parse(JSON.stringify(this)).serial === this.serial;
-  }
-
-  /**
-   * Create a new {@code SoaSerial}, given the date of {@code at} and the {@sequenceNumber}.
-   *
-   * @param {Date|moment.Moment} at - the date at which this instance should be used
-   * @param {Number} sequenceNumber - the sequence number of the SOA serial within the day represented by {@code at}
-   */
-  constructor(at, sequenceNumber) {
-    this._at = moment.utc(at).startOf("day");
-    this.sequenceNumber = sequenceNumber;
   }
 
   get at() {
@@ -141,7 +156,7 @@ class SoaSerial {
     }
   }
 
-}
+});
 
 SoaSerial.yearPattern = "YYYY";
 SoaSerial.yearRegExp = /^\d{4}$/;
