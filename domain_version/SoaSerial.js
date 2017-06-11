@@ -219,11 +219,14 @@ SoaSerial.currentSoaSerialString = new Contract({
               exception: [() => false]
             }).implementation(serial => serial),
             new Contract({
-              post: [() => false],
-              exception: [
-                (err) => true
+              pre: [
+                err => true
                 /* domain does not exist, or there is no SOA record, or there is no internet connection, or
                  no DNS server can be contacted, … */
+              ],
+              post: [() => false],
+              exception: [
+                (err1, err2) => err1 === err2
               ]
             }).implementation(err => {throw err;})
           );
@@ -264,11 +267,14 @@ SoaSerial.currentSoaSerial = new Contract({
         exception: [() => false]
       }).implementation(soaSerial => soaSerial),
       new Contract({
-        post: [() => false],
-        exception: [
-          (err) => true
+        pre: [
+          err => true
           /* domain does not exist, or there is no SOA record, or there is no internet connection, or
            no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
+        ],
+        post: [() => false],
+        exception: [
+          (err1, err2) => err1 === err2
         ]
       }).implementation(err => {throw err;})
     );
