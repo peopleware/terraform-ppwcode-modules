@@ -1,6 +1,6 @@
 const SoaSerial = require("../SoaSerial");
 const moment = require("moment");
-const ConditionViolation = require("@toryt/contracts-ii/src/II/ConditionViolation");
+const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
 
 function validateInvariants(subject) {
   if (!subject.invariants) {
@@ -87,7 +87,7 @@ describe("SoaSerial", function() {
                 validateInvariants(result);
               }
               catch (err) {
-                if (err instanceof ConditionViolation) {
+                if (err instanceof ConditionError) {
                   throw err;
                 }
                 validateInvariants(subject);
