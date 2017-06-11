@@ -18,7 +18,7 @@ const moment = require("moment");
 const pad = require("pad");
 const Contract = require("@toryt/contracts-ii");
 
-const SoaSerial = new Contract({
+const SoaSerialConstructorContract = new Contract({
   pre: [
     (at, sequenceNumber) => at instanceof Date || moment.isMoment(at),
     (at, sequenceNumber) => typeof sequenceNumber === "number",
@@ -32,19 +32,9 @@ const SoaSerial = new Contract({
     (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
   ],
   exceptions: [() => false]
-}).implementation(class SoaSerial {
+});
 
-
-  /**
-   * Create a new {@code SoaSerial}, given the date of {@code at} and the {@sequenceNumber}.
-   *
-   * @param {Date|moment.Moment} at - the date at which this instance should be used
-   * @param {Number} sequenceNumber - the sequence number of the SOA serial within the day represented by {@code at}
-   */
-  constructor(at, sequenceNumber) {
-    this._at = moment.utc(at).startOf("day");
-    this.sequenceNumber = sequenceNumber;
-  }
+class SoaSerial {
 
   get invariants() {
     return moment.isMoment(this.at)
@@ -77,6 +67,17 @@ const SoaSerial = new Contract({
            && JSON.parse(JSON.stringify(this)).day === this.day
            && JSON.parse(JSON.stringify(this)).sequenceNumber === this.sequenceNumber
            && JSON.parse(JSON.stringify(this)).serial === this.serial;
+  }
+
+  /**
+   * Create a new {@code SoaSerial}, given the date of {@code at} and the {@sequenceNumber}.
+   *
+   * @param {Date|moment.Moment} at - the date at which this instance should be used
+   * @param {Number} sequenceNumber - the sequence number of the SOA serial within the day represented by {@code at}
+   */
+  constructor(at, sequenceNumber) {
+    this._at = moment.utc(at).startOf("day");
+    this.sequenceNumber = sequenceNumber;
   }
 
   get at() {
@@ -156,7 +157,7 @@ const SoaSerial = new Contract({
     }
   }
 
-});
+}
 
 SoaSerial.yearPattern = "YYYY";
 SoaSerial.yearRegExp = /^\d{4}$/;
