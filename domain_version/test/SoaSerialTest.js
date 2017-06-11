@@ -30,6 +30,8 @@ const someSerials = [
   "2016022934"
 ];
 
+const someDomains = ["apple.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"];
+
 // quick hack to test conditions
 function validateConditions(conditions, args) {
   conditions.forEach(condition => {
@@ -97,7 +99,7 @@ describe("SoaSerial", function() {
       )
   });
   describe("currentSoaSerialString", function() {
-    ["apple.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"].forEach(function(domain) {
+    someDomains.forEach(function(domain) {
       it("should return a promise for \"" + domain + "\"", function() {
         const result = SoaSerial.currentSoaSerialString(domain);
         return result
@@ -114,6 +116,33 @@ describe("SoaSerial", function() {
           .catch(err => {
             /* domain does not exist, or there is no SOA record, or there is no internet connection, or
              no DNS server can be contacted, … */
+            console.log(err);
+            return true;
+          });
+      });
+    });
+  });
+  describe("currentSoaSerial", function() {
+    someDomains.forEach(function(domain) {
+      it("should return a promise for \"" + domain + "\"", function() {
+        const result = SoaSerial.currentSoaSerial(domain);
+        return result
+          .then(soaSerial => {
+            console.log(soaSerial);
+            if (!(soaSerial instanceof SoaSerial)) {
+              throw new Error("resolution is not an SoaSerial");
+            }
+            return SoaSerial.currentSoaSerialString(domain)
+              .then(serial => {
+                if (soaSerial.serial !== serial) {
+                  throw new Error("resolution does not represent the expected serial");
+                }
+                return true;
+              });
+          })
+          .catch(err => {
+            /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+             no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
             console.log(err);
             return true;
           });

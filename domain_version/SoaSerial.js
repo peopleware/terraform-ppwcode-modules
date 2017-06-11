@@ -209,6 +209,34 @@ SoaSerial.currentSoaSerialString = new Contract({
 });
 
 /**
+ * Return a Promise for the SoaSerial, based on the serial in the SOA record of {@code domain}, retrieved via DNS.
+ * It is a precondition that the record exists, and network is available, and that the serial is in the format
+ * YYYYMMDDnn.
+ *
+ * @param {string} domain - FQDN of the domain to get the SOA record of
+ * @return {Promise<SoaSerial>} Promise for the SoaSerial, based on the serial string in the SOA record of
+ *         {@code domain}, retrieved via DNS
+ */
+SoaSerial.currentSoaSerial = new Contract({
+  pre:       [
+    (domain) => typeof domain === "string",
+  ],
+  post:      [
+    (domain, result) => Q.isPromiseAlike(result)
+    /* Contracts does not offer support for Promises yet */
+  ],
+  exception: [() => false]
+}).implementation(function currentSoaSerial(domain) {
+  return SoaSerial.currentSoaSerialString(domain)
+    .then(serialString => {
+      if (!SoaSerial.serialRegExp.test(serialString)) {
+        throw new Error("The serial of the domain is not in the form YYYYMMDDnn");
+      }
+      return SoaSerial.parse(serialString);
+    });
+});
+
+/**
  * Return a new instance of {@link SoaSerial}, that can be used as the next SOA serial after {@code this}, at
  * {@code useAt}.
  * - If the UTC day-date part of {@link #at} is before the UTC day-date part of {@code useAt},
