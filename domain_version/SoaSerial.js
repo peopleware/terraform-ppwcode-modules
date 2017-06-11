@@ -16,6 +16,7 @@
 
 const moment = require("moment");
 const pad = require("pad");
+const Contract = require("@toryt/contracts-ii");
 
 class SoaSerial {
 
@@ -60,18 +61,6 @@ class SoaSerial {
   constructor(at, sequenceNumber) {
     this._at = moment.utc(at).startOf("day");
     this.sequenceNumber = sequenceNumber;
-  }
-
-  /**
-   * Construct an {@link SoaSerial} instance from the serial string as expected in a DNS SOA record.
-   *
-   * @param {string} serial - string in the format YYYYMMDDnn, expected of an SOA serial
-   * @return {object} object with the parts of the serial ({@code year}, {@code month}, {@code day},
-   *                  {@code sequenceNumber}) as properties of type {@code string}
-   */
-  static parse(serial) {
-    const parts = SoaSerial.serialRegExp.exec(serial);
-    return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]));
   }
 
   get at() {
@@ -139,6 +128,7 @@ class SoaSerial {
     return new SoaSerial(useAt, this._at.isSame(useAt, "day") ? this.sequenceNumber + 1 : 0);
   }
 
+  //noinspection JSUnusedGlobalSymbols
   toJSON() {
     return {
       at:             this.at,
@@ -159,12 +149,43 @@ SoaSerial.monthRegExp = /^\d{2}$/;
 SoaSerial.dayPattern = "DD";
 SoaSerial.dayRegExp = /^\d{2}$/;
 SoaSerial.isoDateWithoutDashesPattern = SoaSerial.yearPattern + SoaSerial.monthPattern + SoaSerial.dayPattern;
-SoaSerial.serialRegExp = /(\d{8})(\d{2})/;
+SoaSerial.serialRegExp = /^(\d{8})(\d{2})$/;
+SoaSerial.detailedSerialRegExp = /^(\d{4})(\d{2})(\d{2})(\d{2})$/;
 //noinspection MagicNumberJS
 SoaSerial.maxSequenceNumber = 99;
 //noinspection MagicNumberJS
 SoaSerial.maxMonth = 12;
 //noinspection MagicNumberJS
 SoaSerial.maxDayInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+/**
+ * Construct an {@link SoaSerial} instance from the serial string as expected in a DNS SOA record.
+ *
+ * @param {string} serial - string in the format YYYYMMDDnn, expected of an SOA serial
+ * @return {object} object with the parts of the serial ({@code year}, {@code month}, {@code day},
+ *                  {@code sequenceNumber}) as properties of type {@code string}
+ */
+SoaSerial.parse = new Contract({
+    pre: [
+      (serial) => typeof serial === "string",
+      (serial) => SoaSerial.detailedSerialRegExp.test(serial),
+      (serial, result) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]),
+      (serial, result) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]) <= SoaSerial.maxMonth,
+      (serial, result) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3]),
+      (serial, result) =>
+        Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3])
+          <= SoaSerial.maxDayInMonth[Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2])],
+      (serial, result) => 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]),
+      (serial, result) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]) <= SoaSerial.maxSequenceNumber
+    ],
+    post: [
+      (serial, result) => result instanceof SoaSerial,
+      (serial, result) => result.serial === serial
+    ],
+    exceptions: [() => false]
+  }).implementation(function(serial) {
+    const parts = SoaSerial.serialRegExp.exec(serial);
+    return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]));
+  });
 
 module.exports = SoaSerial;
