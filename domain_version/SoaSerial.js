@@ -18,22 +18,6 @@ const moment = require("moment");
 const pad = require("pad");
 const Contract = require("@toryt/contracts-ii");
 
-const SoaSerialConstructorContract = new Contract({
-  pre: [
-    (at, sequenceNumber) => at instanceof Date || moment.isMoment(at),
-    (at, sequenceNumber) => typeof sequenceNumber === "number",
-    (at, sequenceNumber) => 0 <= sequenceNumber,
-    (at, sequenceNumber) => sequenceNumber <= SoaSerial.maxSequenceNumber
-  ],
-  post: [
-    (at, sequenceNumber, result) =>
-      result.at.format(SoaSerial.isoDateWithoutDashesPattern)
-        === moment(at).format(SoaSerial.isoDateWithoutDashesPattern),
-    (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
-  ],
-  exceptions: [() => false]
-});
-
 class SoaSerial {
 
   get invariants() {
@@ -158,6 +142,22 @@ class SoaSerial {
   }
 
 }
+
+SoaSerial.contract =new Contract({
+  pre: [
+    (at, sequenceNumber) => at instanceof Date || moment.isMoment(at),
+    (at, sequenceNumber) => typeof sequenceNumber === "number",
+    (at, sequenceNumber) => 0 <= sequenceNumber,
+    (at, sequenceNumber) => sequenceNumber <= SoaSerial.maxSequenceNumber
+  ],
+  post: [
+    (at, sequenceNumber, result) =>
+      result.at.format(SoaSerial.isoDateWithoutDashesPattern)
+        === moment(at).format(SoaSerial.isoDateWithoutDashesPattern),
+    (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
+  ],
+  exceptions: [() => false]
+});
 
 SoaSerial.yearPattern = "YYYY";
 SoaSerial.yearRegExp = /^\d{4}$/;
