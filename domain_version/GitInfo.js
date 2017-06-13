@@ -17,6 +17,59 @@
 const Contract = require("@toryt/contracts-ii");
 
 /**
+ * Holder for consolidated information about a git remote
+ */
+class Remote {
+
+  get invariants() {
+    return typeof this.name === "string"
+           && !!this.name
+           && typeof this.url === "string"
+           && !!this.url;
+  }
+
+  /**
+   * Create a new Remote instance with the given properties.
+   *
+   * @param {String} name - name of the remote
+   * @param {String} url - url of the remote
+   */
+  constructor(name, url) {
+    this._name = name;
+    this._url = url;
+  }
+
+  /**
+   * Name of the remote.
+   */
+  get name() {
+    return this._name;
+  }
+
+  /**
+   * Url of the remote.
+   */
+  get url() {
+    return this._url;
+  }
+
+}
+
+Remote.constructorContract = new Contract({
+  pre: [
+    (name, url) => typeof name === "string",
+    (name, url) => !!name,
+    (name, url) => typeof url === "string",
+    (name, url) => !!url
+  ],
+  post: [
+    (name, url, result) => result.name === name,
+    (name, url, result) => result.url === url
+  ],
+  exception: [() => false]
+});
+
+/**
  * Holder for consolidated information about the git repository at {@code #path}.
  */
 class GitInfo {
@@ -86,5 +139,7 @@ GitInfo.constructorContract = new Contract({
 });
 
 GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
+
+GitInfo.Remote = Remote;
 
 module.exports = GitInfo;
