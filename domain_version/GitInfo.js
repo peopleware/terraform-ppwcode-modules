@@ -57,6 +57,8 @@ class GitInfo {
 
   /**
    * Path to the git repository represented by this.
+   *
+   * @return {String}
    */
   get path() {
     return this._path;
@@ -64,6 +66,8 @@ class GitInfo {
 
   /**
    * Sha of the current commit of the checked-out repository.
+   *
+   * @return {String}
    */
   get sha() {
     return this._sha;
@@ -71,6 +75,8 @@ class GitInfo {
 
   /**
    * Name of the current checked-out branch. Might be {@code undefined}.
+   *
+   * @return {String?}
    */
   get branch() {
     return this._branch;
@@ -79,6 +85,8 @@ class GitInfo {
   /**
    * Url of the remote with name {@code origin} of the current checked-out branch.
    * Might be {@code undefined}.
+   *
+   * @return {String?}
    */
   get originUrl() {
     return this._originUrl;
