@@ -12,11 +12,11 @@
  */
 
 resource "aws_s3_bucket_object" "HTPASSWD" {
-  bucket = "${aws_s3_bucket.BUCKET.bucket}"
-  key = ".htpasswd"
-  source = "${path.root}/resources/${aws_s3_bucket.BUCKET.bucket}/htpasswd"
-  content_type = "text/plain"
-  cache_control = "no-cache"
+  bucket           = "${aws_s3_bucket.BUCKET.bucket}"
+  key              = ".htpasswd"
+  source           = "${path.root}/resources/${aws_s3_bucket.BUCKET.bucket}/htpasswd"
+  content_type     = "text/plain"
+  cache_control    = "no-cache"
   content_language = "en-US"
-  etag = "${md5(file("${path.root}/resources/${aws_s3_bucket.BUCKET.bucket}/htpasswd"))}"
+  etag             = "${md5(file("${path.root}/resources/${aws_s3_bucket.BUCKET.bucket}/htpasswd"))}"
 }

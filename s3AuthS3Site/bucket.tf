@@ -11,7 +11,7 @@
 
 resource "aws_s3_bucket" "BUCKET" {
   bucket = "${var.short-name}.${var.domain}"
-  acl = "private"
+  acl    = "private"
 
   versioning {
     enabled = false

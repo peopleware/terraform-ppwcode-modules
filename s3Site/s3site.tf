@@ -22,13 +22,13 @@ variable "zone_id" {
 }
 
 variable "index_document" {
-  type = "string"
+  type    = "string"
   default = "index.html"
 }
 
 resource "aws_s3_bucket" "BUCKET" {
   bucket = "${var.short-name}.${var.domain}"
-  acl = "public-read"
+  acl    = "public-read"
 
   website {
     index_document = "${var.index_document}"
@@ -62,12 +62,12 @@ EOT
 
 resource "aws_route53_record" "DOMAIN_NAME" {
   zone_id = "${var.zone_id}"
-  name = "${aws_s3_bucket.BUCKET.bucket}"
-  type = "A"
+  name    = "${aws_s3_bucket.BUCKET.bucket}"
+  type    = "A"
 
   alias {
-    name = "${aws_s3_bucket.BUCKET.website_domain}"
-    zone_id = "${aws_s3_bucket.BUCKET.hosted_zone_id}"
+    name                   = "${aws_s3_bucket.BUCKET.website_domain}"
+    zone_id                = "${aws_s3_bucket.BUCKET.hosted_zone_id}"
     evaluate_target_health = true
   }
 }

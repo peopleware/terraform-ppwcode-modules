@@ -36,11 +36,11 @@ variable "RESOURCE_ROOT" {
 }
 
 resource "aws_s3_bucket_object" "OBJECT" {
-  bucket = "${var.bucket}"
-  key = "${var.key}"
-  source = "${path.root}/${var.RESOURCE_ROOT}/${var.bucket}/${var.key}"
-  content_type = "${var.content-type}"
-  cache_control = "${var.cache-control}"
+  bucket           = "${var.bucket}"
+  key              = "${var.key}"
+  source           = "${path.root}/${var.RESOURCE_ROOT}/${var.bucket}/${var.key}"
+  content_type     = "${var.content-type}"
+  cache_control    = "${var.cache-control}"
   content_language = "${var.content-language}"
-  etag = "${md5(file("${path.root}/${var.RESOURCE_ROOT}/${var.bucket}/${var.key}"))}"
+  etag             = "${md5(file("${path.root}/${var.RESOURCE_ROOT}/${var.bucket}/${var.key}"))}"
 }
