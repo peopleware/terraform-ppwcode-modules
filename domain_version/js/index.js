@@ -193,24 +193,27 @@ program
   });
 
 program
-  .command("next-meta [domain]")
+  .command("next-meta [domain] [path]")
   .alias("nm")
-  .description("The next meta-information object, now, for the remote with name '" + remoteName
-               + "' of the repo we are currently in, as JSON")
-  .action(function(domain) {
-    let repoRetrieved = GitInfo.highestGitDirPath(process.cwd()).then(getRepo);
-    //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
-    return Q.object({
-      serial: SoaSerial.nextSoaSerial(domain, new Date())
-                .then((soaSerial) => soaSerial.serial),
-      sha:    repoRetrieved
-                .then((repository) => repository.getHeadCommit())
-                .then((/*Commit*/ head) => head.sha()),
-      repo:   repoRetrieved
-                .then((repository) => repository.getRemote(remoteName))
-                .then((/*Remote*/ remote) => remote.url())
+  .description("The next meta-information object, now, for the highest git working copy and repository above [path], "
+               + "as JSON. cwd is the default for [path].")
+  .action(function(domain, path) {
+    Q.object({
+      soaSerial: SoaSerial.nextSoaSerial(domain, new Date()), // TODO serial already >> 99, no internet, …
+      gitInfo: GitInfo.createForHighestGitDir(path || process.cwd())
     })
-    .done((meta) => console.log("%j", meta));
+    .then(result => Object.assign({serial: result.soaSerial.serial}, result.gitInfo)) // MUDO new meta
+    .done(
+      (meta) => console.log("%j", meta),
+      (err) => {
+        if (err.message === GitInfo.noGitDirectoryMsg) {
+          console.error("No git directory found above " + path);
+          process.exitCode = 1;
+          return false;
+        }
+        throw err;
+      }
+    );
   });
 
 program.parse(process.argv);
