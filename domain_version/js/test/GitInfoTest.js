@@ -153,7 +153,7 @@ describe("GitInfo", function() {
             return true;
           },
           err => {
-            if (err instanceof ConditionError) {
+            if (err instanceof ConditionError || err instanceof ReferenceError) {
               throw err;
             }
             console.log("create failed for %s: %s", dirPath, err);

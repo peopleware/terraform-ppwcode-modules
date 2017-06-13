@@ -289,7 +289,7 @@ GitInfo.create = new Contract({
           .then(remote => remote.url()),
         changes: repository
           .getStatus()
-          .then(statuses =>  new Set(statuses.filter(isNotClean).map(status => status.path())))
+          .then(statuses =>  new Set(statuses.filter(status => GitInfo.isNotClean(status)).map(status => status.path())))
       })
       .then(params => new GitInfo(
         gitDirPath,
