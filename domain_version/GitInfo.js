@@ -124,6 +124,19 @@ class GitInfo {
   get isPrecious() {
     return !this.branch || GitInfo.preciousBranchNameFragments.some(fragment => 0 <= this.branch.indexOf(fragment));
   }
+
+  toJSON() {
+    return {
+      path: this.path,
+      sha: this.sha,
+      branch: this.branch,
+      originUrl: this.originUrl,
+      changes: Array.from(this.changes),
+      isClean: this.isClean,
+      isPrecious: this.isPrecious
+    };
+  }
+
 }
 
 GitInfo.constructorContract = new Contract({
