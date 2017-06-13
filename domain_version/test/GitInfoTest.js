@@ -22,6 +22,11 @@ const someBranchNames = ["", null, undefined, "simple_branch-name", "nested/bran
 //noinspection SpellCheckingInspection
 const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
 const someOriginUrls = ["", null, undefined, "git@GitHub:peopleware/terraform-ppwcode-modules.git"];
+const someChanges = [
+  new Set(),
+  new Set(["a/path/to/a/file"]),
+  new Set(["a/path/to/a/file", "a/path/to/another/file", "a/path/to/yet/another/file"])
+];
 
 describe("GitInfo", function() {
   describe("constructor", function() {
@@ -29,16 +34,22 @@ describe("GitInfo", function() {
     someBranchNames.forEach(branch => {
       const sha = aSha;
       someOriginUrls.forEach(originUrl => {
-      it("should return a GitInfo with the  expected properties for "
-        + "path === \"" + path + "\" "
-        + "sha === \"" + sha + "\" "
-        + "branch === \"" + branch + "\" "
-        + "originUrl === \"" + originUrl + "\" ",
-        function() {
-          util.validateConditions(GitInfo.constructorContract.pre, [path, sha, branch, originUrl]);
-          const result = new GitInfo(path, sha, branch, originUrl);
-          util.validateConditions(GitInfo.constructorContract.post, [path, sha, branch, originUrl, result]);
-          util.validateInvariants(result);
+        someChanges.forEach(changes => {
+          it("should return a GitInfo with the  expected properties for "
+            + "path === \"" + path + "\", "
+            + "sha === \"" + sha + "\", "
+            + "branch === \"" + branch + "\", "
+            + "originUrl === \"" + originUrl + "\", "
+            + "changes: " + changes.size,
+            function() {
+              util.validateConditions(GitInfo.constructorContract.pre, [path, sha, branch, originUrl, changes]);
+              const result = new GitInfo(path, sha, branch, originUrl, changes);
+              util.validateConditions(
+                GitInfo.constructorContract.post,
+                [path, sha, branch, originUrl, changes, result]
+              );
+              util.validateInvariants(result);
+            });
         });
       });
     });

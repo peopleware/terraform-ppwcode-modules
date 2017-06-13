@@ -30,7 +30,9 @@ class GitInfo {
       && typeof this.sha === "string"
       && GitInfo.shaRegExp.test(this.sha)
       && this.branch === undefined || (typeof this.branch === "string" && !!this.branch)
-      && this.originUrl === undefined || (typeof this.originUrl === "string" && !!this.originUrl);
+      && this.originUrl === undefined || (typeof this.originUrl === "string" && !!this.originUrl)
+      && this.changes instanceof Set
+      && Array.from(this.changes).every(path => typeof path === "string" && !!path);
   }
 
   /**
@@ -41,13 +43,16 @@ class GitInfo {
    * @param {String} sha - sha of the current commit of the checked-out repository
    * @param {String?} branch - name of the current checked-out branch; might be {@code undefined}
    * @param {String?} originUrl - url of the remote with name {@code origin} of the current checked-out branch;
-   *                        might be {@code undefined}
+   *                              might be {@code undefined}
+   * @param {Set<String>} changes - set of paths of files that are not committed in the working copy
+   *                                referred to by {@code path}; files are deleted, new, or modified
    */
-  constructor(path, sha, branch, originUrl) {
+  constructor(path, sha, branch, originUrl, changes) {
     this._path = path;
     this._sha = sha;
     this._branch = branch || undefined;
     this._originUrl = originUrl || undefined;
+    this._changes = new Set(changes);
   }
 
   /**
@@ -78,24 +83,38 @@ class GitInfo {
   get originUrl() {
     return this._originUrl;
   }
+
+  /**
+   * Set of paths of files that are not committed in the working copy referred to by {@code path}.
+   * Files are deleted, new, or modified.
+   *
+   * @return {Set<String>}
+   */
+  get changes() {
+    return new Set(this._changes);
+  }
 }
 
 GitInfo.constructorContract = new Contract({
   pre: [
-    (path, sha, branch, originUrl) => typeof path === "string",
-    (path, sha, branch, originUrl) => !!path,
-    (path, sha, branch, originUrl) => typeof sha === "string",
-    (path, sha, branch, originUrl) => GitInfo.shaRegExp.test(sha),
-    (path, sha, branch, originUrl) => !branch || typeof branch === "string",
-    (path, sha, branch, originUrl) => !originUrl || typeof originUrl === "string"
+    (path, sha, branch, originUrl, changes) => typeof path === "string",
+    (path, sha, branch, originUrl, changes) => !!path,
+    (path, sha, branch, originUrl, changes) => typeof sha === "string",
+    (path, sha, branch, originUrl, changes) => GitInfo.shaRegExp.test(sha),
+    (path, sha, branch, originUrl, changes) => !branch || typeof branch === "string",
+    (path, sha, branch, originUrl, changes) => !originUrl || typeof originUrl === "string",
+    (path, sha, branch, originUrl, changes) => changes instanceof Set,
+    (path, sha, branch, originUrl, changes) => Array.from(changes).every(path => typeof path === "string" && !!path)
   ],
   post: [
-    (path, sha, branch, originUrl, result) => result.path === path,
-    (path, sha, branch, originUrl, result) => result.sha === sha,
-    (path, sha, branch, originUrl, result) => !!branch || result.branch === undefined,
-    (path, sha, branch, originUrl, result) => !branch || result.branch === branch,
-    (path, sha, branch, originUrl, result) => !!originUrl || result.originUrl === undefined,
-    (path, sha, branch, originUrl, result) => !originUrl || result.originUrl === originUrl
+    (path, sha, branch, originUrl, changes, result) => result.path === path,
+    (path, sha, branch, originUrl, changes, result) => result.sha === sha,
+    (path, sha, branch, originUrl, changes, result) => !!branch || result.branch === undefined,
+    (path, sha, branch, originUrl, changes, result) => !branch || result.branch === branch,
+    (path, sha, branch, originUrl, changes, result) => !!originUrl || result.originUrl === undefined,
+    (path, sha, branch, originUrl, changes, result) => !originUrl || result.originUrl === originUrl,
+    (path, sha, branch, originUrl, changes, result) => Array.from(changes).every(path => result.changes.has(path)),
+    (path, sha, branch, originUrl, changes, result) => Array.from(result.changes).every(path => changes.has(path))
   ],
   exception: [() => false]
 });
