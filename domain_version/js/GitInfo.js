@@ -332,7 +332,16 @@ GitInfo.create = new Contract({
                     name: branchName,
                     originSha: repository
                       .getBranchCommit(GitInfo.gitOriginRefsPrefix + branchName)
-                      .then(head => head.sha())
+                      .then(
+                        head => head.sha(),
+                        err => {
+                          if (err && err.message && 0 <= err.message.indexOf("no reference found for shorthand")) {
+                            // the branch does not exist in the remote, so certainly not pushed
+                            return undefined;
+                          }
+                          throw err;
+                        }
+                      )
                   })),
         originUrl: repository
           .getRemote(GitInfo.originRemoteName)
