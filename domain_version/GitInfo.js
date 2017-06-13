@@ -154,7 +154,7 @@ GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
 GitInfo.preciousBranchNameFragments = ["prod", "staging", "stage", "test"];
 
 /**
- * promise for the path of the directory of the highest git working copy {@code }path} is in. This is the top most
+ * Promise for the path of the directory of the highest git working copy {@code path} is in. This is the top most
  + ancestor directory of {@code path} that contains a {@code .git} folder.
  */
 GitInfo.highestGitDirPath = new Contract({
