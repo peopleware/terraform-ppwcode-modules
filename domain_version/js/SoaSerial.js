@@ -159,6 +159,43 @@ SoaSerial.maxSequenceNumber = 99;
 //noinspection MagicNumberJS
 SoaSerial.maxMonth = 12;
 
+SoaSerial.isASerial = new Contract({
+  post: [
+    (candidate, result) => typeof result === "boolean",
+    (candidate, result) => !result || typeof candidate === "string",
+    (candidate, result) => !result || SoaSerial.detailedSerialRegExp.test(candidate),
+    (candidate, result) => !result || 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[2]),
+    (candidate, result) =>
+    !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[2]) <= SoaSerial.maxMonth,
+    (candidate, result) => !result || 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[3]),
+    (candidate, result) =>
+      !result
+        || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[3])
+          <= moment(
+            SoaSerial.detailedSerialRegExp.exec(candidate)[1] + SoaSerial.detailedSerialRegExp.exec(candidate)[2],
+            SoaSerial.yearPattern + SoaSerial.monthPattern
+          ).daysInMonth(),
+    (candidate, result) => !result || 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[4]),
+    (candidate, result) =>
+      !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[4]) <= SoaSerial.maxSequenceNumber
+  ],
+  exception: [() => false]
+}).implementation(function(candidate) {
+  if (typeof candidate !== "string" || !SoaSerial.detailedSerialRegExp.test(candidate)) {
+    return false;
+  }
+  const parts = SoaSerial.detailedSerialRegExp.exec(candidate);
+  const month = Number.parseInt(parts[2]);
+  const day = Number.parseInt(parts[3]);
+  const sequenceNumber = Number.parseInt(parts[4]);
+  return 1 <= month
+    && month <= SoaSerial.maxMonth
+    && 1 <= day
+    && day <= moment(parts[1] + parts[2], SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth()
+    && 0 <= sequenceNumber
+    && sequenceNumber <= SoaSerial.maxSequenceNumber;
+});
+
 /**
  * Construct an {@link SoaSerial} instance from the serial string as expected in a DNS SOA record.
  *
@@ -168,19 +205,7 @@ SoaSerial.maxMonth = 12;
  */
 SoaSerial.parse = new Contract({
     pre: [
-      (serial) => typeof serial === "string",
-      (serial) => SoaSerial.detailedSerialRegExp.test(serial),
-      (serial) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]),
-      (serial) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[2]) <= SoaSerial.maxMonth,
-      (serial) => 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3]),
-      (serial) =>
-        Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[3])
-          <= moment(
-               SoaSerial.detailedSerialRegExp.exec(serial)[1] + SoaSerial.detailedSerialRegExp.exec(serial)[2],
-               SoaSerial.yearPattern + SoaSerial.monthPattern
-             ).daysInMonth(),
-      (serial) => 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]),
-      (serial) => Number.parseInt(SoaSerial.detailedSerialRegExp.exec(serial)[4]) <= SoaSerial.maxSequenceNumber
+      (serial) => SoaSerial.isASerial(serial)
     ],
     post: [
       (serial, result) => result instanceof SoaSerial,

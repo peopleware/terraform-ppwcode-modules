@@ -41,6 +41,21 @@ const someSerials = [
   "2016022934"
 ];
 
+const notSomeSerials = [
+  0,
+  false,
+  null,
+  "",
+  "427423825",
+  "fs5252mj2",
+  {},
+  [],
+  new Date(),
+  function() {},
+  "2017131134",
+  "2017063234"
+];
+
 const someDomains = ["apple.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"];
 
 describe("SoaSerial", function() {
@@ -59,6 +74,14 @@ describe("SoaSerial", function() {
           });
         })
       );
+  });
+  describe("isASerial", function() {
+    someSerials.concat(notSomeSerials).forEach(function(candidate) {
+      it("should return the correct boolean for \"" + candidate + "\"", function() {
+        const result = SoaSerial.isASerial(candidate);
+        console.log("isASerial(%s): %s", candidate, result);
+      });
+    });
   });
   describe("parse", function() {
     someSerials.forEach(function(serial) {
