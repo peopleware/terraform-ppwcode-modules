@@ -27,6 +27,8 @@ class GitInfo {
       /* We will not add an invariant that this path exists. 1) That can only be determined
          asynchronously, and we don't want that for invariants(). 2) The disk can be changed after
          creation of this object. */
+      && typeof this.sha === "string"
+      && GitInfo.shaRegExp.test(this.sha)
       && this.branch === undefined || (typeof this.branch === "string" && !!this.branch);
   }
 
@@ -35,10 +37,12 @@ class GitInfo {
    *
    * @param {String} path - path to the git repository represented by the new instance;
    *                        should be a path to a directory that contains a {@code .git/} folder
+   * @param {String} sha - sha of the current commit of the checked-out repository
    * @param {String?} branch - name of the current checked-out branch; might be {@code undefined}
    */
-  constructor(path, branch) {
+  constructor(path, sha, branch) {
     this._path = path;
+    this._sha = sha;
     this._branch = branch || undefined;
   }
 
@@ -47,6 +51,13 @@ class GitInfo {
    */
   get path() {
     return this._path;
+  }
+
+  /**
+   * Sha of the current commit of the checked-out repository.
+   */
+  get sha() {
+    return this._sha;
   }
 
   /**
@@ -59,16 +70,21 @@ class GitInfo {
 
 GitInfo.constructorContract = new Contract({
   pre: [
-    (path, branch) => typeof path === "string",
-    (path, branch) => !!path,
-    (path, branch) => !branch || typeof branch === "string"
+    (path, sha, branch) => typeof path === "string",
+    (path, sha, branch) => !!path,
+    (path, sha, branch) => typeof sha === "string",
+    (path, sha, branch) => GitInfo.shaRegExp.test(sha),
+    (path, sha, branch) => !branch || typeof branch === "string"
   ],
   post: [
-    (path, branch, result) => result.path === path,
-    (path, branch, result) => !!branch || result.branch === undefined,
-    (path, branch, result) => !branch || result.branch === branch
+    (path, sha, branch, result) => result.path === path,
+    (path, sha, branch, result) => result.sha === sha,
+    (path, sha, branch, result) => !!branch || result.branch === undefined,
+    (path, sha, branch, result) => !branch || result.branch === branch
   ],
   exception: [() => false]
 });
+
+GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
 
 module.exports = GitInfo;

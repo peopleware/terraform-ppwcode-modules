@@ -19,18 +19,22 @@ const util = require("./_util");
 
 const thisGitRepoRoot = "../../";
 const someBranchNames = ["", null, undefined, "simple_branch-name", "nested/branch/name"];
+//noinspection SpellCheckingInspection
+const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
 
 describe("GitInfo", function() {
   describe("constructor", function() {
     const path = thisGitRepoRoot;
-    someBranchNames.forEach(branch =>{
+    someBranchNames.forEach(branch => {
+      const sha = aSha;
       it("should return a GitInfo with the  expected properties for "
-         + "path === \"" + path + "\""
-         + "branch === \"" + branch + "\"",
-         function() {
-          util.validateConditions(GitInfo.constructorContract.pre, [path, branch]);
-          const result = new GitInfo(path, branch);
-          util.validateConditions(GitInfo.constructorContract.post, [path, branch, result]);
+        + "path === \"" + path + "\""
+        + "sha === \"" + sha + "\""
+        + "branch === \"" + branch + "\"",
+        function() {
+          util.validateConditions(GitInfo.constructorContract.pre, [path, sha, branch]);
+          const result = new GitInfo(path, sha, branch);
+          util.validateConditions(GitInfo.constructorContract.post, [path, sha, branch, result]);
           util.validateInvariants(result);
         });
     });
