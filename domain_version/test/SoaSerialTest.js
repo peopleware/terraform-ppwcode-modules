@@ -1,4 +1,5 @@
 const SoaSerial = require("../SoaSerial");
+const validateConditions = require("./_util").validateConditions;
 const moment = require("moment");
 const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
 
@@ -31,22 +32,6 @@ const someSerials = [
 ];
 
 const someDomains = ["apple.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"];
-
-// quick hack to test conditions
-function validateConditions(conditions, args) {
-  conditions.forEach(condition => {
-    let conditionResult;
-    try {
-      conditionResult = condition.apply(undefined, args);
-    }
-    catch (err) {
-      throw new Error("condition " + condition + " has an error: " + err);
-    }
-    if (!conditionResult) {
-      throw new Error("condition violation for: " + condition + " (" + JSON.stringify(args) + ")");
-    }
-  });
-}
 
 describe("SoaSerial", function() {
   describe("constructor", function() {
