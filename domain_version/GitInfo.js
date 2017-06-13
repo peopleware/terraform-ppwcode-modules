@@ -27,7 +27,7 @@ class GitInfo {
       /* We will not add an invariant that this path exists. 1) That can only be determined
          asynchronously, and we don't want that for invariants(). 2) The disk can be changed after
          creation of this object. */
-      ;
+      && this.branch === undefined || (typeof this.branch === "string" && !!this.branch);
   }
 
   /**
@@ -35,9 +35,11 @@ class GitInfo {
    *
    * @param {String} path - path to the git repository represented by the new instance;
    *                        should be a path to a directory that contains a {@code .git/} folder
+   * @param {String?} branch - name of the current checked-out branch; might be {@code undefined}
    */
-  constructor(path) {
+  constructor(path, branch) {
     this._path = path;
+    this._branch = branch || undefined;
   }
 
   /**
@@ -47,15 +49,24 @@ class GitInfo {
     return this._path;
   }
 
+  /**
+   * Name of the current checked-out branch. Might be {@code undefined}.
+   */
+  get branch() {
+    return this._branch;
+  }
 }
 
 GitInfo.constructorContract = new Contract({
   pre: [
-    (path) => typeof path === "string",
-    (path) => !!path
+    (path, branch) => typeof path === "string",
+    (path, branch) => !!path,
+    (path, branch) => !branch || typeof branch === "string"
   ],
   post: [
-    (path, result) => result.path === path
+    (path, branch, result) => result.path === path,
+    (path, branch, result) => !!branch || result.branch === undefined,
+    (path, branch, result) => !branch || result.branch === branch
   ],
   exception: [() => false]
 });

@@ -18,15 +18,21 @@ const GitInfo = require("../GitInfo");
 const util = require("./_util");
 
 const thisGitRepoRoot = "../../";
+const someBranchNames = ["", null, undefined, "simple_branch-name", "nested/branch/name"];
 
 describe("GitInfo", function() {
   describe("constructor", function() {
     const path = thisGitRepoRoot;
-    it("should return a GitInfo with the  expected properties for path === \"" + thisGitRepoRoot + "\"", function() {
-      util.validateConditions(GitInfo.constructorContract.pre, [path]);
-      const result = new GitInfo(path);
-      util.validateConditions(GitInfo.constructorContract.post, [path, result]);
-      util.validateInvariants(result);
+    someBranchNames.forEach(branch =>{
+      it("should return a GitInfo with the  expected properties for "
+         + "path === \"" + path + "\""
+         + "branch === \"" + branch + "\"",
+         function() {
+          util.validateConditions(GitInfo.constructorContract.pre, [path, branch]);
+          const result = new GitInfo(path, branch);
+          util.validateConditions(GitInfo.constructorContract.post, [path, branch, result]);
+          util.validateInvariants(result);
+        });
     });
   });
 });
