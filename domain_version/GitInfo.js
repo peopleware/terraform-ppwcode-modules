@@ -35,7 +35,9 @@ class GitInfo {
       && this.branch === undefined || (typeof this.branch === "string" && !!this.branch)
       && this.originUrl === undefined || (typeof this.originUrl === "string" && !!this.originUrl)
       && this.changes instanceof Set
-      && Array.from(this.changes).every(path => typeof path === "string" && !!path);
+      && Array.from(this.changes).every(path => typeof path === "string" && !!path)
+      && typeof this.isClean === "boolean"
+      && this.isClean === (this.changes.size === 0);
   }
 
   /**
@@ -103,6 +105,13 @@ class GitInfo {
    */
   get changes() {
     return new Set(this._changes);
+  }
+
+  /**
+   * This represents a clean git repo working copy.
+   */
+  get isClean() {
+    return this.changes.size === 0;
   }
 }
 
