@@ -23,6 +23,7 @@ const git = require("nodegit");
 const path = require("path");
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
+const GitInfo = require("./GitInfo");
 const fs = require("fs");
 const packageVersion = require("pkginfo")(module, "version");
 
@@ -91,16 +92,6 @@ function isClean(repoPath) {
   return getRepo(repoPath)
     .then((repository) => repository.getStatus())
     .then((statuses) => !statuses.some(isNotClean));
-}
-
-function highestGitDir(dirPath) {
-  const parts = dirPath.split(path.sep);
-  const dirs = parts.map((part, index) => parts.slice(0, index + 1).join(path.sep));
-  return Q.all(dirs.map((dir) =>
-                          Q.nfcall(fs.access, path.format({dir: dir, name: ".git"}), "rw")
-                           .then(() => dir)
-                           .catch(() => undefined)))
-          .then((gitDirs) => gitDirs.find((dir) => !!dir));
 }
 
 /**
@@ -187,7 +178,7 @@ program
   .description("Show the path of the top directory of the highest git working copy [path] is in. This is the top most "
                + "ancestor directory that contains a .git folder. cwd is the default for [path].")
   .action(function(p) {
-    highestGitDir(p || process.cwd())
+    GitInfo.highestGitDirPath(p || process.cwd())
       .done((gitPath) => console.log(gitPath));
   });
 
@@ -196,7 +187,7 @@ program
   .alias("sha")
   .description("The SHA of the HEAD commit of the repo we are currently in.")
   .action(function() {
-    highestGitDir(process.cwd())
+    GitInfo.highestGitDirPath(process.cwd())
       .then(getRepoHead)
       .done((head) => console.log(head.sha()));
   });
@@ -207,7 +198,7 @@ program
   .description("The URL of the remote with name '" + remoteName + "' of the repo we are currently in.")
   .action(function() {
     //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
-    highestGitDir(process.cwd())
+    GitInfo.highestGitDirPath(process.cwd())
       .then(getRepo)
       .then((repository) => repository.getRemote(remoteName))
       .done((remote) => console.log(remote.url()));
@@ -219,7 +210,7 @@ program
   .description("List unclean files")
   .action(function() {
     //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
-    highestGitDir(process.cwd())
+    GitInfo.highestGitDirPath(process.cwd())
       .then(getRepo)
       .then((repository) => repository.getStatus())
       .done(
@@ -242,7 +233,7 @@ program
   .alias("c")
   .description("Exit 0 when the working copy is clean, exit 1 when it is not.")
   .action(function() {
-    highestGitDir(process.cwd())
+    GitInfo.highestGitDirPath(process.cwd())
       .then(isClean)
       .done((clean) => {
         process.exitCode = clean ? 0 : 1;
@@ -263,7 +254,7 @@ program
     const tagName = "build/" + build;
     const message = "tag build " + build;
     //noinspection JSUnresolvedVariable
-    highestGitDir(process.cwd())
+    GitInfo.highestGitDirPath(process.cwd())
       .then(getRepo)
       .then((repository) =>
               repository.getHeadCommit()
@@ -295,7 +286,7 @@ program
   .description("The next meta-information object, now, for the remote with name '" + remoteName
                + "' of the repo we are currently in, as JSON")
   .action(function(domain) {
-    let repoRetrieved = highestGitDir(process.cwd()).then(getRepo);
+    let repoRetrieved = GitInfo.highestGitDirPath(process.cwd()).then(getRepo);
     //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
     return Q.object({
       serial: SoaSerial.nextSoaSerial(domain, moment.utc())
