@@ -121,7 +121,7 @@ class SoaSerial {
       day:            this.day,
       sequenceNumber: this.sequenceNumber,
       serial:         this.serial
-    }
+    };
   }
 
 }
