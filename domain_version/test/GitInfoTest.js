@@ -68,17 +68,38 @@ describe("GitInfo", function() {
       });
     });
   });
+
+  function shouldNotExist(dirName) {
+    throw Error("\"" + dirName + "\" is a git directory, and should not be");
+  }
+
   describe("highestGitDirPath", function() {
     somePaths.forEach(function(dirPath) {
       it("should return a promise for \"" + dirPath + "\"", function() {
         const result = GitInfo.highestGitDirPath(dirPath);
         return result.then(highestPath => {
           console.log("highest git dir path for \"%s\": \"%s\"", dirPath, highestPath);
-          return highestPath
-            ? Q.all([
-              Q.nfcall(fs.access, path.format({dir: highestPath, name: ".git"}), "rw")
-            ])
-            : true;
+
+          if (!highestPath) {
+            return true;
+          }
+
+          const testPromises = [
+            Q.nfcall(fs.access, path.format({dir: highestPath, name: ".git"}), "rw")
+          ];
+          let intermediate = dirPath;
+          while (intermediate.startsWith(highestPath) && intermediate !== highestPath) {
+            const p = path.format({dir: intermediate, name: ".git"});
+            testPromises.push(
+              Q.nfcall(fs.access, p, "rw")
+                .then(
+                  shouldNotExist.bind(undefined, p),
+                  (err) => true
+                )
+            );
+            intermediate = path.dirname(intermediate);
+          }
+          return Q.all(testPromises);
         });
       });
     });
