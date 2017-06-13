@@ -140,16 +140,27 @@ program
   .description("Information about the highest git working copy and repository above [path], as JSON. "
                + "cwd is the default for [path].")
   .action(function(path) {
+    const noGitDirectoryMsg = "NO GIT DIRECTORY";
     GitInfo
       .highestGitDirPath(path || process.cwd())
       .then(gitDirPath => {
         if (!gitDirPath) {
-          throw new Error("No git directory found above " + path);
+          throw new Error(noGitDirectoryMsg);
         }
         return GitInfo
           .create(gitDirPath)
       })
-      .done((gitInfo) => console.log("%j", gitInfo));
+      .done(
+        (gitInfo) => console.log("%j", gitInfo),
+        (err) => {
+          if (err.message === noGitDirectoryMsg) {
+            console.error("No git directory found above " + path);
+            process.exitCode = 1;
+            return false;
+          }
+          throw err;
+        }
+      );
   });
 
 program
