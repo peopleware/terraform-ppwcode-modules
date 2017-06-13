@@ -137,10 +137,7 @@ describe("GitInfo", function() {
           .Repository
           .open(path.dirname(path.dirname(path.dirname(path.resolve(__filename)))))
           .then(repository => repository.getStatus())
-          .then(statuses => statuses.map(status => {
-            console.log(status.path());
-            GitInfo.isNotClean(status)
-          }))
+          .then(statuses => statuses.map(status => GitInfo.isNotClean(status)))
       );
     });
   });
