@@ -19,6 +19,7 @@ const util = require("./_util");
 const path = require("path");
 const fs = require("fs");
 const Q = require("q");
+const Git = require("nodegit");
 
 const thisGitRepoRoot = path.dirname(path.dirname(__dirname));
 const someBranchNames = [
@@ -124,6 +125,22 @@ describe("GitInfo", function() {
           return Q.all(testPromises);
         });
       });
+    });
+  });
+
+  describe("isNotClean", function() {
+    it("should behave for all files in this repo", function() {
+      //noinspection JSUnresolvedVariable
+      return Q.all(
+        Git
+          .Repository
+          .open(path.dirname(path.dirname(path.dirname(path.resolve(__filename)))))
+          .then(repository => repository.getStatus())
+          .then(statuses => statuses.map(status => {
+            console.log(status.path());
+            GitInfo.isNotClean(status)
+          }))
+      );
     });
   });
 });

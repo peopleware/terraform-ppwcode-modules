@@ -190,4 +190,30 @@ GitInfo.highestGitDirPath = new Contract({
     );
 });
 
+/**
+ * Helper function to decide whether a NodeGit Status represents a clean or dirty file.
+ */
+GitInfo.isNotClean = new Contract({
+  pre: [
+    (status) => typeof status.isNew === "function",
+    (status) => typeof status.isModified === "function",
+    (status) => typeof status.isTypechange === "function",
+    (status) => typeof status.isRenamed === "function",
+    (status) => typeof status.isDeleted === "function",
+    (status) => typeof status.isIgnored === "function"
+  ],
+  post: [
+    (status, result) => typeof result === "boolean",
+    (status, result) => !status.isNew() || result,
+    (status, result) => !status.isModified() || result,
+    (status, result) => !status.isTypechange() || result,
+    (status, result) => !status.isRenamed() || result,
+    (status, result) => !status.isDeleted() || result,
+    (status, result) => !status.isIgnored() || !result
+  ],
+  exception: [() => false]
+}).implementation(function(status) {
+  return !!(status.isNew() || status.isModified() || status.isTypechange() || status.isRenamed() || status.isDeleted());
+});
+
 module.exports = GitInfo;
