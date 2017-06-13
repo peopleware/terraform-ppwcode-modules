@@ -61,11 +61,18 @@ class GitInfo {
       && this.originUrl === undefined || (typeof this.originUrl === "string" && !!this.originUrl)
       && this.changes instanceof Set
       && Array.from(this.changes).every(path => typeof path === "string" && !!path)
+      && this.originBranchSha === undefined || typeof this.originBranchSha === "string"
       && typeof this.isClean === "boolean"
       && this.isClean === (this.changes.size === 0)
+      && typeof this.isPushed === "boolean"
+      && this.isPushed === (this.originBranchSha === this.sha)
       && typeof this.isPrecious === "boolean"
       && this.branch || this.isPrecious
-      && GitInfo.preciousBranchNameFragments.every(fragment => this.branch.indexOf(fragment) < 0) || this.isPrecious;
+      && GitInfo.preciousBranchNameFragments.every(fragment => this.branch.indexOf(fragment) < 0) || this.isPrecious
+      && typeof this.isSave === "boolean"
+      && this.isPrecious || this.isSave
+      && this.isClean || !this.isSave
+      && this.isPushed || !this.isSave
   }
 
   /**
@@ -79,13 +86,16 @@ class GitInfo {
    *                              might be {@code undefined}
    * @param {Set<String>} changes - set of paths of files that are not committed in the working copy
    *                                referred to by {@code path}; files are deleted, new, or modified
+   * @param {String?} originBranchSha - sha of branch {@code branch} at remote with name {@code origin};
+   *                                    might be {@code undefined}
    */
-  constructor(path, sha, branch, originUrl, changes) {
+  constructor(path, sha, branch, originUrl, changes, originBranchSha) {
     this._path = path;
     this._sha = sha;
     this._branch = branch || undefined;
     this._originUrl = originUrl || undefined;
     this._changes = new Set(changes);
+    this._originBranchSha = originBranchSha || undefined;
   }
 
   /**
@@ -136,10 +146,24 @@ class GitInfo {
   }
 
   /**
+   * Sha of branch {@link #branch} at remote with name {@code origin}. Might be {@code undefined}.
+   */
+  get originBranchSha() {
+    return this._originBranchSha;
+  }
+
+  /**
    * This represents a clean git repo working copy.
    */
   get isClean() {
     return this.changes.size === 0;
+  }
+
+  /**
+   * This is pushed, i.e., there is a {@link #originBranchSha}, and it is the same as {@link #sha}.
+   */
+  get isPushed() {
+    return this.originBranchSha === this.sha;
   }
 
   /**
@@ -150,6 +174,14 @@ class GitInfo {
     return !this.branch || GitInfo.preciousBranchNameFragments.some(fragment => 0 <= this.branch.indexOf(fragment));
   }
 
+  /**
+   * This represents a git repo that is save.
+   * It is clean, all commits are pushed, and it is in a precious branch.
+   */
+  get isSave() {
+    return !this.isPrecious || (this.isClean && this.isPushed)
+  }
+
   toJSON() {
     return {
       path: this.path,
@@ -157,8 +189,11 @@ class GitInfo {
       branch: this.branch,
       originUrl: this.originUrl,
       changes: Array.from(this.changes),
+      originBranchSha: this.originBranchSha,
       isClean: this.isClean,
-      isPrecious: this.isPrecious
+      isPushed: this.isPushed,
+      isPrecious: this.isPrecious,
+      isSave: this.isSave
     };
   }
 
@@ -166,24 +201,30 @@ class GitInfo {
 
 GitInfo.constructorContract = new Contract({
   pre: [
-    (path, sha, branch, originUrl, changes) => typeof path === "string",
-    (path, sha, branch, originUrl, changes) => !!path,
-    (path, sha, branch, originUrl, changes) => typeof sha === "string",
-    (path, sha, branch, originUrl, changes) => GitInfo.shaRegExp.test(sha),
-    (path, sha, branch, originUrl, changes) => !branch || typeof branch === "string",
-    (path, sha, branch, originUrl, changes) => !originUrl || typeof originUrl === "string",
-    (path, sha, branch, originUrl, changes) => changes instanceof Set,
-    (path, sha, branch, originUrl, changes) => Array.from(changes).every(path => typeof path === "string" && !!path)
+    (path, sha, branch, originUrl, changes, originBranchSha) => typeof path === "string",
+    (path, sha, branch, originUrl, changes, originBranchSha) => !!path,
+    (path, sha, branch, originUrl, changes, originBranchSha) => typeof sha === "string",
+    (path, sha, branch, originUrl, changes, originBranchSha) => GitInfo.shaRegExp.test(sha),
+    (path, sha, branch, originUrl, changes, originBranchSha) => !branch || typeof branch === "string",
+    (path, sha, branch, originUrl, changes, originBranchSha) => !originUrl || typeof originUrl === "string",
+    (path, sha, branch, originUrl, changes, originBranchSha) => changes instanceof Set,
+    (path, sha, branch, originUrl, changes, originBranchSha) =>
+      Array.from(changes).every(path => typeof path === "string" && !!path),
+    (path, sha, branch, originUrl, changes, originBranchSha) => !originBranchSha || typeof originBranchSha === "string"
   ],
   post: [
-    (path, sha, branch, originUrl, changes, result) => result.path === path,
-    (path, sha, branch, originUrl, changes, result) => result.sha === sha,
-    (path, sha, branch, originUrl, changes, result) => !!branch || result.branch === undefined,
-    (path, sha, branch, originUrl, changes, result) => !branch || result.branch === branch,
-    (path, sha, branch, originUrl, changes, result) => !!originUrl || result.originUrl === undefined,
-    (path, sha, branch, originUrl, changes, result) => !originUrl || result.originUrl === originUrl,
-    (path, sha, branch, originUrl, changes, result) => Array.from(changes).every(path => result.changes.has(path)),
-    (path, sha, branch, originUrl, changes, result) => Array.from(result.changes).every(path => changes.has(path))
+    (path, sha, branch, originUrl, changes, originBranchSha, result) => result.path === path,
+    (path, sha, branch, originUrl, changes, originBranchSha, result) => result.sha === sha,
+    (path, sha, branch, originUrl, changes, originBranchSha, result) => !!branch || result.branch === undefined,
+    (path, sha, branch, originUrl, changes, originBranchSha, result) => !branch || result.branch === branch,
+    (path, sha, branch, originUrl, changes, originBranchSha, result) => !!originUrl || result.originUrl === undefined,
+    (path, sha, branch, originUrl, changes, originBranchSha, result) => !originUrl || result.originUrl === originUrl,
+    (path, sha, branch, originUrl, changes, originBranchSha, result) =>
+      Array.from(changes).every(path => result.changes.has(path)),
+    (path, sha, branch, originUrl, changes, originBranchSha, result) =>
+      Array.from(result.changes).every(path => changes.has(path)),
+    (path, sha, branch, originUrl, changes, originBranchSha, result) =>
+      !originBranchSha || result.originBranchSha === originBranchSha
   ],
   exception: [() => false]
 });

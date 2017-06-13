@@ -43,6 +43,7 @@ const preciousBranchNames = [
 ];
 //noinspection SpellCheckingInspection
 const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
+const someShas = [aSha, "3268d7bc82d16d840f71ddfb5c8f5e42dea16f3b", null, undefined, "", 0, false];
 const someOriginUrls = [0, false, "", null, undefined, "git@GitHub:peopleware/terraform-ppwcode-modules.git"];
 const someChanges = [
   new Set(),
@@ -71,25 +72,31 @@ describe("GitInfo", function() {
         const sha = aSha;
         someOriginUrls.forEach(originUrl => {
           someChanges.forEach(changes => {
-            it("should return a GitInfo with the expected properties for "
-              + "path === \"" + path + "\", "
-              + "sha === \"" + sha + "\", "
-              + "branch === \"" + branch.name + "\", "
-              + "originUrl === \"" + originUrl + "\", "
-              + "changes: " + changes.size,
-              function() {
-                util.validateConditions(GitInfo.constructorContract.pre, [path, sha, branch.name, originUrl, changes]);
-                const result = new GitInfo(path, sha, branch.name, originUrl, changes);
-                console.log("branch %s precious? %s", result.branch, result.isPrecious);
-                if (result.isPrecious !== branch.precious) {
-                  throw new Error("Expected precious to be " + branch.precious + " for " + branch.name + ", but wasn't");
-                }
-                util.validateConditions(
-                  GitInfo.constructorContract.post,
-                  [path, sha, branch.name, originUrl, changes, result]
-                );
-                util.validateInvariants(result);
-              });
+            someShas.forEach(originBranchSha => {
+              it("should return a GitInfo with the expected properties for "
+                + "path === \"" + path + "\", "
+                + "sha === \"" + sha + "\", "
+                + "branch === \"" + branch.name + "\", "
+                + "originUrl === \"" + originUrl + "\", "
+                + "changes: " + changes.size + "\", "
+                + "originBranchSha: " + originBranchSha,
+                function() {
+                  util.validateConditions(
+                    GitInfo.constructorContract.pre,
+                    [path, sha, branch.name, originUrl, changes, originBranchSha]
+                  );
+                  const result = new GitInfo(path, sha, branch.name, originUrl, changes, originBranchSha);
+                  console.log("branch %s precious? %s", result.branch, result.isPrecious);
+                  if (result.isPrecious !== branch.precious) {
+                    throw new Error("Expected precious to be " + branch.precious + " for " + branch.name + ", but wasn't");
+                  }
+                  util.validateConditions(
+                    GitInfo.constructorContract.post,
+                    [path, sha, branch.name, originUrl, changes, originBranchSha, result]
+                  );
+                  util.validateInvariants(result);
+                });
+            });
           });
         });
       });
