@@ -204,7 +204,7 @@ program
           return false;
         }
         if (err.message === workingCopyNotSaveMsg) {
-          console.error("The working copy is not save (uncommitted changes, not pushed)");
+          console.error("The working copy is not save (uncommitted changes, not pushed, …)");
           process.exitCode = 1;
           return false;
         }
