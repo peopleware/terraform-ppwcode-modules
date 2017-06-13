@@ -18,13 +18,11 @@
 
 const Q = require("q");
 const dns = require("dns");
-const moment = require("moment");
 const git = require("nodegit");
 const path = require("path");
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
 const GitInfo = require("./GitInfo");
-const fs = require("fs");
 const packageVersion = require("pkginfo")(module, "version");
 
 const dnsTxtKeyValue = /([^=]+)=(.*)/;
@@ -65,36 +63,6 @@ function getRepo(repoPath) {
 }
 
 /**
- * Return a promise for the HEAD commit of the repo we are currently in.
- *
- * @param {string} repoPath - path to the root of the repository
- * @return {Promise<Commit>} - Promise for the HEAD commit of the git repository found at {@code repoPath}
- */
-function getRepoHead(repoPath) {
-  //noinspection JSUnresolvedFunction
-  return getRepo(repoPath)
-            .then((repository) => repository.getHeadCommit());
-}
-
-function isNotClean(status) {
-  return status.isNew() || status.isModified() || status.isTypeChange() || status.isRenamed();
-}
-
-/**
- * Return a promise for a determination whether or not the working copy is clean.
- *
- * @param {string} repoPath - path to the root of the repository
- * @return {Promise<boolean>} - Promise for a boolean that is true if no files in the working copy are new, modified,
- *                              type-changed or renamed, and false otherwise
- */
-function isClean(repoPath) {
-  //noinspection JSUnresolvedFunction
-  return getRepo(repoPath)
-    .then((repository) => repository.getStatus())
-    .then((statuses) => !statuses.some(isNotClean));
-}
-
-/**
  * Turns an object of promises into a promise for an object.  If any of
  * the promises gets rejected, the whole object is rejected immediately.
  * @param {object} promises - an object (or promise for an object) of properties with values (or
@@ -118,22 +86,6 @@ function object(promises) {
 // monkey patch object on q
 Q.object = object;
 
-function uncleanStatusAsText(status) {
-  let words = [];
-  if (status.isNew()) { words.push("NEW"); }
-  if (status.isModified()) { words.push("MODIFIED"); }
-  if (status.isTypechange()) { words.push("TYPE CHANGED"); }
-  if (status.isRenamed()) { words.push("RENAMED"); }
-
-  return words.join(" ");
-}
-
-function closestGitDir(dirPath) {
-  return Q.nfcall(fs.access, path.format({dir: dirPath, name: ".git"}), "rw")
-          .then(() => dirPath)
-          .catch((err) => closestGitDir(path.dirname(dirPath)));
-}
-
 const remoteName = "origin";
 
 //noinspection JSCheckFunctionSignatures
@@ -146,9 +98,14 @@ program
   .description("Get the SOA record via DNS for `domain`, and extract the serial. "
                + "It is a precondition that the record exists, and network is available.")
   .action(function(domain) {
+    if (!domain || domain === "") {
+      console.error("domain is mandatory");
+      process.exitCode = 1;
+      return;
+    }
     SoaSerial.currentSoaSerialString(domain)
       .done((serial) => {
-        console.log("%s %j", serial, SoaSerial.parse(serial));
+        console.log("%j", SoaSerial.parse(serial));
       });
   });
 
@@ -158,87 +115,41 @@ program
   .description("The next SOA serial to use for `domain`, now."
                + "If no current serial is found, the result has sequence number 0.")
   .action(function(domain) {
-    SoaSerial.nextSoaSerial(domain, moment.utc())
+    if (!domain || domain === "") {
+      console.error("domain is mandatory");
+      process.exitCode = 1;
+      return;
+    }
+    SoaSerial.nextSoaSerial(domain, new Date())
              .done((soaSerial) => console.log(soaSerial.serial));
   });
 
 program
-  .command("working-copy-dir [path]")
-  .alias("wc")
-  .description("Show the path of the top directory of the git working copy [path] is in. This is the first "
-               + "ancestor directory that contains a .git folder. cwd is the default for [path].")
-  .action(function(p) {
-    closestGitDir(p || process.cwd())
-      .done((gitPath) => console.log(gitPath));
-  });
-
-program
-  .command("highest-working-copy-dir [path]")
-  .alias("hwc")
+  .command("git-highest-working-copy-dir [path]")
+  .alias("ghwc")
   .description("Show the path of the top directory of the highest git working copy [path] is in. This is the top most "
                + "ancestor directory that contains a .git folder. cwd is the default for [path].")
-  .action(function(p) {
-    GitInfo.highestGitDirPath(p || process.cwd())
+  .action(function(path) {
+    GitInfo.highestGitDirPath(path || process.cwd())
       .done((gitPath) => console.log(gitPath));
   });
 
 program
-  .command("git-sha")
-  .alias("sha")
-  .description("The SHA of the HEAD commit of the repo we are currently in.")
-  .action(function() {
-    GitInfo.highestGitDirPath(process.cwd())
-      .then(getRepoHead)
-      .done((head) => console.log(head.sha()));
-  });
-
-program
-  .command("git-url")
-  .alias("url")
-  .description("The URL of the remote with name '" + remoteName + "' of the repo we are currently in.")
-  .action(function() {
-    //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
-    GitInfo.highestGitDirPath(process.cwd())
-      .then(getRepo)
-      .then((repository) => repository.getRemote(remoteName))
-      .done((remote) => console.log(remote.url()));
-  });
-
-program
-  .command("git-unclean")
-  .alias("uc")
-  .description("List unclean files")
-  .action(function() {
-    //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
-    GitInfo.highestGitDirPath(process.cwd())
-      .then(getRepo)
-      .then((repository) => repository.getStatus())
-      .done(
-        (statuses) => {
-          let uncleanStatuses = statuses.filter(isNotClean);
-          if (0 < uncleanStatuses.length) {
-            uncleanStatuses.forEach((status) => console.warn("%s %s", status.path(), uncleanStatusAsText(status)));
-            console.warn();
-            console.warn("unclean count: %d", statuses.length);
-          }
-          else {
-            console.log("the working copy is crispy clean");
-          }
+  .command("git-info [path]")
+  .alias("gi")
+  .description("Information about the highest git working copy and repository above [path], as JSON. "
+               + "cwd is the default for [path].")
+  .action(function(path) {
+    GitInfo
+      .highestGitDirPath(path || process.cwd())
+      .then(gitDirPath => {
+        if (!gitDirPath) {
+          throw new Error("No git directory found above " + path);
         }
-      );
-  });
-
-program
-  .command("git-clean")
-  .alias("c")
-  .description("Exit 0 when the working copy is clean, exit 1 when it is not.")
-  .action(function() {
-    GitInfo.highestGitDirPath(process.cwd())
-      .then(isClean)
-      .done((clean) => {
-        process.exitCode = clean ? 0 : 1;
-        return clean;
-      });
+        return GitInfo
+          .create(gitDirPath)
+      })
+      .done((gitInfo) => console.log("%j", gitInfo));
   });
 
 program
@@ -289,7 +200,7 @@ program
     let repoRetrieved = GitInfo.highestGitDirPath(process.cwd()).then(getRepo);
     //noinspection JSUnresolvedFunction, JSCheckFunctionSignatures
     return Q.object({
-      serial: SoaSerial.nextSoaSerial(domain, moment.utc())
+      serial: SoaSerial.nextSoaSerial(domain, new Date())
                 .then((soaSerial) => soaSerial.serial),
       sha:    repoRetrieved
                 .then((repository) => repository.getHeadCommit())
