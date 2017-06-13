@@ -23,6 +23,7 @@ const path = require("path");
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
 const GitInfo = require("./GitInfo");
+const DnsMeta = require("./DnsMeta");
 const packageVersion = require("pkginfo")(module, "version");
 
 const dnsTxtKeyValue = /([^=]+)=(.*)/;
@@ -168,22 +169,39 @@ program
       .done((meta) => console.log(meta));
   });
 
+const workingCopyNotSaveMsg = "WORKING COPY NOT SAVE";
+
 program
   .command("next-meta [domain] [path]")
   .alias("nm")
   .description("The next meta-information object, now, for the highest git working copy and repository above [path], "
-               + "as JSON. cwd is the default for [path].")
+               + "as JSON. cwd is the default for [path]. Fails if the current state of the working copy is not save.")
   .action(function(domain, path) {
     Q.object({
       soaSerial: SoaSerial.nextSoaSerial(domain, new Date()), // TODO serial already >> 99, no internet, …
       gitInfo: GitInfo.createForHighestGitDir(path || process.cwd())
     })
-    .then(result => Object.assign({serial: result.soaSerial.serial}, result.gitInfo)) // MUDO new meta
+    .then(result => {
+      if (!result.gitInfo.isSave) {
+        throw new Error(workingCopyNotSaveMsg);
+      }
+      return new DnsMeta(
+        result.gitInfo.sha,
+        result.gitInfo.branch,
+        result.gitInfo.originUrl,
+        result.soaSerial.serial
+      );
+    })
     .done(
       (meta) => console.log("%j", meta),
       (err) => {
         if (err.message === GitInfo.noGitDirectoryMsg) {
           console.error("No git directory found above " + path);
+          process.exitCode = 1;
+          return false;
+        }
+        if (err.message === workingCopyNotSaveMsg) {
+          console.error("The working copy is not save (uncommitted changes, not pushed)");
           process.exitCode = 1;
           return false;
         }
