@@ -1,0 +1,112 @@
+/**
+ *    Copyright 2017 PeopleWare n.v.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+const GitInfo = require("./GitInfo");
+const SoaSerial = require("./SoaSerial");
+const Contract = require("@toryt/contracts-ii");
+
+class DnsMeta {
+
+  get invariants() {
+    return typeof this.sha === "string"
+      && GitInfo.shaRegExp.test(this.sha)
+      && this.branch === undefined || (typeof this.branch === "string" && !!this.branch)
+      && (typeof this.repo === "string" && !!this.repo)
+      && SoaSerial.isASerial(this.serial);
+  }
+
+  /**
+   * Create a new GitInfo instance with the given properties.
+   *
+   * @param {string} sha - sha of the current commit of the checked-out repository
+   * @param {string?} branch - name of the current checked-out branch; might be {@code undefined}
+   * @param {string} repo - url of the git repository where the code is maintained
+   * @param {string} serial - string in the format YYYYMMDDnn, expected of an SOA serial
+   */
+  constructor(sha, branch, repo, serial) {
+    this._sha = sha;
+    this._branch = branch || undefined;
+    this._repo = repo;
+    this._serial = serial;
+  }
+
+  /**
+   * Sha of the current commit of the checked-out repository.
+   *
+   * @return {String}
+   */
+  get sha() {
+    return this._sha;
+  }
+
+  /**
+   * Name of the current checked-out branch. Might be {@code undefined}.
+   *
+   * @return {String?}
+   */
+  get branch() {
+    return this._branch;
+  }
+
+  /**
+   * Url of the remote with name {@code origin} of the current checked-out branch.
+   *
+   * @return {String?}
+   */
+  get repo() {
+    return this._repo;
+  }
+
+  /**
+   * 10-digit SOA serial, in the format YYYYMMDDnn
+   *
+   * @return {string}
+   */
+  get serial() {
+    return this._serial;
+  }
+
+  toJSON() {
+    return {
+      sha:       this.sha,
+      branch:    this.branch,
+      repo: this.repo,
+      serial:    this.serial
+    };
+  }
+
+}
+
+DnsMeta.constructorContract = new Contract({
+  pre: [
+    (sha, branch, repo, serial) => typeof sha === "string",
+    (sha, branch, repo, serial) => GitInfo.shaRegExp.test(sha),
+    (sha, branch, repo, serial) => !branch || typeof branch === "string",
+    (sha, branch, repo, serial) => typeof repo === "string",
+    (sha, branch, repo, serial) => SoaSerial.isASerial(serial)
+  ],
+  post: [
+    (sha, branch, repo, serial, result) => result.sha === sha,
+    (sha, branch, repo, serial, result) => !!branch || result.branch === undefined,
+    (sha, branch, repo, serial, result) => !branch || result.branch === branch,
+    (sha, branch, repo, serial, result) => result.repo === repo,
+    (sha, branch, repo, serial, result) => result.serial === serial
+  ],
+  exception: [() => false]
+});
+
+
+module.exports = DnsMeta;
