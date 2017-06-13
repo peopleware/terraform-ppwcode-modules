@@ -16,8 +16,11 @@
 
 const GitInfo = require("../GitInfo");
 const util = require("./_util");
+const path = require("path");
+const fs = require("fs");
+const Q = require("q");
 
-const thisGitRepoRoot = "../../";
+const thisGitRepoRoot = path.dirname(path.dirname(__dirname));
 const someBranchNames = ["", null, undefined, "simple_branch-name", "nested/branch/name"];
 //noinspection SpellCheckingInspection
 const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
@@ -27,6 +30,17 @@ const someChanges = [
   new Set(["a/path/to/a/file"]),
   new Set(["a/path/to/a/file", "a/path/to/another/file", "a/path/to/yet/another/file"])
 ];
+const somePaths = [
+  "/",
+  __dirname,
+  __filename,
+  process.cwd(),
+  require.main.filename,
+  path.dirname(require.main.filename),
+  thisGitRepoRoot,
+  path.dirname(thisGitRepoRoot),
+  "this is not a path"
+];
 
 describe("GitInfo", function() {
   describe("constructor", function() {
@@ -35,7 +49,7 @@ describe("GitInfo", function() {
       const sha = aSha;
       someOriginUrls.forEach(originUrl => {
         someChanges.forEach(changes => {
-          it("should return a GitInfo with the  expected properties for "
+          it("should return a GitInfo with the expected properties for "
             + "path === \"" + path + "\", "
             + "sha === \"" + sha + "\", "
             + "branch === \"" + branch + "\", "
@@ -50,6 +64,21 @@ describe("GitInfo", function() {
               );
               util.validateInvariants(result);
             });
+        });
+      });
+    });
+  });
+  describe("highestGitDirPath", function() {
+    somePaths.forEach(function(dirPath) {
+      it("should return a promise for \"" + dirPath + "\"", function() {
+        const result = GitInfo.highestGitDirPath(dirPath);
+        return result.then(highestPath => {
+          console.log("highest git dir path for \"%s\": \"%s\"", dirPath, highestPath);
+          return highestPath
+            ? Q.all([
+              Q.nfcall(fs.access, path.format({dir: highestPath, name: ".git"}), "rw")
+            ])
+            : true;
         });
       });
     });

@@ -15,6 +15,9 @@
  */
 
 const Contract = require("@toryt/contracts-ii");
+const path = require("path");
+const fs = require("fs");
+const Q = require("q");
 
 /**
  * Holder for consolidated information about the git repository at {@code #path}.
@@ -128,5 +131,42 @@ GitInfo.constructorContract = new Contract({
 });
 
 GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
+
+/**
+ * promise for the path of the directory of the highest git working copy {@code }path} is in. This is the top most
+ + ancestor directory of {@code path} that contains a {@code .git} folder.
+ */
+GitInfo.highestGitDirPath = new Contract({
+  pre: [
+    (dirPath) => typeof dirPath === "string"
+  ],
+  post: [
+    (dirPath, result) => Q.isPromiseAlike(result)
+  ],
+  exception: [() => false]
+})
+.implementation(dirPath => {
+  const parts = dirPath.split(path.sep);
+  const dirs = parts.map((part, index) => parts.slice(0, index + 1).join(path.sep));
+  return Q.all(dirs.map(dir => Q.nfcall(fs.access, path.format({dir: dir, name: ".git"}), "rw")
+                                .then(() => dir)
+                                .catch(() => undefined)))
+    .then(gitDirs => gitDirs.find(dir => !!dir))
+    .then(
+      new Contract({
+        pre: [
+          result => result === undefined || (typeof result === "string" && !!result),
+          result => !result || dirPath.startsWith(result)
+        ],
+        post: [(highestGitDirPath, result) => result === highestGitDirPath],
+        exception: [() => false]
+      }).implementation(highestGitDirPath => highestGitDirPath),
+      new Contract({
+        pre:       [(err) => false],
+        post:      [() => false],
+        exception: [(err1, err2) => err1 === err2]
+      }).implementation(err => {throw err;})
+    );
+});
 
 module.exports = GitInfo;
