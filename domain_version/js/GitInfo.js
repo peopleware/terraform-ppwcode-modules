@@ -62,6 +62,7 @@ class GitInfo {
       && this.changes instanceof Set
       && Array.from(this.changes).every(path => typeof path === "string" && !!path)
       && this.originBranchSha === undefined || typeof this.originBranchSha === "string"
+      && this.originBranchSha === undefined || GitInfo.shaRegExp.test(this.originBranchSha)
       && typeof this.isClean === "boolean"
       && this.isClean === (this.changes.size === 0)
       && typeof this.isPushed === "boolean"
@@ -210,7 +211,9 @@ GitInfo.constructorContract = new Contract({
     (path, sha, branch, originUrl, changes, originBranchSha) => changes instanceof Set,
     (path, sha, branch, originUrl, changes, originBranchSha) =>
       Array.from(changes).every(path => typeof path === "string" && !!path),
-    (path, sha, branch, originUrl, changes, originBranchSha) => !originBranchSha || typeof originBranchSha === "string"
+    (path, sha, branch, originUrl, changes, originBranchSha) => !originBranchSha || typeof originBranchSha === "string",
+    (path, sha, branch, originUrl, changes, originBranchSha) =>
+      !originBranchSha || GitInfo.shaRegExp.test(originBranchSha)
   ],
   post: [
     (path, sha, branch, originUrl, changes, originBranchSha, result) => result.path === path,
