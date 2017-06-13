@@ -43,7 +43,7 @@
     <option maxerr="50" />
     <option maxlen="120" />
     <option maxstatements="30" />
-    <option mocha="false" />
+    <option mocha="true" />
     <option module="false" />
     <option mootools="false" />
     <option moz="false" />
