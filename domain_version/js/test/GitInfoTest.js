@@ -18,7 +18,7 @@ const GitInfo = require("../GitInfo");
 const util = require("./_util");
 const path = require("path");
 const fs = require("fs");
-const Q = require("q");
+const Q = require("../q2");
 const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
 const Git = require("nodegit");
 

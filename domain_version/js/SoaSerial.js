@@ -16,7 +16,7 @@
 
 const moment = require("moment");
 const pad = require("pad");
-const Q = require("q");
+const Q = require("./q2");
 const dns = require("dns");
 const Contract = require("@toryt/contracts-ii");
 

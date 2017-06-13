@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-const Q = require("q");
+const Q = require("./q2");
 const dns = require("dns");
 const git = require("nodegit");
 const path = require("path");
@@ -61,30 +61,6 @@ function getRepo(repoPath) {
   //noinspection JSUnresolvedVariable
   return git.Repository.open(path.resolve(repoPath));
 }
-
-/**
- * Turns an object of promises into a promise for an object.  If any of
- * the promises gets rejected, the whole object is rejected immediately.
- * @param {object} promises - an object (or promise for an object) of properties with values (or
- *                            promises for values)
- * @return {object|Promise<object>} a promise for an array of the corresponding values
- */
-function object(promises) {
-  if (!promises) {
-    return promises;
-  }
-  return Q.all(Object.keys(promises).map((key) => Q.when(promises[key], (value) => ({key, value}))))
-    .then((kvPairs) => kvPairs.reduce(
-      (acc, kvPair) => {
-        acc[kvPair.key] = kvPair.value;
-        return acc;
-      },
-      {}
-    ));
-}
-
-// monkey patch object on q
-Q.object = object;
 
 //noinspection JSCheckFunctionSignatures
 program
