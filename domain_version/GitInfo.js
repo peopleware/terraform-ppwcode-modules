@@ -17,59 +17,6 @@
 const Contract = require("@toryt/contracts-ii");
 
 /**
- * Holder for consolidated information about a git remote
- */
-class Remote {
-
-  get invariants() {
-    return typeof this.name === "string"
-           && !!this.name
-           && typeof this.url === "string"
-           && !!this.url;
-  }
-
-  /**
-   * Create a new Remote instance with the given properties.
-   *
-   * @param {String} name - name of the remote
-   * @param {String} url - url of the remote
-   */
-  constructor(name, url) {
-    this._name = name;
-    this._url = url;
-  }
-
-  /**
-   * Name of the remote.
-   */
-  get name() {
-    return this._name;
-  }
-
-  /**
-   * Url of the remote.
-   */
-  get url() {
-    return this._url;
-  }
-
-}
-
-Remote.constructorContract = new Contract({
-  pre: [
-    (name, url) => typeof name === "string",
-    (name, url) => !!name,
-    (name, url) => typeof url === "string",
-    (name, url) => !!url
-  ],
-  post: [
-    (name, url, result) => result.name === name,
-    (name, url, result) => result.url === url
-  ],
-  exception: [() => false]
-});
-
-/**
  * Holder for consolidated information about the git repository at {@code #path}.
  */
 class GitInfo {
@@ -82,7 +29,8 @@ class GitInfo {
          creation of this object. */
       && typeof this.sha === "string"
       && GitInfo.shaRegExp.test(this.sha)
-      && this.branch === undefined || (typeof this.branch === "string" && !!this.branch);
+      && this.branch === undefined || (typeof this.branch === "string" && !!this.branch)
+      && this.originUrl === undefined || (typeof this.originUrl === "string" && !!this.originUrl);
   }
 
   /**
@@ -92,11 +40,14 @@ class GitInfo {
    *                        should be a path to a directory that contains a {@code .git/} folder
    * @param {String} sha - sha of the current commit of the checked-out repository
    * @param {String?} branch - name of the current checked-out branch; might be {@code undefined}
+   * @param {String?} originUrl - url of the remote with name {@code origin} of the current checked-out branch;
+   *                        might be {@code undefined}
    */
-  constructor(path, sha, branch) {
+  constructor(path, sha, branch, originUrl) {
     this._path = path;
     this._sha = sha;
     this._branch = branch || undefined;
+    this._originUrl = originUrl || undefined;
   }
 
   /**
@@ -119,27 +70,36 @@ class GitInfo {
   get branch() {
     return this._branch;
   }
+
+  /**
+   * Url of the remote with name {@code origin} of the current checked-out branch.
+   * Might be {@code undefined}.
+   */
+  get originUrl() {
+    return this._originUrl;
+  }
 }
 
 GitInfo.constructorContract = new Contract({
   pre: [
-    (path, sha, branch) => typeof path === "string",
-    (path, sha, branch) => !!path,
-    (path, sha, branch) => typeof sha === "string",
-    (path, sha, branch) => GitInfo.shaRegExp.test(sha),
-    (path, sha, branch) => !branch || typeof branch === "string"
+    (path, sha, branch, originUrl) => typeof path === "string",
+    (path, sha, branch, originUrl) => !!path,
+    (path, sha, branch, originUrl) => typeof sha === "string",
+    (path, sha, branch, originUrl) => GitInfo.shaRegExp.test(sha),
+    (path, sha, branch, originUrl) => !branch || typeof branch === "string",
+    (path, sha, branch, originUrl) => !originUrl || typeof originUrl === "string"
   ],
   post: [
-    (path, sha, branch, result) => result.path === path,
-    (path, sha, branch, result) => result.sha === sha,
-    (path, sha, branch, result) => !!branch || result.branch === undefined,
-    (path, sha, branch, result) => !branch || result.branch === branch
+    (path, sha, branch, originUrl, result) => result.path === path,
+    (path, sha, branch, originUrl, result) => result.sha === sha,
+    (path, sha, branch, originUrl, result) => !!branch || result.branch === undefined,
+    (path, sha, branch, originUrl, result) => !branch || result.branch === branch,
+    (path, sha, branch, originUrl, result) => !!originUrl || result.originUrl === undefined,
+    (path, sha, branch, originUrl, result) => !originUrl || result.originUrl === originUrl
   ],
   exception: [() => false]
 });
 
 GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
-
-GitInfo.Remote = Remote;
 
 module.exports = GitInfo;

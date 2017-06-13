@@ -21,22 +21,26 @@ const thisGitRepoRoot = "../../";
 const someBranchNames = ["", null, undefined, "simple_branch-name", "nested/branch/name"];
 //noinspection SpellCheckingInspection
 const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
+const someOriginUrls = ["", null, undefined, "git@GitHub:peopleware/terraform-ppwcode-modules.git"];
 
 describe("GitInfo", function() {
   describe("constructor", function() {
     const path = thisGitRepoRoot;
     someBranchNames.forEach(branch => {
       const sha = aSha;
+      someOriginUrls.forEach(originUrl => {
       it("should return a GitInfo with the  expected properties for "
-        + "path === \"" + path + "\""
-        + "sha === \"" + sha + "\""
-        + "branch === \"" + branch + "\"",
+        + "path === \"" + path + "\" "
+        + "sha === \"" + sha + "\" "
+        + "branch === \"" + branch + "\" "
+        + "originUrl === \"" + originUrl + "\" ",
         function() {
-          util.validateConditions(GitInfo.constructorContract.pre, [path, sha, branch]);
-          const result = new GitInfo(path, sha, branch);
-          util.validateConditions(GitInfo.constructorContract.post, [path, sha, branch, result]);
+          util.validateConditions(GitInfo.constructorContract.pre, [path, sha, branch, originUrl]);
+          const result = new GitInfo(path, sha, branch, originUrl);
+          util.validateConditions(GitInfo.constructorContract.post, [path, sha, branch, originUrl, result]);
           util.validateInvariants(result);
         });
+      });
     });
   });
 });
