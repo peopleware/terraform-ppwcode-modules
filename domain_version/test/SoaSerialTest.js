@@ -15,15 +15,9 @@
  */
 
 const SoaSerial = require("../SoaSerial");
-const validateConditions = require("./_util").validateConditions;
+const util = require("./_util");
 const moment = require("moment");
 const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
-
-function validateInvariants(subject) {
-  if (!subject.invariants) {
-    throw new Error("invariants do not hold");
-  }
-}
 
 const someMoments = [
   moment("20170611T161923.345Z"),
@@ -58,10 +52,10 @@ describe("SoaSerial", function() {
         someSequenceNumbers.forEach(function(sequenceNumber) {
           it("should return a serial with the  expected properties for at === \"" + moment(at).toISOString() + "\" "
              + "and sequenceNumber === " + sequenceNumber, function() {
-            validateConditions(SoaSerial.constructorContract.pre, [at, sequenceNumber]);
+            util.validateConditions(SoaSerial.constructorContract.pre, [at, sequenceNumber]);
             const result = new SoaSerial(at, sequenceNumber);
-            validateConditions(SoaSerial.constructorContract.post, [at, sequenceNumber, result]);
-            validateInvariants(result);
+            util.validateConditions(SoaSerial.constructorContract.post, [at, sequenceNumber, result]);
+            util.validateInvariants(result);
           });
         })
       );
@@ -70,7 +64,7 @@ describe("SoaSerial", function() {
     someSerials.forEach(function(serial) {
       it("should return a serial with the expected properties for \"" + serial + "\"", function() {
         const result = SoaSerial.parse(serial);
-        validateInvariants(result);
+        util.validateInvariants(result);
       });
     });
   });
@@ -87,13 +81,13 @@ describe("SoaSerial", function() {
                + JSON.stringify(subject) + "\" with useAt === \"" + moment(useAt).toISOString() + "\"", function() {
               try {
                 const result = subject.next(useAt);
-                validateInvariants(result);
+                util.validateInvariants(result);
               }
               catch (err) {
                 if (err instanceof ConditionError) {
                   throw err;
                 }
-                validateInvariants(subject);
+                util.validateInvariants(subject);
               }
             });
           })
