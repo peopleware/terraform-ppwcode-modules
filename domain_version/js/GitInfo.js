@@ -236,6 +236,7 @@ GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
 GitInfo.preciousBranchNameFragments = ["prod", "staging", "stage", "test"];
 GitInfo.originRemoteName = "origin";
 GitInfo.gitRefsPattern = /^refs\/heads\/(.*)$/;
+GitInfo.gitOriginRefsPrefix = "refs\/remotes\/" + GitInfo.originRemoteName + "/";
 
 /**
  * Promise for the path of the directory of the highest git working copy {@code path} is in. This is the top most
@@ -325,22 +326,30 @@ GitInfo.create = new Contract({
           .getHeadCommit()
           .then(head => head.sha()),
         branch: repository
-          .getCurrentBranch()
-          .then(reference => GitInfo.gitRefsPattern.exec(reference.name())[1]),
+                  .getCurrentBranch()
+                  .then(reference => GitInfo.gitRefsPattern.exec(reference.name())[1])
+                  .then(branchName => Q.object({
+                    name: branchName,
+                    originSha: repository
+                      .getBranchCommit(GitInfo.gitOriginRefsPrefix + branchName)
+                      .then(head => head.sha())
+                  })),
         originUrl: repository
           .getRemote(GitInfo.originRemoteName)
           .catch(() => new Error("remote \"" + GitInfo.originRemoteName + "\" does not exist"))
           .then(remote => remote.url()),
         changes: repository
           .getStatus()
-          .then(statuses =>  new Set(statuses.filter(status => GitInfo.isNotClean(status)).map(status => status.path())))
+          .then(statuses =>
+                  new Set(statuses.filter(status => GitInfo.isNotClean(status)).map(status => status.path())))
       })
       .then(params => new GitInfo(
         gitDirPath,
         params.sha,
-        params.branch,
+        params.branch.name,
         params.originUrl,
-        params.changes
+        params.changes,
+        params.branch.originSha
       ));
     })
     .then(
