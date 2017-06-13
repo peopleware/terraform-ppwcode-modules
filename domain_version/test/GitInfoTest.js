@@ -19,6 +19,7 @@ const util = require("./_util");
 const path = require("path");
 const fs = require("fs");
 const Q = require("q");
+const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
 const Git = require("nodegit");
 
 const thisGitRepoRoot = path.dirname(path.dirname(__dirname));
@@ -143,4 +144,27 @@ describe("GitInfo", function() {
       );
     });
   });
+
+  describe("create", function() {
+    somePaths.forEach(function(dirPath) {
+      it("should return a promise for \"" + dirPath + "\"", function() {
+        const result = GitInfo.create(dirPath);
+        return result.then(
+          gitInfo => {
+            util.validateInvariants(gitInfo);
+            console.log("create success for %s: %s", dirPath, JSON.stringify(gitInfo));
+            return true;
+          },
+          err => {
+            if (err instanceof ConditionError) {
+              throw err;
+            }
+            console.log("create failed for %s: %s", dirPath, err);
+            return true;
+          }
+        );
+      });
+    });
+  });
+
 });

@@ -18,6 +18,31 @@ const Contract = require("@toryt/contracts-ii");
 const path = require("path");
 const fs = require("fs");
 const Q = require("q");
+const Git = require("nodegit");
+
+/**
+ * Turns an object of promises into a promise for an object.  If any of
+ * the promises gets rejected, the whole object is rejected immediately.
+ * @param {object} promises - an object (or promise for an object) of properties with values (or
+ *                            promises for values)
+ * @return {object|Promise<object>} a promise for an array of the corresponding values
+ */
+function object(promises) {
+  if (!promises) {
+    return promises;
+  }
+  return Q.all(Object.keys(promises).map((key) => Q.when(promises[key], (value) => ({key, value}))))
+          .then((kvPairs) => kvPairs.reduce(
+            (acc, kvPair) => {
+              acc[kvPair.key] = kvPair.value;
+              return acc;
+            },
+            {}
+          ));
+}
+
+// monkey patch object on q
+Q.object = object;
 
 /**
  * Holder for consolidated information about the git repository at {@code #path}.
@@ -165,6 +190,8 @@ GitInfo.constructorContract = new Contract({
 
 GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
 GitInfo.preciousBranchNameFragments = ["prod", "staging", "stage", "test"];
+GitInfo.originRemoteName = "origin";
+GitInfo.gitRefsPattern = /^refs\/heads\/(.*)$/;
 
 /**
  * Promise for the path of the directory of the highest git working copy {@code path} is in. This is the top most
@@ -227,6 +254,66 @@ GitInfo.isNotClean = new Contract({
   exception: [() => false]
 }).implementation(function(status) {
   return !!(status.isNew() || status.isModified() || status.isTypechange() || status.isRenamed() || status.isDeleted());
+});
+
+/**
+ * Promise for the git working copy information in {@code gitDirPath}.
+ * The promise is rejected if {@code gitDirPath} does not point to a git working copy.
+ */
+GitInfo.create = new Contract({
+  pre: [
+    (gitDirPath) => typeof gitDirPath === "string",
+    (gitDirPath) => !!gitDirPath
+  ],
+  post:      [
+    (dirPath, result) => Q.isPromiseAlike(result)
+  ],
+  exception: [() => false]
+}).implementation(function(gitDirPath) {
+  //noinspection JSUnresolvedVariable
+  return Git.Repository
+    .open(gitDirPath)
+    .catch(() => {throw new Error(gitDirPath + " is not a git directory");})
+    .then(repository => {
+      //noinspection JSCheckFunctionSignatures
+      return Q.object({
+        sha: repository
+          .getHeadCommit()
+          .then(head => head.sha()),
+        branch: repository
+          .getCurrentBranch()
+          .then(reference => GitInfo.gitRefsPattern.exec(reference.name())[1]),
+        originUrl: repository
+          .getRemote(GitInfo.originRemoteName)
+          .catch(() => new Error("remote \"" + GitInfo.originRemoteName + "\" does not exist"))
+          .then(remote => remote.url()),
+        changes: repository
+          .getStatus()
+          .then(statuses =>  new Set(statuses.filter(isNotClean).map(status => status.path())))
+      })
+      .then(params => new GitInfo(
+        gitDirPath,
+        params.sha,
+        params.branch,
+        params.originUrl,
+        params.changes
+      ));
+    })
+    .then(
+      new Contract({
+        pre: [
+          gitInfo => gitInfo instanceof GitInfo,
+          gitInfo => gitInfo.path === gitDirPath
+        ],
+        post: [(gitInfo, result) => result === gitInfo],
+        exception: [() => false]
+      }).implementation(gitInfo => gitInfo),
+      new Contract({
+        pre: [(err) => err instanceof Error],
+        post: [() => false],
+        exception: [(err1, err2) => err1 === err2]
+      }).implementation(err => {throw err;})
+    );
 });
 
 module.exports = GitInfo;
