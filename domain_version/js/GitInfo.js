@@ -369,4 +369,45 @@ GitInfo.create = new Contract({
     );
 });
 
+GitInfo.noGitDirectoryMsg = "NO GIT DIRECTORY";
+
+/**
+ * Promise for the git working copy information of the highest git working copy {@code path} is in.
+ * The promise is rejected if there is no git working copy above {@code path}.
+ */
+GitInfo.createForHighestGitDir = new Contract({
+  pre:       [
+    (path) => typeof path === "string",
+    (path) => !!path
+  ],
+  post:      [
+    (path, result) => Q.isPromiseAlike(result)
+  ],
+  exception: [() => false]
+}).implementation(function(path) {
+  return GitInfo
+    .highestGitDirPath(path)
+    .then(gitDirPath => {
+      if (!gitDirPath) {
+        throw new Error(GitInfo.noGitDirectoryMsg);
+      }
+      return GitInfo.create(gitDirPath);
+    })
+    .then(
+      new Contract({
+        pre: [
+          gitInfo => gitInfo instanceof GitInfo,
+          gitInfo => path.startsWith(gitInfo.path)
+        ],
+        post: [(gitInfo, result) => result === gitInfo],
+        exception: [() => false]
+      }).implementation(gitInfo => gitInfo),
+      new Contract({
+        pre: [(err) => err instanceof Error],
+        post: [() => false],
+        exception: [(err1, err2) => err1 === err2]
+      }).implementation(err => {throw err;})
+    );
+});
+
 module.exports = GitInfo;

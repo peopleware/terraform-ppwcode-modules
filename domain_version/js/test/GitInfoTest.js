@@ -173,4 +173,34 @@ describe("GitInfo", function() {
     });
   });
 
+  describe("createForHighestGitDir", function() {
+    somePaths.forEach(function(dirPath) {
+      it("should return a promise for \"" + dirPath + "\"", function() {
+        return Q.all([
+          GitInfo.createForHighestGitDir(dirPath).then(
+            gitInfo => {
+              util.validateInvariants(gitInfo);
+              console.log("create success for %s: %s", dirPath, JSON.stringify(gitInfo));
+              return gitInfo;
+            },
+            err => {
+              if (err instanceof ConditionError || err instanceof ReferenceError) {
+                throw err;
+              }
+              console.log("create failed for %s: %s", dirPath, err);
+              return false;
+            }
+          ),
+          GitInfo.highestGitDirPath(dirPath)
+        ])
+        .spread((gitInfo, gitDirPath) => {
+          if (gitInfo && gitInfo.path !== gitDirPath) {
+            throw new Error("path is not what was expected");
+          }
+          return gitInfo;
+        });
+      });
+    });
+  });
+
 });

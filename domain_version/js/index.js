@@ -86,8 +86,6 @@ function object(promises) {
 // monkey patch object on q
 Q.object = object;
 
-const remoteName = "origin";
-
 //noinspection JSCheckFunctionSignatures
 program
   .version(packageVersion);
@@ -140,20 +138,12 @@ program
   .description("Information about the highest git working copy and repository above [path], as JSON. "
                + "cwd is the default for [path].")
   .action(function(path) {
-    const noGitDirectoryMsg = "NO GIT DIRECTORY";
     GitInfo
-      .highestGitDirPath(path || process.cwd())
-      .then(gitDirPath => {
-        if (!gitDirPath) {
-          throw new Error(noGitDirectoryMsg);
-        }
-        return GitInfo
-          .create(gitDirPath)
-      })
+      .createForHighestGitDir(path || process.cwd())
       .done(
         (gitInfo) => console.log("%j", gitInfo),
         (err) => {
-          if (err.message === noGitDirectoryMsg) {
+          if (err.message === GitInfo.noGitDirectoryMsg) {
             console.error("No git directory found above " + path);
             process.exitCode = 1;
             return false;
