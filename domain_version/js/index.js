@@ -51,6 +51,7 @@ function getMetaViaDns(domain) {
             {}
           ));
 }
+// MUDO move to DnsTxt, return a "map" of anything we find
 
 /**
  * Return a promise for the git repository we are currently in.
@@ -192,6 +193,8 @@ program
         result.soaSerial.serial
       );
     })
+    // MUDO move above to DnsMeta
+    // MUDO add serial tag, if save
     .done(
       (meta) => console.log("%j", meta),
       (err) => {

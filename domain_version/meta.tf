@@ -17,13 +17,10 @@
 data "external" "calculated_meta" {
   program = [
     "node",
-    "${path.module}/mata.js",
-    "next-meta"
+    "${path.module}/js/index.js",
+    "next-meta",
+    "${var.domain_name}",
   ]
-
-  query = {
-    domain = "${var.domain_name}"
-  }
 }
 
 data "null_data_source" "meta" {
@@ -34,11 +31,10 @@ data "null_data_source" "meta" {
  * A TXT record, called `meta.${var.domain_name}`, that has given ${var.meta} as payload,
  * extended with `serial=${var.serial}`. This follows following https://tools.ietf.org/html/rfc1464.
  */
-
 resource "aws_route53_record" "meta" {
   zone_id = "${var.zone_id}"
-  name = "meta.${var.domain_name}"
-  type = "TXT"
-  ttl = "${var.ttl}"
+  name    = "meta.${var.domain_name}"
+  type    = "TXT"
+  ttl     = "${var.ttl}"
   records = "${formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs))}"
 }
