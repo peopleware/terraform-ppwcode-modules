@@ -69,6 +69,9 @@ class SoaSerial {
     this.sequenceNumber = sequenceNumber;
   }
 
+  /**
+   * @return {moment.Moment}
+   */
   get at() {
     return moment.utc(this._at).startOf("day");
   }
