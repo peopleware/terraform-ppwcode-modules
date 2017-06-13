@@ -37,7 +37,10 @@ class GitInfo {
       && this.changes instanceof Set
       && Array.from(this.changes).every(path => typeof path === "string" && !!path)
       && typeof this.isClean === "boolean"
-      && this.isClean === (this.changes.size === 0);
+      && this.isClean === (this.changes.size === 0)
+      && typeof this.isPrecious === "boolean"
+      && this.branch || this.isPrecious
+      && GitInfo.preciousBranchNameFragments.every(fragment => this.branch.indexOf(fragment) < 0) || this.isPrecious;
   }
 
   /**
@@ -113,6 +116,14 @@ class GitInfo {
   get isClean() {
     return this.changes.size === 0;
   }
+
+  /**
+   * This represents a git repo, of which a precious branch is checked out.
+   * No branch is precious too.
+   */
+  get isPrecious() {
+    return !this.branch || GitInfo.preciousBranchNameFragments.some(fragment => 0 <= this.branch.indexOf(fragment));
+  }
 }
 
 GitInfo.constructorContract = new Contract({
@@ -140,6 +151,7 @@ GitInfo.constructorContract = new Contract({
 });
 
 GitInfo.shaRegExp = /^[a-f0-9]{40}$/;
+GitInfo.preciousBranchNameFragments = ["prod", "staging", "stage", "test"];
 
 /**
  * promise for the path of the directory of the highest git working copy {@code }path} is in. This is the top most
