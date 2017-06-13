@@ -30,6 +30,8 @@ const someBranchNames = [
   "development"
 ];
 const preciousBranchNames = [
+  false,
+  0,
   "",
   null,
   undefined,
@@ -41,7 +43,7 @@ const preciousBranchNames = [
 ];
 //noinspection SpellCheckingInspection
 const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
-const someOriginUrls = ["", null, undefined, "git@GitHub:peopleware/terraform-ppwcode-modules.git"];
+const someOriginUrls = [0, false, "", null, undefined, "git@GitHub:peopleware/terraform-ppwcode-modules.git"];
 const someChanges = [
   new Set(),
   new Set(["a/path/to/a/file"]),
