@@ -18,12 +18,11 @@
 
 const Q = require("./q2");
 const dns = require("dns");
-const git = require("nodegit");
-const path = require("path");
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
 const GitInfo = require("./GitInfo");
 const DnsMeta = require("./DnsMeta");
+const tagGitRepo = require("./tagGitRepo");
 const packageVersion = require("pkginfo")(module, "version");
 
 const dnsTxtKeyValue = /([^=]+)=(.*)/;
@@ -52,17 +51,6 @@ function getMetaViaDns(domain) {
           ));
 }
 // MUDO move to DnsTxt, return a "map" of anything we find
-
-/**
- * Return a promise for the git repository we are currently in.
- *
- * @param {string} repoPath - path to the root of the repository
- * @return {Promise<Repository>} - Promise for the git repository found at {@code repoPath}
- */
-function getRepo(repoPath) {
-  //noinspection JSUnresolvedVariable
-  return git.Repository.open(path.resolve(repoPath));
-}
 
 //noinspection JSCheckFunctionSignatures
 program
@@ -132,35 +120,6 @@ program
   });
 
 program
-  .command("tag-build [build]")
-  .alias("tb")
-  .description("Tag the current head with the build number, and push, if the current git repository is clean (c)")
-  .action(function(build) {
-    if (!build && build !== 0) {
-      console.error("build number is mandatory");
-      process.exitCode = 1;
-      return;
-    }
-    const tagName = "build/" + build;
-    const message = "tag build " + build;
-    //noinspection JSUnresolvedVariable
-    GitInfo.highestGitDirPath(process.cwd())
-      .then(getRepo)
-      .then((repository) =>
-              repository.getHeadCommit()
-                        .then((head) => git.Tag.create(
-                          repository,
-                          tagName,
-                          head,
-                          git.Signature.default(repository),
-                          message,
-                          0
-                        ))
-      )
-      .done(() => console.log("tagged as %s", tagName));
-  });
-
-program
   .command("current-meta [domain]")
   .alias("cm")
   .description("Get the TXT record via DNS for `domain`, and report all key value pairs. "
@@ -170,60 +129,34 @@ program
       .done((meta) => console.log(meta));
   });
 
-/**
- * Tag the git repository at {@code path} with &quot;serial/{@code serial}&quot;, and return a Promise
- * that resolves when done. This will fail if the tag already exists. The tag is not pushed!
- *
- * @param {string} serial - string in the format YYYYMMDDnn, expected of an SOA serial
- * @param {String} path - path to the git repository to tag;
- *                        should be a path to a directory that contains a {@code .git/} folder
- * @return {Promise<Tag>} Promise for a reference to the tag that was created
- */
-const tagWithSerial = new Contract({
+const serialTagPrefix = "serial/";
 
-});
-function tagWithSerial(path, serial) {
-  const tagName = "serial/" + serial;
-  const message = "tag with serial " + serial;
-  //noinspection JSUnresolvedVariable
-  return git.Repository
-    .open(path)
-    .catch(ignore => {
-      throw new Error(GitInfo.noGitDirectoryMsg);
-    })
-    .then(repository =>
-      repository
-        .getHeadCommit()
-        .then(head => git.Tag.create(
-          repository,
-          tagName,
-          head,
-          git.Signature.default(repository),
-          message,
-          0
-        ))
-        .catch(ignore => {
-          throw new Error(tagWithSerial.couldNotCreateTagMsg);
-        })
-    );
-}
-
-tagWithSerial.couldNotCreateTagMsg = "COULD NOT CREATE TAG";
-
+//noinspection JSCheckFunctionSignatures
 program
+  .option("-t, --tag-with-serial", "tag the repository with the created serial in next-meta")
   .command("next-meta [domain] [path]")
   .alias("nm")
   .description("The next meta-information object, now, for the highest git working copy and repository above [path], "
-               + "as JSON. cwd is the default for [path]. Fails if the current state of the working copy is not save.")
+               + "as JSON. cwd is the default for [path]. Fails if the current state of the working copy is not save. "
+               + "The repository is tagged with \"serial/<serial>\" if option -t is given.")
   .action(function(domain, path) {
     if (!domain || domain === "") {
       console.error("domain is mandatory");
       process.exitCode = 1;
       return;
     }
-    DnsMeta.nextDnsMeta(domain, new Date(), path || process.cwd())
-    // MUDO add serial tag, if save
-    .done(
+    const gitBasePath = path || process.cwd();
+    const metaGenerated = DnsMeta.nextDnsMeta(domain, new Date(), gitBasePath); // rejected if not save
+    console.log(program.tagWithSerial);
+    //noinspection JSUnresolvedVariable
+    const tagged = program.tagWithSerial
+      ? metaGenerated
+        .then(meta => GitInfo
+          .highestGitDirPath(gitBasePath)
+          .then(gitPath => tagGitRepo(gitPath, serialTagPrefix + meta.serial))
+          .then(() => meta))
+      : metaGenerated;
+    tagged.done(
       (meta) => console.log("%j", meta),
       (err) => {
         // TODO serial already >> 99, no internet, …

@@ -18,6 +18,7 @@ data "external" "calculated_meta" {
   program = [
     "node",
     "${path.module}/js/index.js",
+    "-t",
     "next-meta",
     "${var.domain_name}",
   ]
