@@ -110,7 +110,6 @@ const serialTagPrefix = "serial/";
 
 //noinspection JSCheckFunctionSignatures
 program
-  .option("-t, --tag-with-serial", "tag the repository with the created serial in next-meta")
   .command("next-meta [domain] [path]")
   .alias("nm")
   .description("The next meta-information object, now, for the highest git working copy and repository above [path], "
@@ -123,37 +122,25 @@ program
       return;
     }
     const gitBasePath = path || process.cwd();
-    const metaGenerated = DnsMeta.nextDnsMeta(domain, new Date(), gitBasePath); // rejected if not save
-    //noinspection JSUnresolvedVariable
-    const tagged = program.tagWithSerial
-      ? metaGenerated
-        .then(meta => GitInfo
-          .highestGitDirPath(gitBasePath)
-          .then(gitPath => tagGitRepo(gitPath, serialTagPrefix + meta.serial))
-          .then(() => meta))
-      : metaGenerated;
-    tagged.done(
-      (meta) => console.log("%j", meta),
-      (err) => {
-        // TODO serial already >> 99, no internet, …
-        if (err.message === GitInfo.noGitDirectoryMsg) {
-          console.error("No git directory found above " + path);
-          process.exitCode = 1;
-          return false;
+    DnsMeta
+      .nextDnsMeta(domain, new Date(), gitBasePath) // rejected if not save
+      .done(
+        (meta) => console.log("%j", meta),
+        (err) => {
+          // TODO serial already >> 99, no internet, …
+          if (err.message === GitInfo.noGitDirectoryMsg) {
+            console.error("No git directory found above " + path);
+            process.exitCode = 1;
+            return false;
+          }
+          if (err.message === DnsMeta.workingCopyNotSaveMsg) {
+            console.error("The working copy is not save (uncommitted changes, not pushed, …)");
+            process.exitCode = 1;
+            return false;
+          }
+          throw err;
         }
-        if (err.message === DnsMeta.workingCopyNotSaveMsg) {
-          console.error("The working copy is not save (uncommitted changes, not pushed, …)");
-          process.exitCode = 1;
-          return false;
-        }
-        if (err.message === tagGitRepo.couldNotCreateTagMsg) {
-          console.error("Could not create the tag on the git repository. Does it already exist?");
-          process.exitCode = 1;
-          return false;
-        }
-        throw err;
-      }
-    );
+      );
   });
 
 program
