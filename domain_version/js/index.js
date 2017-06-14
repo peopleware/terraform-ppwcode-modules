@@ -170,8 +170,6 @@ program
       .done((meta) => console.log(meta));
   });
 
-const workingCopyNotSaveMsg = "WORKING COPY NOT SAVE";
-
 program
   .command("next-meta [domain] [path]")
   .alias("nm")
