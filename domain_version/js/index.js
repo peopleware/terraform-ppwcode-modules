@@ -16,41 +16,13 @@
  * limitations under the License.
  */
 
-const Q = require("./q2");
-const dns = require("dns");
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
 const GitInfo = require("./GitInfo");
 const DnsMeta = require("./DnsMeta");
 const tagGitRepo = require("./tagGitRepo");
+const dnsTxt = require("./dnsTxt");
 const packageVersion = require("pkginfo")(module, "version");
-
-const dnsTxtKeyValue = /([^=]+)=(.*)/;
-
-/**
- * Get meta-information about {@code domain}, retrieved via DNS.
- * This is a {@code TXT} record, with key value pairs, with FQDN
- * <code>meta.<var>domain</var></code>.
- *
- * @param {string} domain - FQDN of the domain to get the meta information of
- * @return {Promise<object>} Promise for an object containing all key value pairs found in the meta DNS record
- */
-function getMetaViaDns(domain) {
-  const metaFqdn = "meta." + domain;
-  return Q.denodeify(dns.resolveTxt)(metaFqdn)
-          .then((allTxtRecords) => allTxtRecords.reduce(
-            (acc, oneTxtRecord) => oneTxtRecord.reduce(
-              (acc, str) => {
-                const keyValue = dnsTxtKeyValue.exec(str);
-                acc[keyValue[1]] = keyValue[2];
-                return acc;
-              },
-              acc
-            ),
-            {}
-          ));
-}
-// MUDO move to DnsTxt, return a "map" of anything we find
 
 //noinspection JSCheckFunctionSignatures
 program
@@ -122,11 +94,16 @@ program
 program
   .command("current-meta [domain]")
   .alias("cm")
-  .description("Get the TXT record via DNS for `domain`, and report all key value pairs. "
-               + "It is a precondition that the record exists, and network is available.")
+  .description("Get the TXT record via DNS for &quot;meta.{@code domain}&quot;, and report all key value pairs, "
+               + "as JSON. It is a precondition that the record exists, and network is available.")
   .action(function(domain) {
-    getMetaViaDns(domain)
-      .done((meta) => console.log(meta));
+    if (!domain || domain === "") {
+      console.error("domain is mandatory");
+      process.exitCode = 1;
+      return;
+    }
+    dnsTxt("meta." + domain) // TODO better error handling
+      .done((meta) => console.log("%j", meta));
   });
 
 const serialTagPrefix = "serial/";
@@ -147,6 +124,7 @@ program
     }
     const gitBasePath = path || process.cwd();
     const metaGenerated = DnsMeta.nextDnsMeta(domain, new Date(), gitBasePath); // rejected if not save
+    //noinspection JSUnresolvedVariable
     console.log(program.tagWithSerial);
     //noinspection JSUnresolvedVariable
     const tagged = program.tagWithSerial
