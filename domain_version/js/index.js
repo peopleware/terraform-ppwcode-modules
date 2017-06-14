@@ -156,4 +156,29 @@ program
     );
   });
 
+program
+  .command("tag [tagName] [path]")
+  .alias("t")
+  .description("Tag the highest git working copy and repository above [path] with [tagName]. "
+               + "cwd is the default for [path]. The tag is not pushed!")
+  .action(function(tagName, path) {
+    const gitBasePath = path || process.cwd();
+    GitInfo
+      .highestGitDirPath(gitBasePath)
+      .then(gitPath => tagGitRepo(gitPath, tagName))
+      .done(
+        () => {
+          console.log("%j", {tag: tagName});
+        },
+        err => {
+          if (err.message === tagGitRepo.couldNotCreateTagMsg) {
+            console.error("Could not create the tag on the git repository. Does it already exist?");
+            process.exitCode = 1;
+            return false;
+          }
+          throw err;
+        }
+      );
+  });
+
 program.parse(process.argv);
