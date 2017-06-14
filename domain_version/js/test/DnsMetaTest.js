@@ -95,8 +95,8 @@ describe("DnsMeta", function() {
               err => {
                 console.log("%s", err.message);
                 return true;
-                /* TODO Because SoaSerial does not report detailed exception yet, it makes no sense to try to sort it
-                 out here now. The details are tested in the called routines already. */
+                /* TODO Because SoaSerial >> 99 does not report detailed exception yet, it makes no sense to try to
+                        sort it out here now. The details are tested in the called routines already. */
               }
             );
         });

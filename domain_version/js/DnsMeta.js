@@ -130,7 +130,7 @@ DnsMeta.nextDnsMeta = new Contract({
   exception: [() => false]
 }).implementation(function(domain, at, path) {
   return Q.object({
-    soaSerial: SoaSerial.nextSoaSerial(domain, at), // TODO serial already >> 99, no internet, …
+    soaSerial: SoaSerial.nextSoaSerial(domain, at), // TODO serial already >> 99
     gitInfo:   GitInfo.createForHighestGitDir(path)
   })
   .then(result => {
