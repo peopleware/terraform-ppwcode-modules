@@ -146,6 +146,11 @@ program
           process.exitCode = 1;
           return false;
         }
+        if (err.message === tagGitRepo.couldNotCreateTagMsg) {
+          console.error("Could not create the tag on the git repository. Does it already exist?");
+          process.exitCode = 1;
+          return false;
+        }
         throw err;
       }
     );
