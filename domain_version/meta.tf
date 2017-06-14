@@ -18,7 +18,7 @@ data "external" "calculated_meta" {
   program = [
     "node",
     "${path.module}/js/index.js",
-    "-t",
+    "-t", // MUDO only tag when applying, not when testing
     "next-meta",
     "${var.domain_name}",
   ]
