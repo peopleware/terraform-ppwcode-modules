@@ -35,11 +35,10 @@ resource "aws_route53_zone" "zone" {
 }
 
 module "version" {
-  source         = "../domain_version"
-  zone_id        = "${aws_route53_zone.zone.zone_id}"
-  domain_name    = "${aws_route53_zone.zone.name}"
-  ns-domain_name = "${aws_route53_zone.zone.name_servers.0}"
-  serial         = "${var.serial}"
-  meta           = "${var.meta}"
-  ttl            = "${var.ttl}"
+  source          = "../domain_version"
+  zone_id         = "${aws_route53_zone.zone.zone_id}"
+  domain_name     = "${aws_route53_zone.zone.name}"
+  ns-domain_name  = "${aws_route53_zone.zone.name_servers.0}"
+  additional_meta = "${var.additional_meta}"
+  ttl             = "${var.ttl}"
 }
