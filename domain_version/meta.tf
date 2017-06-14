@@ -47,5 +47,5 @@ data "external" "tag" {
     "serial/${data.external.calculated_meta.result.serial}"
   ]
 
-  depends_on = ["${aws_route53_record.meta}"]
+  depends_on = ["aws_route53_record.meta"]
 }
