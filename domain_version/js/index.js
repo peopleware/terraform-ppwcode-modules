@@ -178,6 +178,11 @@ program
   .description("The next meta-information object, now, for the highest git working copy and repository above [path], "
                + "as JSON. cwd is the default for [path]. Fails if the current state of the working copy is not save.")
   .action(function(domain, path) {
+    if (!domain || domain === "") {
+      console.error("domain is mandatory");
+      process.exitCode = 1;
+      return;
+    }
     DnsMeta.nextDnsMeta(domain, new Date(), path || process.cwd())
     // MUDO add serial tag, if save
     .done(
