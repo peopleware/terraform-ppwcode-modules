@@ -37,5 +37,5 @@ resource "aws_route53_record" "meta" {
   name    = "meta.${var.domain_name}"
   type    = "TXT"
   ttl     = "${var.ttl}"
-  records = "${formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs))}"
+  records = ["${formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs))}"]
 }
