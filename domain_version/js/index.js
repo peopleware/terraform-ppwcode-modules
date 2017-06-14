@@ -125,8 +125,6 @@ program
     const gitBasePath = path || process.cwd();
     const metaGenerated = DnsMeta.nextDnsMeta(domain, new Date(), gitBasePath); // rejected if not save
     //noinspection JSUnresolvedVariable
-    console.log(program.tagWithSerial);
-    //noinspection JSUnresolvedVariable
     const tagged = program.tagWithSerial
       ? metaGenerated
         .then(meta => GitInfo
