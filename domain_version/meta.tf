@@ -38,3 +38,14 @@ resource "aws_route53_record" "meta" {
   ttl     = "${var.ttl}"
   records = ["${formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs))}"]
 }
+
+data "external" "tag" {
+  program = [
+    "node",
+    "${path.module}/js/index.js",
+    "tag",
+    "serial/${data.external.calculated_meta.result.serial}"
+  ]
+
+  depends_on = ["${aws_route53_record.meta}"]
+}
