@@ -17,6 +17,8 @@
 const GitInfo = require("./GitInfo");
 const SoaSerial = require("./SoaSerial");
 const Contract = require("@toryt/contracts-ii");
+const Q = require("./q2");
+const moment = require("moment");
 
 class DnsMeta {
 
@@ -106,6 +108,53 @@ DnsMeta.constructorContract = new Contract({
     (sha, branch, repo, serial, result) => result.serial === serial
   ],
   exception: [() => false]
+});
+
+DnsMeta.workingCopyNotSaveMsg = "WORKING COPY NOT SAVE";
+
+/**
+ * Promise for an {@link DnsMeta} instance, that contains the [next SOA serial]{@linkplain SoaSerial.nextSoaSerial()},
+ * to be used at {@code at} for {@code domain}, and information about the highest git repository found above
+ * {@code path}.
+ */
+DnsMeta.nextDnsMeta = new Contract({
+  pre: [
+    (domain, at, path) => typeof domain === "string",
+    (domain, at, path) => at instanceof Date || moment.isMoment(at),
+    (domain, at, path) => typeof path === "string",
+    (domain, at, path) => !!path
+  ],
+  post: [
+    (domain, at, path, result) => Q.isPromiseAlike(result)
+  ],
+  exception: [() => false]
+}).implementation(function(domain, at, path) {
+  return Q.object({
+    soaSerial: SoaSerial.nextSoaSerial(domain, at), // TODO serial already >> 99, no internet, …
+    gitInfo:   GitInfo.createForHighestGitDir(path)
+  })
+  .then(result => {
+    if (!result.gitInfo.isSave) {
+      throw new Error(DnsMeta.workingCopyNotSaveMsg);
+    }
+    return new DnsMeta(result.gitInfo.sha, result.gitInfo.branch, result.gitInfo.originUrl, result.soaSerial.serial);
+  })
+  .then(
+    new Contract({
+      pre: [
+        dnsMeta => dnsMeta instanceof DnsMeta,
+        dnsMeta =>
+        SoaSerial.parse(dnsMeta.serial).serialStart === moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern)
+      ],
+      post: [(dnsMeta, result) => result === dnsMeta],
+      exception: [() => false]
+    }).implementation(gitInfo => gitInfo),
+    new Contract({
+      pre: [(err) => err instanceof Error],
+      post: [() => false],
+      exception: [(err1, err2) => err1 === err2]
+   }).implementation(err => {throw err;})
+  );
 });
 
 
