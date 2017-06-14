@@ -170,6 +170,46 @@ program
       .done((meta) => console.log(meta));
   });
 
+/**
+ * Tag the git repository at {@code path} with &quot;serial/{@code serial}&quot;, and return a Promise
+ * that resolves when done. This will fail if the tag already exists. The tag is not pushed!
+ *
+ * @param {string} serial - string in the format YYYYMMDDnn, expected of an SOA serial
+ * @param {String} path - path to the git repository to tag;
+ *                        should be a path to a directory that contains a {@code .git/} folder
+ * @return {Promise<Tag>} Promise for a reference to the tag that was created
+ */
+const tagWithSerial = new Contract({
+
+});
+function tagWithSerial(path, serial) {
+  const tagName = "serial/" + serial;
+  const message = "tag with serial " + serial;
+  //noinspection JSUnresolvedVariable
+  return git.Repository
+    .open(path)
+    .catch(ignore => {
+      throw new Error(GitInfo.noGitDirectoryMsg);
+    })
+    .then(repository =>
+      repository
+        .getHeadCommit()
+        .then(head => git.Tag.create(
+          repository,
+          tagName,
+          head,
+          git.Signature.default(repository),
+          message,
+          0
+        ))
+        .catch(ignore => {
+          throw new Error(tagWithSerial.couldNotCreateTagMsg);
+        })
+    );
+}
+
+tagWithSerial.couldNotCreateTagMsg = "COULD NOT CREATE TAG";
+
 program
   .command("next-meta [domain] [path]")
   .alias("nm")
