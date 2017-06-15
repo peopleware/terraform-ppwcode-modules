@@ -15,7 +15,7 @@
  */
 
 const SoaSerial = require("../SoaSerial");
-const util = require("./_util");
+const util = require("../../../js/test/_util");
 const moment = require("moment");
 const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
 
@@ -58,7 +58,7 @@ const notSomeSerials = [
 
 const someDomains = ["apple.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"];
 
-describe("SoaSerial", function() {
+describe("domain_version/SoaSerial", function() {
   describe("constructor", function() {
     someMoments
       .map(m => m.clone())

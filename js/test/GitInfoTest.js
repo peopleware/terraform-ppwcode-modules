@@ -144,7 +144,7 @@ describe("GitInfo", function() {
       return Q.all(
         Git
           .Repository
-          .open(path.dirname(path.dirname(path.dirname(path.dirname(path.resolve(__filename))))))
+          .open(path.dirname(path.dirname(path.dirname(path.resolve(__filename)))))
           .then(repository => repository.getStatus())
           .then(statuses => statuses.map(status => GitInfo.isNotClean(status)))
       );
@@ -202,5 +202,4 @@ describe("GitInfo", function() {
       });
     });
   });
-
 });

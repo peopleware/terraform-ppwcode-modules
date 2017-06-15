@@ -18,10 +18,10 @@
 
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
-const GitInfo = require("./GitInfo");
+const GitInfo = require("../../js/GitInfo");
 const DnsMeta = require("./DnsMeta");
-const tagGitRepo = require("./tagGitRepo");
-const dnsTxt = require("./dnsTxt");
+const tagGitRepo = require("../../js/tagGitRepo");
+const dnsTxt = require("../../js/dnsTxt");
 const packageVersion = require("pkginfo")(module, "version");
 
 //noinspection JSCheckFunctionSignatures

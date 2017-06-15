@@ -1,6 +1,6 @@
 {
   "name": "@ppwcode/terraform-ppwcode-modules",
-  "version": "2.0.0",
+  "version": "2.1.0-pre",
   "description": "A number of general Terraform modules",
   "keywords": [
     "Terraform",
@@ -36,6 +36,6 @@
     "mocha": "^3.4.2"
   },
   "scripts": {
-    "test": "mocha domain_version/js/test/**"
+    "test": "mocha js/test/**/*Test.js domain_version/js/test/**/*Test.js"
   }
 }

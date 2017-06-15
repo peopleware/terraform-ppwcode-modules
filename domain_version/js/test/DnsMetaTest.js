@@ -15,10 +15,10 @@
  */
 
 const DnsMeta = require("../DnsMeta");
-const util = require("./_util");
+const util = require("../../../js/test/_util");
 const SoaSerial = require("../SoaSerial");
-const GitInfo = require("../GitInfo");
-const Q = require("../q2");
+const GitInfo = require("../../../js/GitInfo");
+const Q = require("../../../js/q2");
 
 //noinspection SpellCheckingInspection
 const aSha = "b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b";
@@ -30,7 +30,7 @@ const someDomains = ["apple.com", "google.com", "does.not.exist"];
 const aMoment = new Date(2017, 5, 14, 9, 38, 23.345);
 const somePaths = [__filename, "/lala/land/over/the/rainbow"];
 
-describe("DnsMeta", function() {
+describe("domain_version/DnsMeta", function() {
   describe("constructor", function() {
     const sha = aSha;
     const repo = anOriginUrl;
