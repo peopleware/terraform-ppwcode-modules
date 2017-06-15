@@ -18,9 +18,9 @@
 
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
-const GitInfo = require("./GitInfo");
+const GitInfo = require("@ppwcode/node-gitinfo/GitInfo");
 const DnsMeta = require("./DnsMeta");
-const tagGitRepo = require("./tagGitRepo");
+const tagGitRepo = require("@ppwcode/node-gitinfo/tagGitRepo");
 const dnsTxt = require("./dnsTxt");
 const packageVersion = require("pkginfo")(module, "version");
 

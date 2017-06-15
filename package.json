@@ -1,6 +1,6 @@
 {
   "name": "@ppwcode/terraform-ppwcode-modules",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A number of general Terraform modules",
   "keywords": [
     "Terraform",
@@ -24,13 +24,12 @@
     "node": ">=6.10.3"
   },
   "dependencies": {
+    "@ppwcode/node-gitinfo": "^1.0.0",
     "@toryt/contracts-ii": "^1.2.0",
     "commander": "^2.9.0",
     "moment": "^2.18.1",
-    "nodegit": "^0.18.3",
     "pad": "^1.1.0",
-    "pkginfo": "^0.4.0",
-    "q": "^1.5.0"
+    "pkginfo": "^0.4.0"
   },
   "devDependencies": {
     "mocha": "^3.4.2"

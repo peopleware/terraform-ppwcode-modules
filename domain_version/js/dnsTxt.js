@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-const Q = require("./q2");
+const Q = require("@ppwcode/node-gitinfo/q2");
 const dns = require("dns");
 const Contract = require("@toryt/contracts-ii");
 

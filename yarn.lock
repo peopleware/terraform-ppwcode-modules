@@ -2,6 +2,17 @@
 # yarn lockfile v1
 
 
+"@ppwcode/node-gitinfo@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ppwcode/node-gitinfo/-/node-gitinfo-1.0.0.tgz#d765a7115eae4d36697ba15a379cd5128f92a434"
+  dependencies:
+    "@toryt/contracts-ii" "^1.2.0"
+    commander "^2.9.0"
+    nodegit "^0.18.3"
+    pad "^1.1.0"
+    pkginfo "^0.4.0"
+    q "^1.5.0"
+
 "@toryt/contracts-ii@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@toryt/contracts-ii/-/contracts-ii-1.2.0.tgz#30fabec92fa51238ccb1edfc0a9419d53db4074b"
