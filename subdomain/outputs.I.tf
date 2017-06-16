@@ -21,3 +21,10 @@ output "I-zone_id" {
 output "I-fqdn" {
   value = "${aws_route53_zone.zone.name}"
 }
+
+/**
+ * The full meta payload as a map, including the serial.
+ */
+output "I-meta_payload" {
+  value = "${module.version.I-meta_payload}"
+}

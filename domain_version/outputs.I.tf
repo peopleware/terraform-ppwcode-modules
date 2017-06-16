@@ -15,7 +15,7 @@
  */
 
 /**
- * The full meta payload as a list, including the serial.
+ * The full meta payload as a map, including the serial.
  */
 output "I-meta_payload" {
   value = "${data.null_data_source.meta.inputs}"
