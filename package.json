@@ -9,6 +9,9 @@
     "DNS",
     "Route53"
   ],
+  "bin": {
+    "domainversion": "./domain_version/js/index.js"
+  },
   "homepage": "https://github.com/peopleware/terraform-ppwcode-modules",
   "repository": {
     "type": "git",
