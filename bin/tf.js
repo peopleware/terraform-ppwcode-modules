@@ -95,7 +95,12 @@ production branch and 'make-it-so' to change the production environment to the
 new desired state.
 
 Terraform configurations in staging or production environments should only be
-applied ('tf make-it-so') by CI-tools, and not by humans.
+applied ('tf make-it-so') by CI-tools, and not by humans. This is because this
+is the best guarantee that procedures will be followed to the letter every
+time, so that each build / apply / state is perfectly reproducible in
+production. The best guarantee that the state change will work in production
+without any problems, is to first try it out in a staging environment following
+the exact same procedure.
 
 If anything goes wrong in any of these environments while applying the
 configuration, you are on your own, and these scripts will not help. These
