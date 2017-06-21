@@ -16,7 +16,7 @@
 
 // https://github.com/hashicorp/terraform/issues/12877#issuecomment-289920798
 resource "aws_dynamodb_table" "terraform_statelock" {
-  name           = "tfstate-lock.${var.origanisation_name}"
+  name           = "tfstate-lock.${var.organisation_name}"
   read_capacity  = 20
   write_capacity = 20
   hash_key       = "LockID"

@@ -15,7 +15,7 @@
  */
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "tfstate.${var.origanisation_name}"
+  bucket = "tfstate.${var.organisation_name}"
   region = "${var.region}"
   acl    = "private"
 

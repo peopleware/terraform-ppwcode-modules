@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-variable "origanisation_name" {
+variable "organisation_name" {
   type = "string"
 
   description = <<DESCRIPTION

@@ -15,7 +15,7 @@
  */
 
 resource "aws_s3_bucket" "terraform_state_logging" {
-  bucket = "tfstate-log.${var.origanisation_name}"
+  bucket = "tfstate-log.${var.organisation_name}"
   region = "${var.region}"
   acl    = "log-delivery-write"
 
