@@ -41,6 +41,14 @@ function handleTerraformError(cwd, err) {
       cwd
     );
   }
+  else if (err.message === terraform.workingCopyNotSaveMessage) {
+    console.error(
+      "Git working copy \"%s\" is not save, and you are working in branch \"%s\", which is precious. "
+      + "The command will not be completed.",
+      err.repo,
+      err.branch
+    );
+  }
   else if (err.message === terraform.environmentSwitchFailedMessage) {
     console.error(
       "Did not succeed in setting the environment of \"%s\" to \"%s\". "

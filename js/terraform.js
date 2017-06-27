@@ -193,6 +193,7 @@ function check(expectedEnvironment, terraformConfigurationPath) {
 }
 
 module.exports.noEnvironmentFromBranchMessage = "NO_ENVIRONMENT_FROM_BRANCH";
+module.exports.workingCopyNotSaveMessage = "WORKING_COPY_NOT_SAVE";
 
 /**
  * Make it so that the Terraform environment in {@code terraformConfigurationPath} is in the environment
@@ -216,10 +217,11 @@ module.exports.noEnvironmentFromBranchMessage = "NO_ENVIRONMENT_FROM_BRANCH";
  * It is not possible to test this, without actually changing branches and initialising Terraform,
  * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
  *
+ * @param {boolean} onlyWhenSave - if true, the Promise will be rejected if the git working copy is not save
  * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to set the environment of
  * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
  */
-function setEnvironmentFromBranch(terraformConfigurationPath) {
+function setEnvironmentFromBranch(onlyWhenSave, terraformConfigurationPath) {
   console.log("Making sure you are in the environment of the currently checked-out branch …");
   //noinspection JSUnresolvedFunction
   return Q.all([
@@ -227,6 +229,15 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
       GitInfo.createForHighestGitDir(terraformConfigurationPath)
     ])
     .spread((environments, gitInfo) => {
+      if (gitInfo.isPrecious) {
+        console.warn("The branch \"%s\" is precious.", gitInfo.branch);
+      }
+      if (onlyWhenSave && !gitInfo.isSave) {
+        const err = new Error(module.exports.workingCopyNotSaveMessage);
+        err.branch = gitInfo.branch;
+        err.repo = gitInfo.path;
+        throw err;
+      }
       if (!gitInfo.environment) {
         const err = new Error(module.exports.noEnvironmentFromBranchMessage);
         err.branch = gitInfo.branch;
@@ -288,8 +299,48 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
 module.exports.init = function(terraformConfigurationPath) {
   console.log("Init Terraform configuration in \"%s\" …", terraformConfigurationPath);
   return runWithOutput("terraform init")(terraformConfigurationPath)
-    .then(setEnvironmentFromBranch)
+    .then(setEnvironmentFromBranch.bind(undefined, false))
     .then(() => console.log("Terraform configuration initialised successfully"));
+};
+
+/**
+ * Update Terraform modules, and switch Terraform to the environment derived from the
+ * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}. Then validate, and plan the
+ * configuration.
+ *
+ * This function reports on the console.
+ *
+ * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
+ * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranchMessage} if no branch is checked out
+ * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
+ * named &quot;default&quot; are not supported.
+ * The Promise is rejected if no current environment is found, with message
+ * {@link module#exports#noCurrentEnvironmentMessage}, or when multiple current environments are found,
+ * with message {@link module#exports#multipleCurrentEnvironmentsMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {boolean} onlyWhenSave - if true, the Promise will be rejected if the git working copy is not save
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to test
+ * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
+ */
+function testConfiguration(onlyWhenSave, terraformConfigurationPath) {
+  return runWithOutput(
+    "terraform get --update",
+    "Update Terraform modules in \"" + terraformConfigurationPath + "\" …"
+  )(terraformConfigurationPath)
+    .then(setEnvironmentFromBranch.bind(undefined, onlyWhenSave))
+    .then(runWithOutput(
+      "terraform validate",
+      "Validate Terraform configuration in \"" + terraformConfigurationPath + "\" …"
+    ))
+    .then(runWithOutput(
+      "terraform plan",
+      "Plan Terraform configuration in \"" + terraformConfigurationPath + "\" …"
+    ))
+    .then(() => console.log("Terraform configuration tested successfully"));
 };
 
 /**
@@ -316,26 +367,18 @@ module.exports.init = function(terraformConfigurationPath) {
  */
 module.exports.test = function(terraformConfigurationPath) {
   console.log("Test Terraform configuration in \"%s\" …", terraformConfigurationPath);
-  return runWithOutput(
-    "terraform get --update",
-    "Update Terraform modules in \"" + terraformConfigurationPath + "\" …"
-  )(terraformConfigurationPath)
-    .then(setEnvironmentFromBranch)
-    .then(runWithOutput(
-      "terraform validate",
-      "Validate Terraform configuration in \"" + terraformConfigurationPath + "\" …"
-    ))
-    .then(runWithOutput(
-      "terraform plan",
-      "Plan Terraform configuration in \"" + terraformConfigurationPath + "\" …"
-    ))
-    .then(() => console.log("Terraform configuration tested successfully"));
+  return testConfiguration(false, terraformConfigurationPath);
 };
 
 /**
  * Update Terraform modules, and switch Terraform to the environment derived from the
  * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}. Then validate, and plan the
  * configuration. If all goes well, apply the configuration.
+ *
+ * This function only does is thing if the working copy is save, i.e., there are no dangling changes, and
+ * all commits in this branch are pushed. This only applies to <em>previous</em> branches, i.e.,
+ * branches with &quot;prod&quot;, &quot;stage&quot; or &quot;staging&quot;, or &quot;test&quot; in its name.
+ * Other branches are always save.
  *
  * This function reports on the console.
  *
@@ -356,7 +399,7 @@ module.exports.test = function(terraformConfigurationPath) {
  */
 module.exports.makeItSo = function(terraformConfigurationPath) {
   console.log("Apply Terraform configuration in \"%s\" …", terraformConfigurationPath);
-  return module.exports.test(terraformConfigurationPath)
+  return testConfiguration(true, terraformConfigurationPath)
     .then(runWithOutput(
       "terraform apply",
       "Apply Terraform configuration in \"" + terraformConfigurationPath + "\" …"
@@ -367,6 +410,11 @@ module.exports.makeItSo = function(terraformConfigurationPath) {
 /**
  * Update Terraform modules, and switch Terraform to the environment derived from the
  * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}. Then destroy the environment.
+ *
+ * This function only does is thing if the working copy is save, i.e., there are no dangling changes, and
+ * all commits in this branch are pushed. This only applies to <em>previous</em> branches, i.e.,
+ * branches with &quot;prod&quot;, &quot;stage&quot; or &quot;staging&quot;, or &quot;test&quot; in its name.
+ * Other branches are always save.
  *
  * This function reports on the console.
  *
@@ -392,7 +440,7 @@ module.exports.destroy = function(terraformConfigurationPath) {
     "terraform get --update",
     "Update Terraform modules in \"" + terraformConfigurationPath + "\" …"
   )(terraformConfigurationPath)
-    .then(setEnvironmentFromBranch)
+    .then(setEnvironmentFromBranch.bind(undefined, true))
     .then(runWithOutput(
       "terraform destroy",
       "Destroy Terraform configuration in \"" + terraformConfigurationPath + "\" …"
