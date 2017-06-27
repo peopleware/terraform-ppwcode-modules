@@ -22,48 +22,53 @@
  */
 
 const Q = require("@ppwcode/node-gitinfo/q2");
-const bareExec = require("child_process").exec;
-const exec = Q.denodeify(bareExec);
+const execProcess = require("child_process").exec;
 const eol = require("os").EOL;
 const GitInfo = require("@ppwcode/node-gitinfo");
-const path = require("path");
-const formatBranchAsEnvironmentName = require("@ppwcode/node-gitinfo/formatBranchAsEnvironmentName");
 
 function removeFinalEol(text) {
   return text.endsWith(eol) ? text.substring(0, text.length - 1) : text;
 }
 
+/**
+ * Return a function that takes a {@code cwd}, and executes {@code command} in that {@code cwd}.
+ * The returned function returns a Promise that resolves if the command succeeds to {@code cwd}.
+ * The promise is rejected if the command fails, with an Error.
+ *
+ * This function prints the stdout and stderr the {@code command} returns on the console.
+ *
+ * It is not possible to test this, without actually doing outside calls. That is possible, but very labour intensive.
+ *
+ * @param {string} command - the command to execute
+ * @return {Function} A function that executes {@code command} in {@code cwd}, which it takes as parameter.
+ */
 function runWithOutput(command) {
   return function(cwd) {
+    //noinspection JSUnresolvedFunction
     let deferred = Q.defer();
-    const childProcess = bareExec(
-      command,
-      {
-        cwd: cwd
-      },
-      (err, stdout, stderr) => {
-
-      }
-    );
+    const childProcess = execProcess(command, {cwd: cwd});
 
     const errCommandStr = "`" + command + "`";
     let promiseHandled = false;
 
     childProcess.on("error", (internalError) => {
       if (promiseHandled) {
-        console.warn("Received error event from " + errCommandStr + ", but Promise was already settled (error: "
+        console.error("Received error event from " + errCommandStr + ", but Promise was already settled (error: "
                      + internalError.message + ")");
         return;
       }
       const err = new Error(errCommandStr + " failed because of an internal error: " + internalError.message);
+      err.command = command;
+      err.cwd = cwd;
       err.internalError = internalError;
       promiseHandled = true;
+      //noinspection JSIgnoredPromiseFromCall
       deferred.reject(err);
     });
 
     childProcess.on("exit", (exitCode, signal) => {
       if (promiseHandled) {
-        console.warn("Received exit event from " + errCommandStr + ", but Promise was already settled "
+        console.error("Received exit event from " + errCommandStr + ", but Promise was already settled "
                      + "(exit code: " + exitCode + ", signal: " + signal + ")");
         return;
       }
@@ -80,10 +85,13 @@ function runWithOutput(command) {
         else {
           err = new Error(errCommandStr + " stopped before completion with signal " + signal);
         }
+        err.command = command;
+        err.cwd = cwd;
         err.exitCode = exitCode;
         err.signal = signal;
         err.stderr = childProcess.stderr;
         promiseHandled = true;
+        //noinspection JSIgnoredPromiseFromCall
         deferred.reject(err);
       }
     });
@@ -96,25 +104,41 @@ function runWithOutput(command) {
       console.error(removeFinalEol(data)); // console adds an eol
     });
 
+    //noinspection JSUnresolvedVariable
     return deferred.promise;
   };
 }
 
-
 const currentEnvironmentPattern = /^(\*\s*)?(.*)$/;
+module.exports.multipleCurrentEnvironmentsMessage = "MULTIPLE_CURRENT_ENVIRONMENTS";
+module.exports.noCurrentEnvironmentMessage = "NO_CURRENT_ENVIRONMENT";
 
-function getEnvironments() {
-  return exec("terraform env list", {cwd: path.dirname(path.dirname(__filename))})
+/**
+ * Return a Promise for all environments Terraform knows in {@code terraformConfigurationPath}.
+ * The Promise is rejected if no current environment is found, or multiple current
+ * environments are found.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to set the environment of
+ * @result {Promise<string>} Promise that resolves to all the known environment names, as an array.
+ *                           The array has a property {@code current} of type {@code string}, that is the name of the
+ *                           current environment.
+ */
+function getEnvironments(terraformConfigurationPath) {
+  // TODO the handling of the response should be tested in a separate function
+  const command = "terraform env list";
+  return runWithOutput(command)(terraformConfigurationPath)
     .then(function(args) {
       const stdout = args[0];
-      //const stderr = args[1];
       let environments = stdout.split(eol).filter(l => !!l).map(l => l.trim());
       const currentEnvironmentIndex = environments
         .reduce(
           (acc, e, index) => {
             if (e.startsWith("* ")) {
               if (acc !== undefined) {
-                throw new Error("Multiple candidates for current environment");
+                throw new Error(module.exports.multipleCurrentEnvironmentsMessage);
               }
               return index;
             }
@@ -123,7 +147,7 @@ function getEnvironments() {
           undefined
         );
       if (currentEnvironmentIndex === undefined) {
-        throw new Error("No current environment found");
+        throw new Error(module.exports.noCurrentEnvironmentMessage);
       }
       environments = environments.map(l => currentEnvironmentPattern.exec(l)[2]);
       environments.current = environments[currentEnvironmentIndex];
@@ -131,76 +155,212 @@ function getEnvironments() {
     });
 }
 
-// MUDO throw error
-function setEnvironmentFromBranch(path) {
-  return Q.all([
-                 getEnvironments(),
-                 GitInfo
-                   .createForHighestGitDir(path)
-                   .then(gitInfo => gitInfo.branch)
-               ]).spread((environments, branch) => {
-    let formattedBranch = formatBranchAsEnvironmentName(branch);
-    if (formattedBranch === "master") {
-      formattedBranch = "default";
-    }
+module.exports.environmentSwitchFailedMessage = "ENVIRONMENT_SWITCH_FAILED";
 
-    function check() {
-      return getEnvironments()
-        .then(environments => {
-          if (environments.current !== formattedBranch) {
-            console.error("Switch to environment %s failed", formattedBranch);
-            process.exitCode = 1;
-            return;
-          }
-          console.log("You are now in environment %s", environments.current);
-          return formattedBranch;
-        });
-    }
-
-    if (environments.indexOf(formattedBranch) < 0) {
-      console.warn(
-        "There is not yet an environment for branch \"%s\". Creating environment \"%s\" …",
-        branch,
-        formattedBranch
-      );
-      return exec("terraform env new " + formattedBranch).then(check);
-    }
-    else if (environments.current !== formattedBranch) {
-      console.warn(
-        "You are currently not in the environment of branch \"%s\", but in environment \"%s\". "
-        + "Switching to environment \"%s\" …",
-        branch,
-        environments.current,
-        formattedBranch
-      );
-      return exec("terraform env select " + formattedBranch).then(check);
-    }
-    else {
-      console.log("You are in the correct environment \"%s\" for branch \"%s\".", environments.current, branch);
-      return formattedBranch;
-    }
-  });
+/**
+ * Validate that we are in environment {@code expectedEnvironment}, and report on the console.
+ *
+ * Returns a Promise that resolves to the {@code terraformConfigurationPath} if the test succeeds.
+ * The Promise is rejected if the test fails, with an {@code Error} with message
+ * {@link module#exports#environmentSwitchFailedMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to set the environment of
+ * @param {string} expectedEnvironment - the environment to validate
+ * @return {Promise<string?>} Resolves to {@code terraformConfigurationPath} if the test succeeds.
+ */
+function check(expectedEnvironment, terraformConfigurationPath) {
+  return getEnvironments(terraformConfigurationPath)
+    .then(environments => {
+      if (environments.current !== expectedEnvironment) {
+        const err = Error(module.exports.environmentSwitchFailedMessage);
+        err.expectedEnvironment = expectedEnvironment;
+        err.actualEnvironment = environments.current;
+        throw err;
+      }
+      console.log("You are now in environment %s", expectedEnvironment);
+      return terraformConfigurationPath;
+    });
 }
 
-module.exports.init = function(path) {
-  return runWithOutput("terraform init")(path)
+module.exports.noEnvironmentFromBranch = "NO_ENVIRONMENT_FROM_BRANCH";
+
+/**
+ * Make it so that the Terraform environment in {@code terraformConfigurationPath} is in the environment
+ * that is associated with the currently check out branch of the highest git directory above
+ * {@code terraformConfigurationPath}. Nothing happens if we are already in the desired environment.
+ * If we are not, and the desired environment exists, we switch to the desired environment. If the desired
+ * environment does not yet exist, it is created.
+ *
+ * This function reports on the console.
+ *
+ * Returns a Promise that resolves to the {@code terraformConfigurationPath} name when done.
+ * The Promise is rejected with an {@code Error}
+ * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
+ * named &quot;default&quot; are not supported.
+ * The Promise is rejected if no current environment is found, with message
+ * {@link module#exports#noCurrentEnvironmentMessage}, or when multiple current environments are found,
+ * with message {@link module#exports#multipleCurrentEnvironmentsMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to set the environment of
+ * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
+ */
+function setEnvironmentFromBranch(terraformConfigurationPath) {
+  //noinspection JSUnresolvedFunction
+  return Q.all([
+      getEnvironments(terraformConfigurationPath),
+      GitInfo.createForHighestGitDir(terraformConfigurationPath)
+    ])
+    .spread((environments, gitInfo) => {
+      if (!gitInfo.environment) {
+        const err = new Error(module.exports.noEnvironmentFromBranch);
+        err.branch = gitInfo.branch;
+        throw err;
+      }
+      if (environments.indexOf(gitInfo.environment) < 0) {
+        console.warn(
+          "There is not yet an environment for branch \"%s\". Creating environment \"%s\" …",
+          gitInfo.branch,
+          gitInfo.environment
+        );
+        return runWithOutput("terraform env new " + gitInfo.environment)(terraformConfigurationPath)
+          .then(check.bind(undefined, gitInfo.environment));
+      }
+      else if (environments.current !== gitInfo.environment) {
+        console.warn(
+          "You are currently not in the environment of branch \"%s\", but in environment \"%s\". "
+          + "Switching to environment \"%s\" …",
+          gitInfo.branch,
+          environments.current,
+          gitInfo.environment
+        );
+        return runWithOutput("terraform env select " + gitInfo.environment)(terraformConfigurationPath)
+          .then(check.bind(undefined, gitInfo.environment));
+      }
+      else {
+        console.log(
+          "You are in the correct environment \"%s\" for branch \"%s\".",
+          environments.current,
+          gitInfo.branch
+        );
+        return gitInfo.environment;
+      }
+    }
+  );
+}
+
+/**
+ * Execute {@code terraform init}, and switch Terraform to the environment derived from the
+ * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}.
+ *
+ * This function reports on the console.
+ *
+ * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
+ * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
+ * named &quot;default&quot; are not supported.
+ * The Promise is rejected if no current environment is found, with message
+ * {@link module#exports#noCurrentEnvironmentMessage}, or when multiple current environments are found,
+ * with message {@link module#exports#multipleCurrentEnvironmentsMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to set the environment of
+ * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
+ */
+module.exports.init = function(terraformConfigurationPath) {
+  return runWithOutput("terraform init")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch);
 };
 
-module.exports.test = function(path) {
-  return runWithOutput("terraform get --update")(path)
+/**
+ * Update Terraform modules, and switch Terraform to the environment derived from the
+ * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}. Then validate, and plan the
+ * configuration.
+ *
+ * This function reports on the console.
+ *
+ * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
+ * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
+ * named &quot;default&quot; are not supported.
+ * The Promise is rejected if no current environment is found, with message
+ * {@link module#exports#noCurrentEnvironmentMessage}, or when multiple current environments are found,
+ * with message {@link module#exports#multipleCurrentEnvironmentsMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to test
+ * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
+ */
+module.exports.test = function(terraformConfigurationPath) {
+  return runWithOutput("terraform get --update")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
     .then(runWithOutput("terraform validate"))
     .then(runWithOutput("terraform plan"));
 };
 
-module.exports.makeItSo = function(path) {
-  return module.exports.test(path)
+/**
+ * Update Terraform modules, and switch Terraform to the environment derived from the
+ * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}. Then validate, and plan the
+ * configuration. If all goes well, apply the configuration.
+ *
+ * This function reports on the console.
+ *
+ * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
+ * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
+ * named &quot;default&quot; are not supported.
+ * The Promise is rejected if no current environment is found, with message
+ * {@link module#exports#noCurrentEnvironmentMessage}, or when multiple current environments are found,
+ * with message {@link module#exports#multipleCurrentEnvironmentsMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to apply
+ * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
+ */
+module.exports.makeItSo = function(terraformConfigurationPath) {
+  return module.exports.test(terraformConfigurationPath)
     .then(runWithOutput("terraform apply"));
 };
 
-module.exports.destroy = function(path) {
-  return runWithOutput("terraform get --update")(path)
+/**
+ * Update Terraform modules, and switch Terraform to the environment derived from the
+ * [name of the current git branch]{@linkplain #formatBranchAsEnvironmentName}. Then destroy the environment.
+ *
+ * This function reports on the console.
+ *
+ * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
+ * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
+ * named &quot;default&quot; are not supported.
+ * The Promise is rejected if no current environment is found, with message
+ * {@link module#exports#noCurrentEnvironmentMessage}, or when multiple current environments are found,
+ * with message {@link module#exports#multipleCurrentEnvironmentsMessage}.
+ *
+ * It is not possible to test this, without actually changing branches and initialising Terraform,
+ * apart from writing extensive mocks. The latter might make little sense. This is not done at this time.
+ *
+ * @param {string} terraformConfigurationPath - path to the Terraform configuration directory to destroy
+ * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
+ */
+module.exports.destroy = function(terraformConfigurationPath) {
+  return runWithOutput("terraform get --update")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
     .then(runWithOutput("terraform destroy"));
 };
