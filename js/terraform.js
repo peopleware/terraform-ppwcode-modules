@@ -192,7 +192,7 @@ function check(expectedEnvironment, terraformConfigurationPath) {
     });
 }
 
-module.exports.noEnvironmentFromBranch = "NO_ENVIRONMENT_FROM_BRANCH";
+module.exports.noEnvironmentFromBranchMessage = "NO_ENVIRONMENT_FROM_BRANCH";
 
 /**
  * Make it so that the Terraform environment in {@code terraformConfigurationPath} is in the environment
@@ -206,7 +206,7 @@ module.exports.noEnvironmentFromBranch = "NO_ENVIRONMENT_FROM_BRANCH";
  * Returns a Promise that resolves to the {@code terraformConfigurationPath} name when done.
  * The Promise is rejected with an {@code Error}
  * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
- * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranchMessage} if no branch is checked out
  * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
  * named &quot;default&quot; are not supported.
  * The Promise is rejected if no current environment is found, with message
@@ -228,7 +228,7 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
     ])
     .spread((environments, gitInfo) => {
       if (!gitInfo.environment) {
-        const err = new Error(module.exports.noEnvironmentFromBranch);
+        const err = new Error(module.exports.noEnvironmentFromBranchMessage);
         err.branch = gitInfo.branch;
         throw err;
       }
@@ -272,7 +272,7 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
  *
  * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
  * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
- * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranchMessage} if no branch is checked out
  * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
  * named &quot;default&quot; are not supported.
  * The Promise is rejected if no current environment is found, with message
@@ -301,7 +301,7 @@ module.exports.init = function(terraformConfigurationPath) {
  *
  * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
  * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
- * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranchMessage} if no branch is checked out
  * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
  * named &quot;default&quot; are not supported.
  * The Promise is rejected if no current environment is found, with message
@@ -341,7 +341,7 @@ module.exports.test = function(terraformConfigurationPath) {
  *
  * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
  * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
- * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranchMessage} if no branch is checked out
  * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
  * named &quot;default&quot; are not supported.
  * The Promise is rejected if no current environment is found, with message
@@ -372,7 +372,7 @@ module.exports.makeItSo = function(terraformConfigurationPath) {
  *
  * Returns a Promise that resolves to the environment name when done. The Promise is rejected with an {@code Error}
  * with message {@link module#exports#environmentSwitchFailedMessage} if switching fails. The Promise is rejected
- * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranch} if no branch is checked out
+ * with an {@code Error} with message {@link module#exports#noEnvironmentFromBranchMessage} if no branch is checked out
  * in the git repository (e.g., detached HEAD), or the branch is called &quot;default&quot;. Branches that are
  * named &quot;default&quot; are not supported.
  * The Promise is rejected if no current environment is found, with message

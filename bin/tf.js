@@ -50,7 +50,7 @@ function handleTerraformError(cwd, err) {
       err.actualEnvironment
     );
   }
-  else if (err.message === terraform.noEnvironmentFromBranch) {
+  else if (err.message === terraform.noEnvironmentFromBranchMessage) {
     console.error(
       "There cannot be an environment for branch \"%s\" in \"%s\". Cannot proceed",
       err.branch,
