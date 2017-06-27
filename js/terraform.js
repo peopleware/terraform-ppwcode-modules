@@ -41,10 +41,14 @@ function removeFinalEol(text) {
  * It is not possible to test this, without actually doing outside calls. That is possible, but very labour intensive.
  *
  * @param {string} command - the command to execute
+ * @param {string?} consoleMessage - message to show in the console before we begin
  * @return {Function} A function that executes {@code command} in {@code cwd}, which it takes as parameter.
  */
-function runWithOutput(command) {
+function runWithOutput(command, consoleMessage) {
   return function(cwd) {
+    if (consoleMessage) {
+      console.log(consoleMessage);
+    }
     //noinspection JSUnresolvedFunction
     let deferred = Q.defer();
     const childProcess = execProcess(command, {cwd: cwd});
@@ -128,6 +132,7 @@ module.exports.noCurrentEnvironmentMessage = "NO_CURRENT_ENVIRONMENT";
  *                           current environment.
  */
 function getEnvironments(terraformConfigurationPath) {
+  console.log("Getting the known Terraform environments …");
   // TODO the handling of the response should be tested in a separate function
   const command = "terraform env list";
   return exec(command, {cwd: terraformConfigurationPath})
@@ -173,6 +178,7 @@ module.exports.environmentSwitchFailedMessage = "ENVIRONMENT_SWITCH_FAILED";
  * @return {Promise<string?>} Resolves to {@code terraformConfigurationPath} if the test succeeds.
  */
 function check(expectedEnvironment, terraformConfigurationPath) {
+  console.log("Double checking that you are in the environment of the currently checked-out branch …");
   return getEnvironments(terraformConfigurationPath)
     .then(environments => {
       if (environments.current !== expectedEnvironment) {
@@ -214,6 +220,7 @@ module.exports.noEnvironmentFromBranch = "NO_ENVIRONMENT_FROM_BRANCH";
  * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
  */
 function setEnvironmentFromBranch(terraformConfigurationPath) {
+  console.log("Making sure you are in the environment of the currently checked-out branch …");
   //noinspection JSUnresolvedFunction
   return Q.all([
       getEnvironments(terraformConfigurationPath),
@@ -231,7 +238,7 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
           gitInfo.branch,
           gitInfo.environment
         );
-        return runWithOutput("terraform env new " + gitInfo.environment)(terraformConfigurationPath)
+        return runWithOutput("terraform env new " + gitInfo.environment)(terraformConfigurationPath + " …")
           .then(check.bind(undefined, gitInfo.environment));
       }
       else if (environments.current !== gitInfo.environment) {
@@ -279,6 +286,7 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
  * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
  */
 module.exports.init = function(terraformConfigurationPath) {
+  console.log("Init Terraform configuration in \"%s\" …", terraformConfigurationPath);
   return runWithOutput("terraform init")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
     .then(() => console.log("terraform configuration initialised successfully"));
@@ -307,10 +315,20 @@ module.exports.init = function(terraformConfigurationPath) {
  * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
  */
 module.exports.test = function(terraformConfigurationPath) {
-  return runWithOutput("terraform get --update")(terraformConfigurationPath)
+  console.log("Test Terraform configuration in \"%s\" …", terraformConfigurationPath);
+  return runWithOutput(
+    "terraform get --update",
+    "Update Terraform modules in \"" + terraformConfigurationPath + "\" …"
+  )(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
-    .then(runWithOutput("terraform validate"))
-    .then(runWithOutput("terraform plan"))
+    .then(runWithOutput(
+      "terraform validate",
+      "Validate Terraform configuration in \"" + terraformConfigurationPath + "\" …"
+    ))
+    .then(runWithOutput(
+      "terraform plan",
+      "Plan Terraform configuration in \"" + terraformConfigurationPath + "\" …"
+    ))
     .then(() => console.log("terraform configuration tested successfully"));
 };
 
@@ -337,8 +355,12 @@ module.exports.test = function(terraformConfigurationPath) {
  * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
  */
 module.exports.makeItSo = function(terraformConfigurationPath) {
+  console.log("Apply Terraform configuration in \"%s\" …", terraformConfigurationPath);
   return module.exports.test(terraformConfigurationPath)
-    .then(runWithOutput("terraform apply"))
+    .then(runWithOutput(
+      "terraform apply",
+      "Apply Terraform configuration in \"" + terraformConfigurationPath + "\" …"
+    ))
     .then(() => console.log("terraform configuration applied successfully"));
 };
 
@@ -364,8 +386,16 @@ module.exports.makeItSo = function(terraformConfigurationPath) {
  * @result {Promise<string>} Promise that resolves to the {@code terraformConfigurationPath}.
  */
 module.exports.destroy = function(terraformConfigurationPath) {
-  return runWithOutput("terraform get --update")(terraformConfigurationPath)
+  console.log("Destroy Terraform configuration in \"%s\" …", terraformConfigurationPath);
+  console.log("Updating Terraform modules …");
+  return runWithOutput(
+    "terraform get --update",
+    "Update Terraform modules in \"" + terraformConfigurationPath + "\" …"
+  )(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
-    .then(runWithOutput("terraform destroy"))
+    .then(runWithOutput(
+      "terraform destroy",
+      "Destroy Terraform configuration in \"" + terraformConfigurationPath + "\" …"
+    ))
     .then(() => console.log("terraform configuration destroyed successfully"));
 };
