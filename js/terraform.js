@@ -249,7 +249,7 @@ function setEnvironmentFromBranch(onlyWhenSave, terraformConfigurationPath) {
           gitInfo.branch,
           gitInfo.environment
         );
-        return runWithOutput("terraform env new " + gitInfo.environment)(terraformConfigurationPath + " …")
+        return runWithOutput("terraform env new " + gitInfo.environment)(terraformConfigurationPath)
           .then(check.bind(undefined, gitInfo.environment));
       }
       else if (environments.current !== gitInfo.environment) {
