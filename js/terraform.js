@@ -279,7 +279,8 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
  */
 module.exports.init = function(terraformConfigurationPath) {
   return runWithOutput("terraform init")(terraformConfigurationPath)
-    .then(setEnvironmentFromBranch);
+    .then(setEnvironmentFromBranch)
+    .then(() => console.log("terraform configuration initialised successfully"));
 };
 
 /**
@@ -308,7 +309,8 @@ module.exports.test = function(terraformConfigurationPath) {
   return runWithOutput("terraform get --update")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
     .then(runWithOutput("terraform validate"))
-    .then(runWithOutput("terraform plan"));
+    .then(runWithOutput("terraform plan"))
+    .then(() => console.log("terraform configuration tested successfully"));
 };
 
 /**
@@ -335,7 +337,8 @@ module.exports.test = function(terraformConfigurationPath) {
  */
 module.exports.makeItSo = function(terraformConfigurationPath) {
   return module.exports.test(terraformConfigurationPath)
-    .then(runWithOutput("terraform apply"));
+    .then(runWithOutput("terraform apply"))
+    .then(() => console.log("terraform configuration applied successfully"));
 };
 
 /**
@@ -362,5 +365,6 @@ module.exports.makeItSo = function(terraformConfigurationPath) {
 module.exports.destroy = function(terraformConfigurationPath) {
   return runWithOutput("terraform get --update")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
-    .then(runWithOutput("terraform destroy"));
+    .then(runWithOutput("terraform destroy"))
+    .then(() => console.log("terraform configuration destroyed successfully"));
 };
