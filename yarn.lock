@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@ppwcode/node-gitinfo@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ppwcode/node-gitinfo/-/node-gitinfo-1.0.0.tgz#d765a7115eae4d36697ba15a379cd5128f92a434"
+"@ppwcode/node-gitinfo@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ppwcode/node-gitinfo/-/node-gitinfo-2.0.0.tgz#173fd7eaf78ffd7d4f04470bca7fd2144be688d5"
   dependencies:
     "@toryt/contracts-ii" "^1.2.0"
     commander "^2.9.0"
