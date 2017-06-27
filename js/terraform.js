@@ -258,7 +258,7 @@ function setEnvironmentFromBranch(terraformConfigurationPath) {
           environments.current,
           gitInfo.branch
         );
-        return gitInfo.environment;
+        return terraformConfigurationPath;
       }
     }
   );
