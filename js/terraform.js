@@ -23,6 +23,7 @@
 
 const Q = require("@ppwcode/node-gitinfo/q2");
 const execProcess = require("child_process").exec;
+const exec = Q.denodeify(execProcess);
 const eol = require("os").EOL;
 const GitInfo = require("@ppwcode/node-gitinfo");
 
@@ -129,7 +130,7 @@ module.exports.noCurrentEnvironmentMessage = "NO_CURRENT_ENVIRONMENT";
 function getEnvironments(terraformConfigurationPath) {
   // TODO the handling of the response should be tested in a separate function
   const command = "terraform env list";
-  return runWithOutput(command)(terraformConfigurationPath)
+  return exec(command, {cwd: terraformConfigurationPath})
     .then(function(args) {
       const stdout = args[0];
       let environments = stdout.split(eol).filter(l => !!l).map(l => l.trim());
