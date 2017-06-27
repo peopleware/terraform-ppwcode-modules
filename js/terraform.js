@@ -289,7 +289,7 @@ module.exports.init = function(terraformConfigurationPath) {
   console.log("Init Terraform configuration in \"%s\" …", terraformConfigurationPath);
   return runWithOutput("terraform init")(terraformConfigurationPath)
     .then(setEnvironmentFromBranch)
-    .then(() => console.log("terraform configuration initialised successfully"));
+    .then(() => console.log("Terraform configuration initialised successfully"));
 };
 
 /**
@@ -329,7 +329,7 @@ module.exports.test = function(terraformConfigurationPath) {
       "terraform plan",
       "Plan Terraform configuration in \"" + terraformConfigurationPath + "\" …"
     ))
-    .then(() => console.log("terraform configuration tested successfully"));
+    .then(() => console.log("Terraform configuration tested successfully"));
 };
 
 /**
@@ -361,7 +361,7 @@ module.exports.makeItSo = function(terraformConfigurationPath) {
       "terraform apply",
       "Apply Terraform configuration in \"" + terraformConfigurationPath + "\" …"
     ))
-    .then(() => console.log("terraform configuration applied successfully"));
+    .then(() => console.log("Terraform configuration applied successfully"));
 };
 
 /**
@@ -397,5 +397,5 @@ module.exports.destroy = function(terraformConfigurationPath) {
       "terraform destroy",
       "Destroy Terraform configuration in \"" + terraformConfigurationPath + "\" …"
     ))
-    .then(() => console.log("terraform configuration destroyed successfully"));
+    .then(() => console.log("Terraform configuration destroyed successfully"));
 };
