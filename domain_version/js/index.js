@@ -106,8 +106,6 @@ program
       .done((meta) => console.log("%j", meta));
   });
 
-const serialTagPrefix = "serial/";
-
 //noinspection JSCheckFunctionSignatures
 program
   .command("next-meta [domain] [path]")
