@@ -45,7 +45,7 @@ data "external" "tag" {
     "node",
     "${path.module}/js/index.js",
     "tag",
-    "serial/${data.external.calculated_meta.result.serial}",
+    "serial/${terraform.env}/${data.external.calculated_meta.result.serial}",
   ]
 
   depends_on = ["aws_route53_record.meta"]
