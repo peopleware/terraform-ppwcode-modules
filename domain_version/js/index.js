@@ -16,6 +16,20 @@
  * limitations under the License.
  */
 
+// MUDO move to bin, and remove commands covered in gitinfo
+/* MUDO there is an unresolved problem with new environments
+        with a brand new environment plan and apply fail, because
+        "Resource 'data.external.calculated_meta' does not have attribute 'result.serial' for variable 'data.external.calculated_meta.result.serial'"
+        It turns out this script isn't even called in that case. Providing a default doesn't help either.
+        The assumption is that, early on, Terraform looks for the previous value in the state file, and there isn't one
+        yet.
+        If the complete usage of this script result is removed, and terraform is applied, it works.
+        And after that, when adding this, this works too.
+        So, building a configuration step by step will alway work.
+        But that is not the intention with environments. With environments, the intention is to take what we have
+        already, and "copy" it in the new environment. And that will not work.
+    */
+
 const program = require("commander");
 const SoaSerial = require("./SoaSerial");
 const GitInfo = require("@ppwcode/node-gitinfo/GitInfo");
