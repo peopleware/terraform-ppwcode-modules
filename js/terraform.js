@@ -341,7 +341,7 @@ function testConfiguration(onlyWhenSave, terraformConfigurationPath) {
       "Plan Terraform configuration in \"" + terraformConfigurationPath + "\" …"
     ))
     .then(() => console.log("Terraform configuration tested successfully"));
-};
+}
 
 /**
  * Update Terraform modules, and switch Terraform to the environment derived from the
