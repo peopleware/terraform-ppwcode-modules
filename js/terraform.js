@@ -442,7 +442,7 @@ module.exports.destroy = function(terraformConfigurationPath) {
   )(terraformConfigurationPath)
     .then(setEnvironmentFromBranch.bind(undefined, true))
     .then(runWithOutput(
-      "terraform destroy",
+      "terraform destroy -force",
       "Destroy Terraform configuration in \"" + terraformConfigurationPath + "\" …"
     ))
     .then(() => console.log("Terraform configuration destroyed successfully"));
