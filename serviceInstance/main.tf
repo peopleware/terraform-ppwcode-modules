@@ -25,10 +25,17 @@
  * - 1 TXT record that lists specfics about the service instance
  */
 
+data "null_data_source" "extra_details" {
+  inputs = {
+    submitted = "${timestamp()}"
+  }
+}
+
 locals {
   type     = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
   fullType = "${trimspace(var.subtype) == "" ? "" : format("_%s._sub.", trimspace(var.subtype))}${local.type}"
   instance = "${trimspace(var.instance)}.${local.type}"
+  fullDetails = "${merge(var.details, data.null_data_source.extra_details.inputs)}"
 }
 
 resource "aws_route53_record" "ptr" {
@@ -60,5 +67,5 @@ resource "aws_route53_record" "txt" {
   type    = "TXT"
   ttl     = "${var.ttl}"
 
-  records = ["${formatlist("%s=%s", keys(var.details), values(var.details))}"]
+  records = ["${formatlist("%s=%s", keys(local.fullDetails), values(local.fullDetails))}"]
 }
