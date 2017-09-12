@@ -26,11 +26,9 @@
  */
 
 locals {
-  type        = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
-  fullType    = "${trimspace(var.subtype) == "" ? "" : format("_%s._sub.", trimspace(var.subtype))}${local.type}"
-  instance    = "${trimspace(var.instance)}.${local.type}"
-  submitted   = "${timestamp()}"
-  fullDetails = "${merge(map("submitted", local.submitted), var.details)}"                                        // submitted must be the first property
+  type     = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
+  fullType = "${trimspace(var.subtype) == "" ? "" : format("_%s._sub.", trimspace(var.subtype))}${local.type}"
+  instance = "${trimspace(var.instance)}.${local.type}"
 }
 
 resource "aws_route53_record" "ptr" {
@@ -62,12 +60,5 @@ resource "aws_route53_record" "txt" {
   type    = "TXT"
   ttl     = "${var.ttl}"
 
-  records = ["${formatlist("%s=%s", keys(local.fullDetails), values(local.fullDetails))}"]
-
-  lifecycle {
-    ignore_changes = [
-      // submitted
-      "records[0]",
-    ]
-  }
+  records = ["${formatlist("%s=%s", keys(var.details), values(var.details))}"]
 }
