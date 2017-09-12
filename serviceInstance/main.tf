@@ -32,9 +32,9 @@ data "null_data_source" "extra_details" {
 }
 
 locals {
-  type     = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
-  fullType = "${trimspace(var.subtype) == "" ? "" : format("_%s._sub.", trimspace(var.subtype))}${local.type}"
-  instance = "${trimspace(var.instance)}.${local.type}"
+  type        = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
+  fullType    = "${trimspace(var.subtype) == "" ? "" : format("_%s._sub.", trimspace(var.subtype))}${local.type}"
+  instance    = "${trimspace(var.instance)}.${local.type}"
   fullDetails = "${merge(var.details, data.null_data_source.extra_details.inputs)}"
 }
 
