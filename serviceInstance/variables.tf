@@ -64,10 +64,16 @@ EOF
 variable "instance" {
   type = "string"
 
+  /* http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DomainNameFormat.html
+     Formatting Domain Names for Hosted Zones and Resource Record Sets
+     "escape codes in the format \three-digit octal code" \
+     Upper case is not supported by Route53! Not even with escape codes. */
+
   description = <<EOF
 Name of the service instance. This should be human readable, and can contain any character
-in principle. Currently, the user must replace all readable ASCII characters by an 3-digit
-octal (double) escape sequence. E.g., instead of a space, use '\\040'.
+in principle. Currently, the user must replace all non-readable ASCII characters by an 3-digit
+octal (double) escape sequence. E.g., instead of a space, use '\\040'. Upper case is not
+supported.
 EOF
 }
 
