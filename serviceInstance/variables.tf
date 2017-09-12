@@ -86,7 +86,7 @@ variable "port" {
 Port at which the service instance is hosted at the $${var.host}. Default is 443 (https).
 EOF
 
-  default = "443"
+  default = 443
 }
 
 variable "priority" {
@@ -96,7 +96,7 @@ variable "priority" {
 Priority of this service instance among it's peers. Default 0.
 EOF
 
-  default = "0"
+  default = 0
 }
 
 variable "weight" {
@@ -106,7 +106,7 @@ variable "weight" {
 Weight of this service instance among it's peers with the same priority. Default 0.
 EOF
 
-  default = "0"
+  default = 0
 }
 
 variable "details" {
