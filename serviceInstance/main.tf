@@ -67,5 +67,5 @@ resource "aws_route53_record" "txt" {
   type    = "TXT"
   ttl     = "${var.ttl}"
 
-  records = ["${formatlist("%s=%s", keys(local.fullDetails), values(local.fullDetails))}"]
+  records = ["${join("\"\"", formatlist("%s=%s", keys(local.fullDetails), values(local.fullDetails)))}"]
 }
