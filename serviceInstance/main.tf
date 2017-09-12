@@ -51,7 +51,8 @@ resource "aws_route53_record" "srv" {
   ttl     = "${var.ttl}"
 
   records = [
-    "${format("%d %d %d %s", var.priority, var.weight, var.port, var.host)}",
+    // "0 +" coerces to number
+    "${format("%d %d %d %s", 0 + var.priority, 0 + var.weight, 0 + var.port, var.host)}",
   ]
 }
 
