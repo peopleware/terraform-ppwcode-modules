@@ -123,7 +123,7 @@ Details about the service instance. Should at least contain a value for the key 
 containing a number that represents the data version of this record,
 and a value for the key 'at', containing an UTC timestamp string in RFC 3339 format that
 reflects when this information was defined. An UTC timestamp string in RFC 3339 format
-is added for the key 'submitted', that reflects when this information was last updated
+should be added for the key 'submitted', that reflects when this information was last updated
 in DNS (which should be later than 'at'). You should avoid using keys 'type', 'name',
 'host', 'port', 'priority', 'weight'
 EOF
