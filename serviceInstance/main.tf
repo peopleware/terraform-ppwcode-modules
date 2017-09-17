@@ -23,11 +23,13 @@
  * - 1 SRV record that defines at which domain name and port the service instance operates, and
  *   with which priority and weight
  * - 1 TXT record that lists specfics about the service instance
+ *
+ * A key-value pair "at=NOW" is automatically added to the TXT record
  */
 
 data "null_data_source" "extra_details" {
   inputs = {
-    submitted = "${timestamp()}"
+    at = "${timestamp()}"
   }
 }
 

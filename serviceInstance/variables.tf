@@ -120,12 +120,10 @@ variable "details" {
 
   description = <<EOF
 Details about the service instance. Should at least contain a value for the key 'textvers',
-containing a number that represents the data version of this record,
-and a value for the key 'at', containing an UTC timestamp string in RFC 3339 format that
-reflects when this information was defined. An UTC timestamp string in RFC 3339 format
-should be added for the key 'submitted', that reflects when this information was last updated
-in DNS (which should be later than 'at'). You should avoid using keys 'type', 'name',
-'host', 'port', 'priority', 'weight'
+containing a number that represents the data version of this record. A key-value pair "at=NOW"
+is automatically added, containing an UTC timestamp string in RFC 3339 format that
+reflects the last time of application of this definition. You should avoid using keys 'at',
+'type', 'subtype', 'name', 'instance', 'host', 'port', 'priority', 'weight'.
 EOF
 
   default = {}

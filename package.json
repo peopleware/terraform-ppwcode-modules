@@ -1,13 +1,14 @@
 {
   "name": "@ppwcode/terraform-ppwcode-modules",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "A number of general Terraform modules",
   "keywords": [
     "Terraform",
     "AWS",
     "S3",
     "DNS",
-    "Route53"
+    "Route53",
+    "DNS-SD"
   ],
   "bin": {
     "domainversion": "./domain_version/js/index.js"
