@@ -63,6 +63,10 @@ resource "aws_route53_record" "srv" {
   ]
 }
 
+/**
+ * This follows https://tools.ietf.org/html/rfc1464.
+ * See HowtoDefineMultiStringTXTRecords.md
+ */
 resource "aws_route53_record" "txt" {
   zone_id = "${var.domain-zone_id}"
   name    = "${local.instance}"
