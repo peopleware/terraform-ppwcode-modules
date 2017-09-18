@@ -29,14 +29,15 @@ data "null_data_source" "meta" {
 
 /**
  * A TXT record, called `meta.${var.domain_name}`, that has given ${var.meta} as payload,
- * extended with `serial=${var.serial}`. This follows following https://tools.ietf.org/html/rfc1464.
+ * extended with `serial=${var.serial}`. This follows https://tools.ietf.org/html/rfc1464.
+ * See HowtoDefineMultiStringTXTRecords.md
  */
 resource "aws_route53_record" "meta" {
   zone_id = "${var.zone_id}"
   name    = "meta.${var.domain_name}"
   type    = "TXT"
   ttl     = "${var.ttl}"
-  records = ["${formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs))}"]
+  records = ["${join("\"\"", formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs)))}"]
 }
 
 data "external" "tag" {
