@@ -41,6 +41,15 @@ _Note to the [Terraform] maintainers: go with the flow, and promote [npm] / [yar
 modules._
 
 
+
+
+// TODO
+=======
+
+ `@ppwcode/node-gitinfo` should be updated asap, to use a more recent version of nodegit (because there
+ is no pre-build binary for the latest node of the older version).
+
+
 [Terraform]: https://peopleware.atlassian.net/wiki/x/CwAvBg
 [how to use modules]: https://www.terraform.io/docs/modules/usage.html
 [Terraform module sources]: https://www.terraform.io/docs/modules/sources.html
