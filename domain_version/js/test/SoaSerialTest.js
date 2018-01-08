@@ -56,7 +56,7 @@ const notSomeSerials = [
   "2017063234"
 ];
 
-const someDomains = ["apple.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"];
+const someDomains = ["microsoft.com", "google.com", "ppwcode.org", "this.domain.does.not.exist"];
 
 describe("SoaSerial", function() {
   describe("constructor", function() {
