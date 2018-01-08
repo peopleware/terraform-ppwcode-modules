@@ -20,7 +20,7 @@ const moment = require("moment");
 const ConditionError = require("@toryt/contracts-ii/src/II/ConditionError");
 
 const someMoments = [
-  moment("20170611T161923.345Z"),
+  moment("20180108T142423.345Z"),
   moment("20170611T161923.345+02:00"),
   moment("20170611T161923.345-06:00"),
   moment("20170611T011923.345+02:00"),
@@ -184,13 +184,14 @@ describe("SoaSerial", function() {
                   }
                 );
             },
-            ignore => {
+            err => {
               return SoaSerial.currentSoaSerial(domain)
                 .then(currentSoaSerial => {
                   if (currentSoaSerial.sequenceNumber
                       < SoaSerial.maxSequenceNumber
                       || currentSoaSerial.serialStart
                          !== moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern)) {
+                    console.log(err);
                     throw new Error("resolution rejected for no good reason");
                   }
                   console.log("%s: rejected - current YYYYMMDDnn serial is %s", domain, currentSoaSerial.serial);
