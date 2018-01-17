@@ -24,12 +24,12 @@ This should be the domain name of the organisation.
 DESCRIPTION
 }
 
-variable "version" {
+variable "prefix" {
   type = "string"
 
   description = <<DESCRIPTION
-Optional version of this structure. This makes it possible to create a new structure
-on a live situation. The names then becomes "v<VERSION>.tfstate.…". Configurations can be switched one by one.
+Optional prefix of this structure, e.g., "v2". This makes it possible to create a new structure
+on a live situation. The names then becomes "<PREFIX>.tfstate.…". Configurations can be switched one by one.
 When switching, terraform proposes to copy the existing configuration file. You should answer "yes".
 DESCRIPTION
 
