@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
+output "I-logging_bucket" {
+  value = "${aws_s3_bucket.terraform_state_logging.bucket}"
+}
+
 output "I-logging_bucket_id" {
   value = "${aws_s3_bucket.terraform_state_logging.id}"
 }
 
 output "I-logging_bucket_arn" {
   value = "${aws_s3_bucket.terraform_state_logging.arn}"
+}
+
+output "I-state_bucket" {
+  value = "${aws_s3_bucket.terraform_state.bucket}"
 }
 
 output "I-state_bucket_id" {
