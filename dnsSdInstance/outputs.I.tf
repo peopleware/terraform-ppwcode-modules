@@ -20,7 +20,7 @@ output "I-zone_id" {
 
 locals {
   I_instanceInfo = {
-    type     = "${local.type}"
+    type     = "${local.main_type}"
     instance = "${aws_route53_record.srv.name}"
     host     = "${var.host}"
     port     = "${var.port}"

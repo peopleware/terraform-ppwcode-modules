@@ -36,8 +36,8 @@ data "null_data_source" "extra_details" {
 }
 
 locals {
-  type        = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
-  instance    = "${trimspace(var.instance)}.${local.type}"
+  main_type   = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
+  instance    = "${trimspace(var.instance)}.${local.main_type}"
   fullDetails = "${merge(var.details, data.null_data_source.extra_details.inputs)}"
 }
 
