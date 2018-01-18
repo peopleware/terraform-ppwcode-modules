@@ -44,16 +44,28 @@ EOF
 variable "type" {
   type = "string"
 
-  description = <<EOF
-Service type identification. The starting dash is added automatically. For APIs, use type "api",
-and specify the actual API with a subtype. For UIs, use type "http". A subtype is optional.
-The user should create a `PTR` resource record for the full name of this service type
-("_$${var.type}._$${var.protocol}.$${var.domain-name}") or one of its subtypes
-("<subtype>._sub._$${var.type}._$${var.protocol}.$${var.domain-name}"),
-with the full name of this servive instance
-("$${var.instance}._$${var.type}._$${var.protocol}.$${var.domain-name}")
-as value.
-EOF
+  description = <<DESCRIPTION
+Main service type identification. The starting dash is added automatically. For APIs, use type "api",
+and specify the actual API with a subtype. For UIs, use type "http".
+The user should create a `PTR` resource record for the `generic_type` in the output, with the dns domain in which the
+type is defined as postfix. An actual DNS-SD service type is composed as `<generic_type>.<DNS DOMAIN>`.
+A DNS-SD generic service type typically has the form `_<generic_type>._sub._<type>._<protocol>`. If there is no
+subtype, the generic type is `_<type>._<protocol>`.
+DESCRIPTION
+}
+
+variable "subtype" {
+  type = "string"
+
+  description = <<DESCRIPTION
+Optional subtype of the service type. The starting dash is added always (by convention). Not used to create resources,
+but to provide clear identification in output "generic_type". DNS-SD generic service types are the first part of a
+DNS-SD service type, leaving out the domain. An actual DNS-SD service type is composed as `<generic_type>.<DNS DOMAIN>`.
+A DNS-SD generic service type typically has the form `_<generic_type>._sub._<type>._<protocol>`. If there is no
+subtype, the generic type is `_<type>._<protocol>`.
+DESCRIPTION
+
+  default = ""
 }
 
 variable "instance" {
