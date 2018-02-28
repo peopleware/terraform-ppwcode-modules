@@ -313,7 +313,10 @@ SoaSerial.currentSoaSerial = new Contract({
  * at {@code at}. If no SOA record exists, the network is not available, or the serial is not in
  * the format YYYYMMDDnn, an SoaSerial is created with sequence number 0.
  * The promise is rejected if the current sequence number is already at 99, and {@code at} is at the same
- * day in the UTC time zone as reflected by the current SOA serial.
+ * day in the UTC time zone as reflected by the current SOA serial, or if {@code at} is before the
+ * day of the current SOA serial in the UTC timezone.
+ *
+ * In principle, {@code at} must be today, or in the future.
  *
  * @param {string} domain - FQDN of the domain to get the current SOA record of
  * @param {Date|moment.Moment} at - the time at which the resulting instance would be used
@@ -348,7 +351,8 @@ SoaSerial.nextSoaSerial = new Contract({
         pre: [
           err => true
           /* current sequence number is already at 99, and {@code at} is at the same
-             day in the UTC time zone as reflected by the current SOA serial. */
+             day in the UTC time zone as reflected by the current SOA serial, or {@code at} is before the
+             day reflected by the current SOA serial. */
         ],
         post: [() => false],
         exception: [
@@ -366,9 +370,10 @@ SoaSerial.nextSoaSerial = new Contract({
  * - If {@link #at} has the same UTC date as {@code useAt}, the result has the same {@link at} as {@code this}
  *   (and thus the same {@link year()}, {@link month()}, and {@link #day()}, but its {@link #sequenceNumber} is the
  *   successor of this' {@link #sequenceNumber}.
- * - If there is a {@code currentSerial}, and its date part represents the UTC date of {@code at},
- *   that date part followed by a 2-digit sequence number that is the successor of the sequence number in
- *   {@code currentSerial}
+ *
+ * Fails if the day of {@code useAt} is before the day of {@link at} in the UTC timezone, or the sequence numbers are
+ * depleted.
+ * In principle, {@code useAt} must be today, or in the future.
  *
  * @param {Date|Moment} useAt - the time at which the resulting instance would be used
  * @return {SoaSerial} Next SOA serial, to be used at {@code useAt}, given {@code this} as the current SOA serial
