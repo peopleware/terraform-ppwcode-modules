@@ -16,7 +16,7 @@
 
 const GitInfo = require("@ppwcode/node-gitinfo/GitInfo");
 const SoaSerial = require("./SoaSerial");
-const Contract = require("@toryt/contracts-ii");
+const Contract = require("@toryt/contracts-iii");
 const Q = require("@ppwcode/node-gitinfo/q2");
 const moment = require("moment");
 

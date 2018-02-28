@@ -51,5 +51,5 @@ or
 [RFC 6763 section 6]: https://tools.ietf.org/html/rfc6763#section-6
 [RFC 1912 section 2.2]: https://tools.ietf.org/html/rfc1912
 [Mocha]: https://mochajs.org
-[Toryt Contracts]: https://www.npmjs.com/package/@toryt/contracts-ii
+[Toryt Contracts]: https://www.npmjs.com/package/@toryt/contracts-iii
 

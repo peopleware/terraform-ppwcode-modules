@@ -16,6 +16,10 @@
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@toryt/contracts-ii/-/contracts-ii-2.1.3.tgz#bc8dfce83dc84da8e429d818f983a4a861b26d6e"
 
+"@toryt/contracts-iii@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@toryt/contracts-iii/-/contracts-iii-3.1.0.tgz#b0d9b7b04b1e8c37fd537e1fa51793c2dc977afb"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"

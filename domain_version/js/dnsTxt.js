@@ -18,7 +18,7 @@
 
 const Q = require("@ppwcode/node-gitinfo/q2");
 const dns = require("dns");
-const Contract = require("@toryt/contracts-ii");
+const Contract = require("@toryt/contracts-iii");
 
 /**
  * Promise for the key / value pairs in DNS TXT records for {@code fqdn}.

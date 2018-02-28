@@ -18,7 +18,7 @@ const moment = require("moment");
 const pad = require("pad");
 const Q = require("@ppwcode/node-gitinfo/q2");
 const dns = require("dns");
-const Contract = require("@toryt/contracts-ii");
+const Contract = require("@toryt/contracts-iii");
 
 class SoaSerial {
 
