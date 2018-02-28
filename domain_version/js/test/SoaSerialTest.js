@@ -154,51 +154,53 @@ describe("SoaSerial", function() {
     });
   });
   describe("nextSoaSerial", function() {
-    someDomains.forEach(function(domain) {
-      it("should return a promise for \"" + domain + "\"", function() {
-        const at = someMoments[0];
-        /* Note: we do not cover everything here, because we have no control over the changing of serials of
-                 apple.com, the only one of our examples that does follow the guideline to use YYYYMMDDnn */
-        const result = SoaSerial.nextSoaSerial(domain, at);
-        return result
-          .then(
-            soaSerial => {
-              return SoaSerial.currentSoaSerial(domain)
-                .then(
-                  currentSoaSerial => {
-                    if (soaSerial.serial !== currentSoaSerial.next(at).serial) {
-                      throw new Error("resolution does not represent the expected serial");
+    const moments = [someMoments[0], moment()];
+    moments.forEach(function(m) {
+      someDomains.forEach(function(domain) {
+        it("should return a promise for \"" + domain + "\" and useAt = " + m.format(), function() {
+          const at = moment(); // today, because we do not want to change the tests each time one of the domains changes
+          /* Note: we do not cover everything here, because we have no control over the changing of serials of
+                   apple.com, the only one of our examples that does follow the guideline to use YYYYMMDDnn */
+          const result = SoaSerial.nextSoaSerial(domain, m);
+          return result
+            .then(
+              soaSerial => {
+                return SoaSerial.currentSoaSerial(domain)
+                  .then(
+                    currentSoaSerial => {
+                      if (soaSerial.serial !== currentSoaSerial.next(at).serial) {
+                        throw new Error("resolution does not represent the expected serial");
+                      }
+                      console.log("%s: current YYYYMMDDnn serial is %s --> %s", domain, currentSoaSerial.serial, soaSerial.serial);
+                      return true;
+                    },
+                    ignore => {
+                      /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+                         no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
+                      if (soaSerial.serialStart !== moment(m).utc().format(SoaSerial.isoDateWithoutDashesPattern)
+                          || soaSerial.sequenceNumber !== 0) {
+                        throw new Error("resolution does not represent the expected serial");
+                      }
+                      console.log("%s: no current YYYYMMDDnn serial --> %s", domain, soaSerial.serial);
+                      return true;
                     }
-                    console.log("%s: current YYYYMMDDnn serial is %s --> %s", domain, currentSoaSerial.serial, soaSerial.serial);
-                    return true;
-                  },
-                  ignore => {
-                    /* domain does not exist, or there is no SOA record, or there is no internet connection, or
-                       no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
-                    if (soaSerial.serialStart !== moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern)
-                        || soaSerial.sequenceNumber !== 0) {
-                      throw new Error("resolution does not represent the expected serial");
+                  );
+              },
+              err => {
+                return SoaSerial.currentSoaSerial(domain)
+                  .then(currentSoaSerial => {
+                    if ((currentSoaSerial.sequenceNumber < SoaSerial.maxSequenceNumber
+                          || currentSoaSerial.serialStart !== moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern))
+                        && (currentSoaSerial.serialStart >= moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern))) {
+                      console.log(err);
+                      throw new Error("resolution rejected for no good reason");
                     }
-                    console.log("%s: no current YYYYMMDDnn serial --> %s", domain, soaSerial.serial);
+                    console.log("%s: rejected - current YYYYMMDDnn serial is %s", domain, currentSoaSerial.serial);
                     return true;
-                  }
-                );
-            },
-            err => {
-              return SoaSerial.currentSoaSerial(domain)
-                .then(currentSoaSerial => {
-                  if (currentSoaSerial.sequenceNumber
-                      < SoaSerial.maxSequenceNumber
-                      || currentSoaSerial.serialStart
-                         !== moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern)) {
-                    console.log(err);
-                    throw new Error("resolution rejected for no good reason");
-                  }
-                  console.log("%s: rejected - current YYYYMMDDnn serial is %s", domain, currentSoaSerial.serial);
-                  return true;
-                });
-            }
-          );
+                  });
+              }
+            );
+        });
       });
     });
   });
