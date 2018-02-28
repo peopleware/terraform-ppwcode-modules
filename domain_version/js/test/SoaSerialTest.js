@@ -190,8 +190,8 @@ describe("SoaSerial", function() {
                 return SoaSerial.currentSoaSerial(domain)
                   .then(currentSoaSerial => {
                     if ((currentSoaSerial.sequenceNumber < SoaSerial.maxSequenceNumber
-                          || currentSoaSerial.serialStart !== moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern))
-                        && (currentSoaSerial.serialStart >= moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern))) {
+                          || currentSoaSerial.serialStart !== moment(m).utc().format(SoaSerial.isoDateWithoutDashesPattern))
+                        && (currentSoaSerial.serialStart <= moment(m).utc().format(SoaSerial.isoDateWithoutDashesPattern))) {
                       console.log(err);
                       throw new Error("resolution rejected for no good reason");
                     }
