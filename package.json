@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@ppwcode/node-gitinfo": "^2.2.0",
-    "@toryt/contracts-ii": "^1.2.0",
+    "@toryt/contracts-ii": "^2.1.3",
     "commander": "^2.12.2",
     "moment": "^2.20.1",
     "pad": "^2.0.3",
