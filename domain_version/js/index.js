@@ -106,15 +106,12 @@ program
       .done((meta) => console.log('%j', meta))
   })
 
-const serialTagPrefix = 'serial/'
-
 // noinspection JSCheckFunctionSignatures
 program
   .command('next-meta [domain] [path]')
   .alias('nm')
   .description('The next meta-information object, now, for the highest git working copy and repository above [path], ' +
-               'as JSON. cwd is the default for [path]. Fails if the current state of the working copy is not save. ' +
-               'The repository is tagged with "serial/<serial>" if option -t is given.')
+               'as JSON. cwd is the default for [path]. Fails if the current state of the working copy is not save.')
   .action(function (domain, path) {
     if (!domain || domain === '') {
       console.error('domain is mandatory')
