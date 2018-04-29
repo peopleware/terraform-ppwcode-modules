@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint-env mocha */
+
 const SoaSerial = require('../SoaSerial')
 const util = require('./_util')
 const moment = require('moment')

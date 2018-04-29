@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint-env mocha */
+
 const DnsMeta = require('../DnsMeta')
 const util = require('./_util')
 const SoaSerial = require('../SoaSerial')

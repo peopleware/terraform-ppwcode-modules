@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint-env mocha */
+
 const dnsTxt = require('../dnsTxt')
 
 const someFqdns = ['google.com', 'does.not.exist', 'www.toryt.org', 'peopleware.be']
