@@ -246,7 +246,7 @@ SoaSerial.currentSoaSerialString = new Contract({
       }).implementation(serial => serial),
       new Contract({
         pre: [
-          err => true
+          () => true
           /* domain does not exist, or there is no SOA record, or there is no internet connection, or
                  no DNS server can be contacted, … */
         ],
@@ -294,7 +294,7 @@ SoaSerial.currentSoaSerial = new Contract({
       }).implementation(soaSerial => soaSerial),
       new Contract({
         pre: [
-          err => true
+          () => true
           /* domain does not exist, or there is no SOA record, or there is no internet connection, or
            no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
         ],
@@ -347,7 +347,7 @@ SoaSerial.nextSoaSerial = new Contract({
       }).implementation(soaSerial => soaSerial),
       new Contract({
         pre: [
-          err => true
+          () => true
           /* current sequence number is already at 99, and {@code at} is at the same
              day in the UTC time zone as reflected by the current SOA serial, or {@code at} is before the
              day reflected by the current SOA serial. */

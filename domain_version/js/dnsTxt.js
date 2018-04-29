@@ -63,7 +63,7 @@ const dnsTxt = new Contract({
       }).implementation(txtMap => txtMap),
       new Contract({
         pre: [
-          err => true
+          () => true
           /* domain does not exist, or there is no TXT record, or there is no internet connection, or
            no DNS server can be contacted, … */
         ],
