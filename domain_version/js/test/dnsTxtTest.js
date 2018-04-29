@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-const dnsTxt = require("../dnsTxt");
+const dnsTxt = require('../dnsTxt')
 
-const someFqdns = ["google.com", "does.not.exist", "www.toryt.org", "peopleware.be"];
+const someFqdns = ['google.com', 'does.not.exist', 'www.toryt.org', 'peopleware.be']
 
-describe("dnsTxt", function() {
-  describe("dnsTxt", function() {
-    someFqdns.forEach(function(fqdn) {
-      it("gets a sensible result for fqdn \"" + fqdn + "\"", function() {
+describe('dnsTxt', function () {
+  describe('dnsTxt', function () {
+    someFqdns.forEach(function (fqdn) {
+      it('gets a sensible result for fqdn "' + fqdn + '"', function () {
         return dnsTxt(fqdn)
           .then(
             result => {
-              console.log("%j", result);
-              return result;
+              console.log('%j', result)
+              return result
             },
             err => {
-              console.log(err);
-              return true;
+              console.log(err)
+              return true
             }
-          );
-      });
-    });
-  });
-});
+          )
+      })
+    })
+  })
+})

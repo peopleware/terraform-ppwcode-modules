@@ -18,26 +18,23 @@
  * Quick hack to test conditions.
  */
 module.exports = {
-  validateConditions: function(conditions, args) {
+  validateConditions: function (conditions, args) {
     conditions.forEach(condition => {
-      let conditionResult;
+      let conditionResult
       try {
-        conditionResult = condition.apply(undefined, args);
-      }
-      catch (err) {
-        throw new Error("condition " + condition + " has an error: " + err);
+        conditionResult = condition.apply(undefined, args)
+      } catch (err) {
+        throw new Error('condition ' + condition + ' has an error: ' + err)
       }
       if (!conditionResult) {
-        throw new Error("condition violation for: " + condition + " (" + JSON.stringify(args) + ")");
+        throw new Error('condition violation for: ' + condition + ' (' + JSON.stringify(args) + ')')
       }
-    });
+    })
   },
 
-  validateInvariants: function(subject) {
+  validateInvariants: function (subject) {
     if (!subject.invariants) {
-      throw new Error("invariants do not hold");
+      throw new Error('invariants do not hold')
     }
   }
-};
-
-
+}

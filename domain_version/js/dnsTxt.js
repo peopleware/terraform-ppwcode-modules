@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-const Q = require("@ppwcode/node-gitinfo/q2");
-const dns = require("dns");
-const Contract = require("@toryt/contracts-iii");
+const Q = require('@ppwcode/node-gitinfo/q2')
+const dns = require('dns')
+const Contract = require('@toryt/contracts-iii')
 
 /**
  * Promise for the key / value pairs in DNS TXT records for {@code fqdn}.
@@ -33,7 +33,7 @@ const Contract = require("@toryt/contracts-iii");
  */
 const dnsTxt = new Contract({
   pre: [
-    (fqdn) => typeof fqdn === "string",
+    (fqdn) => typeof fqdn === 'string',
     (fqdn) => !!fqdn
   ],
   post: [
@@ -42,14 +42,14 @@ const dnsTxt = new Contract({
   exception: [
     (fqdn, err) => err instanceof Error
   ]
-}).implementation(function(fqdn) {
+}).implementation(function (fqdn) {
   return Q.denodeify(dns.resolveTxt)(fqdn)
     .then((allTxtRecords) => allTxtRecords.reduce(
       (acc, oneTxtRecord) => oneTxtRecord.reduce(
         (acc, str) => {
-          const keyValue = dnsTxt.keyValuePattern.exec(str);
-          acc[keyValue[1]] = keyValue[2];
-          return acc;
+          const keyValue = dnsTxt.keyValuePattern.exec(str)
+          acc[keyValue[1]] = keyValue[2]
+          return acc
         },
         acc
       ),
@@ -71,14 +71,13 @@ const dnsTxt = new Contract({
         exception: [
           (err1, err2) => err1 === err2
         ]
-      }).implementation(err => {throw err;})
-    );
-
-});
+      }).implementation(err => { throw err })
+    )
+})
 
 /* Note: it is unclear to this author what the difference is between key / value pairs in 1 TXT record, or in different
          TXT records for the same FQDN */
 
-dnsTxt.keyValuePattern = /([^=]+)=(.*)/;
+dnsTxt.keyValuePattern = /([^=]+)=(.*)/
 
-module.exports = dnsTxt;
+module.exports = dnsTxt

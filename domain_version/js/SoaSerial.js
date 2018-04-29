@@ -14,48 +14,47 @@
  * limitations under the License.
  */
 
-const moment = require("moment");
-const pad = require("pad");
-const Q = require("@ppwcode/node-gitinfo/q2");
-const dns = require("dns");
-const Contract = require("@toryt/contracts-iii");
+const moment = require('moment')
+const pad = require('pad')
+const Q = require('@ppwcode/node-gitinfo/q2')
+const dns = require('dns')
+const Contract = require('@toryt/contracts-iii')
 
 class SoaSerial {
-
-  get invariants() {
-    return moment.isMoment(this.at)
-           && this.at.utcOffset() === 0
-           && this.at.utc().hours() === 0
-           && this.at.utc().minutes() === 0
-           && this.at.utc().seconds() === 0
-           && this.at.utc().milliseconds() === 0
-           && typeof this.year === "string"
-           && SoaSerial.yearRegExp.test(this.year)
-           && this.year === this.at.format(SoaSerial.yearPattern)
-           && typeof this.month === "string"
-           && SoaSerial.monthRegExp.test(this.month)
-           && 1 <= Number.parseInt(this.month)
-           && Number.parseInt(this.month) <= SoaSerial.maxMonth
-           && this.month === this.at.format(SoaSerial.monthPattern)
-           && typeof this.day === "string"
-           && SoaSerial.dayRegExp.test(this.day)
-           && 1 <= Number.parseInt(this.day)
-           && Number.parseInt(this.day)
-              <= moment(this.year + this.month, SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth()
-           && this.day === this.at.format(SoaSerial.dayPattern)
-           && typeof this.serialStart === "string"
-           && this.serialStart === this.year + this.month + this.day
-           && typeof this.sequenceNumber === "number"
-           && 0 <= this.sequenceNumber
-           && this.sequenceNumber <= SoaSerial.maxSequenceNumber
-           && typeof this.serial === "string"
-           && this.serial === this.serialStart + pad(2, this.sequenceNumber, "0")
-           && JSON.parse(JSON.stringify(this)).at === JSON.parse(JSON.stringify(this.at))
-           && JSON.parse(JSON.stringify(this)).year === this.year
-           && JSON.parse(JSON.stringify(this)).month === this.month
-           && JSON.parse(JSON.stringify(this)).day === this.day
-           && JSON.parse(JSON.stringify(this)).sequenceNumber === this.sequenceNumber
-           && JSON.parse(JSON.stringify(this)).serial === this.serial;
+  get invariants () {
+    return moment.isMoment(this.at) &&
+           this.at.utcOffset() === 0 &&
+           this.at.utc().hours() === 0 &&
+           this.at.utc().minutes() === 0 &&
+           this.at.utc().seconds() === 0 &&
+           this.at.utc().milliseconds() === 0 &&
+           typeof this.year === 'string' &&
+           SoaSerial.yearRegExp.test(this.year) &&
+           this.year === this.at.format(SoaSerial.yearPattern) &&
+           typeof this.month === 'string' &&
+           SoaSerial.monthRegExp.test(this.month) &&
+           Number.parseInt(this.month) >= 1 &&
+           Number.parseInt(this.month) <= SoaSerial.maxMonth &&
+           this.month === this.at.format(SoaSerial.monthPattern) &&
+           typeof this.day === 'string' &&
+           SoaSerial.dayRegExp.test(this.day) &&
+           Number.parseInt(this.day) >= 1 &&
+           Number.parseInt(this.day) <=
+              moment(this.year + this.month, SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth() &&
+           this.day === this.at.format(SoaSerial.dayPattern) &&
+           typeof this.serialStart === 'string' &&
+           this.serialStart === this.year + this.month + this.day &&
+           typeof this.sequenceNumber === 'number' &&
+           this.sequenceNumber >= 0 &&
+           this.sequenceNumber <= SoaSerial.maxSequenceNumber &&
+           typeof this.serial === 'string' &&
+           this.serial === this.serialStart + pad(2, this.sequenceNumber, '0') &&
+           JSON.parse(JSON.stringify(this)).at === JSON.parse(JSON.stringify(this.at)) &&
+           JSON.parse(JSON.stringify(this)).year === this.year &&
+           JSON.parse(JSON.stringify(this)).month === this.month &&
+           JSON.parse(JSON.stringify(this)).day === this.day &&
+           JSON.parse(JSON.stringify(this)).sequenceNumber === this.sequenceNumber &&
+           JSON.parse(JSON.stringify(this)).serial === this.serial
   }
 
   /**
@@ -64,37 +63,37 @@ class SoaSerial {
    * @param {Date|moment.Moment} at - the date at which this instance should be used
    * @param {Number} sequenceNumber - the sequence number of the SOA serial within the day represented by {@code at}
    */
-  constructor(at, sequenceNumber) {
-    this._at = moment.utc(at).startOf("day");
-    this.sequenceNumber = sequenceNumber;
+  constructor (at, sequenceNumber) {
+    this._at = moment.utc(at).startOf('day')
+    this.sequenceNumber = sequenceNumber
   }
 
   /**
    * @return {moment.Moment}
    */
-  get at() {
-    return moment.utc(this._at).startOf("day");
+  get at () {
+    return moment.utc(this._at).startOf('day')
   }
 
   /**
    * @return {string} 4-digit year of {@link #at}
    */
-  get year() {
-    return this._at.format(SoaSerial.yearPattern);
+  get year () {
+    return this._at.format(SoaSerial.yearPattern)
   }
 
   /**
    * @return {string} 2-digit month of {@link #at}
    */
-  get month() {
-    return this._at.format(SoaSerial.monthPattern);
+  get month () {
+    return this._at.format(SoaSerial.monthPattern)
   }
 
   /**
    * @return {string} 2-digit day of {@link #at}
    */
-  get day() {
-    return this._at.format(SoaSerial.dayPattern);
+  get day () {
+    return this._at.format(SoaSerial.dayPattern)
   }
 
   /**
@@ -102,8 +101,8 @@ class SoaSerial {
    *
    * @return {string} {@link #year} + {@link #month} + {@link #day}
    */
-  get serialStart() {
-    return this._at.format(SoaSerial.isoDateWithoutDashesPattern);
+  get serialStart () {
+    return this._at.format(SoaSerial.isoDateWithoutDashesPattern)
   }
 
   /**
@@ -111,90 +110,89 @@ class SoaSerial {
    *
    * @return {string} {@link #serialStart} + {@link #sequenceNumber}
    */
-  get serial() {
-    return this.serialStart + pad(2, this.sequenceNumber, "0");
+  get serial () {
+    return this.serialStart + pad(2, this.sequenceNumber, '0')
   }
 
-  //noinspection JSUnusedGlobalSymbols
-  toJSON() {
+  // noinspection JSUnusedGlobalSymbols
+  toJSON () {
     return {
-      at:             this.at,
-      year:           this.year,
-      month:          this.month,
-      day:            this.day,
+      at: this.at,
+      year: this.year,
+      month: this.month,
+      day: this.day,
       sequenceNumber: this.sequenceNumber,
-      serial:         this.serial
-    };
+      serial: this.serial
+    }
   }
-
 }
 
 SoaSerial.constructorContract = new Contract({
   pre: [
     (at, sequenceNumber) => at instanceof Date || moment.isMoment(at),
-    (at, sequenceNumber) => typeof sequenceNumber === "number",
-    (at, sequenceNumber) => 0 <= sequenceNumber,
+    (at, sequenceNumber) => typeof sequenceNumber === 'number',
+    (at, sequenceNumber) => sequenceNumber >= 0,
     (at, sequenceNumber) => sequenceNumber <= SoaSerial.maxSequenceNumber
   ],
   post: [
     (at, sequenceNumber, result) =>
-      result.at.format(SoaSerial.isoDateWithoutDashesPattern)
-        === moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern),
+      result.at.format(SoaSerial.isoDateWithoutDashesPattern) ===
+        moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern),
     (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
   ],
   exception: [() => false]
-});
+})
 
-SoaSerial.yearPattern = "YYYY";
-SoaSerial.yearRegExp = /^\d{4}$/;
-SoaSerial.monthPattern = "MM";
-SoaSerial.monthRegExp = /^\d{2}$/;
-SoaSerial.dayPattern = "DD";
-SoaSerial.dayRegExp = /^\d{2}$/;
-SoaSerial.isoDateWithoutDashesPattern = SoaSerial.yearPattern + SoaSerial.monthPattern + SoaSerial.dayPattern;
-SoaSerial.serialRegExp = /^(\d{8})(\d{2})$/;
-SoaSerial.detailedSerialRegExp = /^(\d{4})(\d{2})(\d{2})(\d{2})$/;
-//noinspection MagicNumberJS
-SoaSerial.maxSequenceNumber = 99;
-//noinspection MagicNumberJS
-SoaSerial.maxMonth = 12;
+SoaSerial.yearPattern = 'YYYY'
+SoaSerial.yearRegExp = /^\d{4}$/
+SoaSerial.monthPattern = 'MM'
+SoaSerial.monthRegExp = /^\d{2}$/
+SoaSerial.dayPattern = 'DD'
+SoaSerial.dayRegExp = /^\d{2}$/
+SoaSerial.isoDateWithoutDashesPattern = SoaSerial.yearPattern + SoaSerial.monthPattern + SoaSerial.dayPattern
+SoaSerial.serialRegExp = /^(\d{8})(\d{2})$/
+SoaSerial.detailedSerialRegExp = /^(\d{4})(\d{2})(\d{2})(\d{2})$/
+// noinspection MagicNumberJS
+SoaSerial.maxSequenceNumber = 99
+// noinspection MagicNumberJS
+SoaSerial.maxMonth = 12
 
 SoaSerial.isASerial = new Contract({
   post: [
-    (candidate, result) => typeof result === "boolean",
-    (candidate, result) => !result || typeof candidate === "string",
+    (candidate, result) => typeof result === 'boolean',
+    (candidate, result) => !result || typeof candidate === 'string',
     (candidate, result) => !result || SoaSerial.detailedSerialRegExp.test(candidate),
-    (candidate, result) => !result || 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[2]),
+    (candidate, result) => !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[2]) >= 1,
     (candidate, result) =>
-    !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[2]) <= SoaSerial.maxMonth,
-    (candidate, result) => !result || 1 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[3]),
+      !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[2]) <= SoaSerial.maxMonth,
+    (candidate, result) => !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[3]) >= 1,
     (candidate, result) =>
-      !result
-        || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[3])
-          <= moment(
+      !result ||
+        Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[3]) <=
+          moment(
             SoaSerial.detailedSerialRegExp.exec(candidate)[1] + SoaSerial.detailedSerialRegExp.exec(candidate)[2],
             SoaSerial.yearPattern + SoaSerial.monthPattern
           ).daysInMonth(),
-    (candidate, result) => !result || 0 <= Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[4]),
+    (candidate, result) => !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[4]) >= 0,
     (candidate, result) =>
       !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[4]) <= SoaSerial.maxSequenceNumber
   ],
   exception: [() => false]
-}).implementation(function(candidate) {
-  if (typeof candidate !== "string" || !SoaSerial.detailedSerialRegExp.test(candidate)) {
-    return false;
+}).implementation(function (candidate) {
+  if (typeof candidate !== 'string' || !SoaSerial.detailedSerialRegExp.test(candidate)) {
+    return false
   }
-  const parts = SoaSerial.detailedSerialRegExp.exec(candidate);
-  const month = Number.parseInt(parts[2]);
-  const day = Number.parseInt(parts[3]);
-  const sequenceNumber = Number.parseInt(parts[4]);
-  return 1 <= month
-    && month <= SoaSerial.maxMonth
-    && 1 <= day
-    && day <= moment(parts[1] + parts[2], SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth()
-    && 0 <= sequenceNumber
-    && sequenceNumber <= SoaSerial.maxSequenceNumber;
-});
+  const parts = SoaSerial.detailedSerialRegExp.exec(candidate)
+  const month = Number.parseInt(parts[2])
+  const day = Number.parseInt(parts[3])
+  const sequenceNumber = Number.parseInt(parts[4])
+  return month >= 1 &&
+    month <= SoaSerial.maxMonth &&
+    day >= 1 &&
+    day <= moment(parts[1] + parts[2], SoaSerial.yearPattern + SoaSerial.monthPattern).daysInMonth() &&
+    sequenceNumber >= 0 &&
+    sequenceNumber <= SoaSerial.maxSequenceNumber
+})
 
 /**
  * Construct an {@link SoaSerial} instance from the serial string as expected in a DNS SOA record.
@@ -204,18 +202,18 @@ SoaSerial.isASerial = new Contract({
  *                  {@code sequenceNumber}) as properties of type {@code string}
  */
 SoaSerial.parse = new Contract({
-    pre: [
-      (serial) => SoaSerial.isASerial(serial)
-    ],
-    post: [
-      (serial, result) => result instanceof SoaSerial,
-      (serial, result) => result.serial === serial
-    ],
-    exception: [() => false]
-  }).implementation(function parse(serial) {
-    const parts = SoaSerial.serialRegExp.exec(serial);
-    return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]));
-  });
+  pre: [
+    (serial) => SoaSerial.isASerial(serial)
+  ],
+  post: [
+    (serial, result) => result instanceof SoaSerial,
+    (serial, result) => result.serial === serial
+  ],
+  exception: [() => false]
+}).implementation(function parse (serial) {
+  const parts = SoaSerial.serialRegExp.exec(serial)
+  return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]))
+})
 
 /**
  * Return a Promise for the serial in the SOA record of {@code domain}, retrieved via DNS.
@@ -227,38 +225,38 @@ SoaSerial.parse = new Contract({
  */
 SoaSerial.currentSoaSerialString = new Contract({
   pre: [
-    (domain) => typeof domain === "string",
+    (domain) => typeof domain === 'string'
   ],
   post: [
     (domain, result) => Q.isPromiseAlike(result)
     /* Contracts does not offer support for Promises yet */
   ],
   exception: [() => false]
-}).implementation(function currentSoaSerialString(domain) {
+}).implementation(function currentSoaSerialString (domain) {
   return Q.denodeify(dns.resolveSoa)(domain)
-          .then((soa) => "" + soa.serial)
-          .then(
-            new Contract({
-              pre: [
-                serial => typeof serial === "string",
-                serial => /^\d+$/.test(serial)
-              ],
-              post: [(serial, result) => result === serial],
-              exception: [() => false]
-            }).implementation(serial => serial),
-            new Contract({
-              pre: [
-                err => true
-                /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+    .then((soa) => '' + soa.serial)
+    .then(
+      new Contract({
+        pre: [
+          serial => typeof serial === 'string',
+          serial => /^\d+$/.test(serial)
+        ],
+        post: [(serial, result) => result === serial],
+        exception: [() => false]
+      }).implementation(serial => serial),
+      new Contract({
+        pre: [
+          err => true
+          /* domain does not exist, or there is no SOA record, or there is no internet connection, or
                  no DNS server can be contacted, … */
-              ],
-              post: [() => false],
-              exception: [
-                (err1, err2) => err1 === err2
-              ]
-            }).implementation(err => {throw err;})
-          );
-});
+        ],
+        post: [() => false],
+        exception: [
+          (err1, err2) => err1 === err2
+        ]
+      }).implementation(err => { throw err })
+    )
+})
 
 /**
  * Return a Promise for the SoaSerial, based on the serial in the SOA record of {@code domain}, retrieved via DNS.
@@ -271,20 +269,20 @@ SoaSerial.currentSoaSerialString = new Contract({
  */
 SoaSerial.currentSoaSerial = new Contract({
   pre: [
-    (domain) => typeof domain === "string",
+    (domain) => typeof domain === 'string'
   ],
   post: [
     (domain, result) => Q.isPromiseAlike(result)
     /* Contracts does not offer support for Promises yet */
   ],
   exception: [() => false]
-}).implementation(function currentSoaSerial(domain) {
+}).implementation(function currentSoaSerial (domain) {
   return SoaSerial.currentSoaSerialString(domain)
     .then(serialString => {
       if (!SoaSerial.serialRegExp.test(serialString)) {
-        throw new Error("The serial of the domain is not in the form YYYYMMDDnn");
+        throw new Error('The serial of the domain is not in the form YYYYMMDDnn')
       }
-      return SoaSerial.parse(serialString);
+      return SoaSerial.parse(serialString)
     })
     .then(
       new Contract({
@@ -304,9 +302,9 @@ SoaSerial.currentSoaSerial = new Contract({
         exception: [
           (err1, err2) => err1 === err2
         ]
-      }).implementation(err => {throw err;})
-    );
-});
+      }).implementation(err => { throw err })
+    )
+})
 
 /**
  * Get the current SOA serial via DNS (which might not exists), and create the next one, for use
@@ -325,7 +323,7 @@ SoaSerial.currentSoaSerial = new Contract({
  */
 SoaSerial.nextSoaSerial = new Contract({
   pre: [
-    (domain, at) => typeof domain === "string",
+    (domain, at) => typeof domain === 'string',
     (domain, at) => at instanceof Date || moment.isMoment(at)
   ],
   post: [
@@ -333,7 +331,7 @@ SoaSerial.nextSoaSerial = new Contract({
     /* Contracts does not offer support for Promises yet */
   ],
   exception: [() => false]
-}).implementation(function(domain, at) {
+}).implementation(function (domain, at) {
   return SoaSerial.currentSoaSerialString(domain)
     .then(
       (serial) => SoaSerial.serialRegExp.test(serial) ? SoaSerial.parse(serial).next(at) : new SoaSerial(at, 0),
@@ -358,9 +356,9 @@ SoaSerial.nextSoaSerial = new Contract({
         exception: [
           (err1, err2) => err1 === err2
         ]
-      }).implementation(err => {throw err;})
-    );
-});
+      }).implementation(err => { throw err })
+    )
+})
 
 /**
  * Return a new instance of {@link SoaSerial}, that can be used as the next SOA serial after {@code this}, at
@@ -385,29 +383,29 @@ SoaSerial.prototype.next = new Contract({
   post: [
     (useAt, result) => result instanceof SoaSerial,
     (useAt, result) => result.serialStart === moment(useAt).utc().format(SoaSerial.isoDateWithoutDashesPattern),
-    function(useAt, result) {
-      return (result.serialStart === this.serialStart) || result.sequenceNumber === 0;
+    function (useAt, result) {
+      return (result.serialStart === this.serialStart) || result.sequenceNumber === 0
     },
-    function(useAt, result) {
-      return (result.serialStart !== this.serialStart) || result.sequenceNumber === this.sequenceNumber + 1;
+    function (useAt, result) {
+      return (result.serialStart !== this.serialStart) || result.sequenceNumber === this.sequenceNumber + 1
     }
   ],
   exception: [
-    function(useAt, err) {
-      return err instanceof Error
-        && (this.at.isAfter(useAt, "day") || SoaSerial.maxSequenceNumber <= this.sequenceNumber);
+    function (useAt, err) {
+      return err instanceof Error &&
+        (this.at.isAfter(useAt, 'day') || SoaSerial.maxSequenceNumber <= this.sequenceNumber)
     }
   ]
-}).implementation(function next(useAt) {
+}).implementation(function next (useAt) {
   if (SoaSerial.maxSequenceNumber <= this.sequenceNumber) {
-    throw new Error("Cannot create a next serial on useAt, "
-                    + "because this serial already has the maximum sequence number for that day");
+    throw new Error('Cannot create a next serial on useAt, ' +
+                    'because this serial already has the maximum sequence number for that day')
   }
-  if (this._at.isAfter(useAt, "day")) {
-    throw new Error("Cannot create a next serial for useAt earlier than the day in the current serial");
+  if (this._at.isAfter(useAt, 'day')) {
+    throw new Error('Cannot create a next serial for useAt earlier than the day in the current serial')
   }
 
-  return new SoaSerial(useAt, this._at.isSame(useAt, "day") ? this.sequenceNumber + 1 : 0);
-});
+  return new SoaSerial(useAt, this._at.isSame(useAt, 'day') ? this.sequenceNumber + 1 : 0)
+})
 
-module.exports = SoaSerial;
+module.exports = SoaSerial
