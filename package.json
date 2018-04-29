@@ -43,6 +43,7 @@
   },
   "scripts": {
     "pretest": "npm-check || exit 0",
-    "test": "standard && nyc mocha domain_version/js/test/**"
+    "test": "standard && nyc mocha domain_version/js/test/**",
+    "preversion": "npm-check && standard && nyc mocha test/**/*Test.js"
   }
 }
