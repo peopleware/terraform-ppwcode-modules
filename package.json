@@ -36,9 +36,12 @@
     "pkginfo": "^0.4.1"
   },
   "devDependencies": {
-    "mocha": "^4.1.0"
+    "mocha": "^4.1.0",
+    "npm-check": "^5.7.0",
+    "nyc": "^11.7.1"
   },
   "scripts": {
-    "test": "mocha domain_version/js/test/**"
+    "pretest": "npm-check || exit 0",
+    "test": "nyc mocha domain_version/js/test/**"
   }
 }
