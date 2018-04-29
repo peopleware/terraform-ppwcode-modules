@@ -28,15 +28,15 @@
     "node": ">=6.10.3"
   },
   "dependencies": {
-    "@ppwcode/node-gitinfo": "^2.2.1",
+    "@ppwcode/node-gitinfo": "^2.2.2",
     "@toryt/contracts-iii": "^3.1.0",
-    "commander": "^2.12.2",
-    "moment": "^2.20.1",
+    "commander": "^2.15.1",
+    "moment": "^2.22.1",
     "pad": "^2.0.3",
     "pkginfo": "^0.4.1"
   },
   "devDependencies": {
-    "mocha": "^4.1.0",
+    "mocha": "^5.1.1",
     "npm-check": "^5.7.0",
     "nyc": "^11.7.1",
     "standard": "^11.0.1"
