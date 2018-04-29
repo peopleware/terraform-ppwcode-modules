@@ -24,7 +24,7 @@ class DnsMeta {
   get invariants () {
     return typeof this.sha === 'string' &&
       GitInfo.shaRegExp.test(this.sha) &&
-      this.branch === undefined || (typeof this.branch === 'string' && !!this.branch) &&
+      (this.branch === undefined || (typeof this.branch === 'string' && !!this.branch)) &&
       (typeof this.repo === 'string' && !!this.repo) &&
       SoaSerial.isASerial(this.serial)
   }
