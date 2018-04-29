@@ -38,10 +38,11 @@
   "devDependencies": {
     "mocha": "^4.1.0",
     "npm-check": "^5.7.0",
-    "nyc": "^11.7.1"
+    "nyc": "^11.7.1",
+    "standard": "^11.0.1"
   },
   "scripts": {
     "pretest": "npm-check || exit 0",
-    "test": "nyc mocha domain_version/js/test/**"
+    "test": "standard && nyc mocha domain_version/js/test/**"
   }
 }
