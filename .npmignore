@@ -1,1 +1,6 @@
 .idea
+.nyc_output
+domain_version/js/test/**
+.gitignore
+.nvmrc
+How_to_publish.md
