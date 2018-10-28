@@ -239,7 +239,7 @@ SoaSerial.currentSoaSerialString = new PromiseContract({
      no DNS server can be contacted, … */
   exception: util.exceptionIsAnError
 }).implementation(function currentSoaSerialString (domain) {
-  return Q.denodeify(dns.resolveSoa)(domain)
+  return util.realPromise(Q.denodeify(dns.resolveSoa)(domain))
     .then((soa) => '' + soa.serial)
 })
 

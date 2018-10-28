@@ -78,6 +78,14 @@ describe('SoaSerial', function () {
       )
   })
   describe('isASerial', function () {
+    before(function () {
+      SoaSerial.isASerial.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      SoaSerial.isASerial.contract.verifyPostconditions = false
+    })
+
     someSerials.concat(notSomeSerials).forEach(function (candidate) {
       it('should return the correct boolean for "' + candidate + '"', function () {
         const result = SoaSerial.isASerial(candidate)
@@ -86,6 +94,14 @@ describe('SoaSerial', function () {
     })
   })
   describe('parse', function () {
+    before(function () {
+      SoaSerial.parse.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      SoaSerial.parse.contract.verifyPostconditions = false
+    })
+
     someSerials.forEach(function (serial) {
       it('should return a serial with the expected properties for "' + serial + '"', function () {
         const result = SoaSerial.parse(serial)
@@ -94,6 +110,14 @@ describe('SoaSerial', function () {
     })
   })
   describe('#next()', function () {
+    before(function () {
+      SoaSerial.prototype.next.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      SoaSerial.prototype.next.contract.verifyPostconditions = false
+    })
+
     someSerials
       .map(serial => function () { return SoaSerial.parse(serial) })
       .forEach(generateSubject =>
@@ -118,6 +142,14 @@ describe('SoaSerial', function () {
       )
   })
   describe('currentSoaSerialString', function () {
+    before(function () {
+      SoaSerial.currentSoaSerialString.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      SoaSerial.currentSoaSerialString.contract.verifyPostconditions = false
+    })
+
     someDomains.forEach(function (domain) {
       it('should return a promise for "' + domain + '"', function () {
         return SoaSerial
@@ -132,6 +164,14 @@ describe('SoaSerial', function () {
     })
   })
   describe('currentSoaSerial', function () {
+    before(function () {
+      SoaSerial.currentSoaSerial.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      SoaSerial.currentSoaSerial.contract.verifyPostconditions = false
+    })
+
     someDomains.forEach(function (domain) {
       it('should return a promise for "' + domain + '"', function () {
         const result = SoaSerial.currentSoaSerial(domain)
@@ -155,6 +195,14 @@ describe('SoaSerial', function () {
     })
   })
   describe('nextSoaSerial', function () {
+    before(function () {
+      SoaSerial.nextSoaSerial.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      SoaSerial.nextSoaSerial.contract.verifyPostconditions = false
+    })
+
     const moments = [someMoments[0], moment()]
     moments.forEach(function (m) {
       someDomains.forEach(function (domain) {
