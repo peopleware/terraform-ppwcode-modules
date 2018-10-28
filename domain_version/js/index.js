@@ -24,6 +24,11 @@ const tagGitRepo = require('@ppwcode/node-gitinfo/tagGitRepo')
 const dnsTxt = require('./dnsTxt')
 const packageVersion = require('pkginfo')(module, 'version')
 
+function reportError (err) {
+  console.error(err)
+  process.exitCode = 1
+}
+
 // noinspection JSCheckFunctionSignatures
 program
   .version(packageVersion)
@@ -39,10 +44,11 @@ program
       process.exitCode = 1
       return
     }
-    SoaSerial.currentSoaSerialString(domain)
-      .done((serial) => {
+    return SoaSerial.currentSoaSerialString(domain)
+      .then(serial => {
         console.log('%j', SoaSerial.parse(serial))
       })
+      .catch(reportError)
   })
 
 program
@@ -57,7 +63,10 @@ program
       return
     }
     SoaSerial.nextSoaSerial(domain, new Date())
-      .done((soaSerial) => console.log(soaSerial.serial))
+      .then(soaSerial => {
+        console.log(soaSerial.serial)
+      })
+      .catch(reportError)
   })
 
 program
@@ -67,7 +76,10 @@ program
                'ancestor directory that contains a .git folder. cwd is the default for [path].')
   .action(function (path) {
     GitInfo.highestGitDirPath(path || process.cwd())
-      .done((gitPath) => console.log(gitPath))
+      .then(gitPath => {
+        console.log(gitPath)
+      })
+      .catch(reportError)
   })
 
 program
@@ -78,17 +90,17 @@ program
   .action(function (path) {
     GitInfo
       .createForHighestGitDir(path || process.cwd())
-      .done(
-        (gitInfo) => console.log('%j', gitInfo),
-        (err) => {
-          if (err.message === GitInfo.noGitDirectoryMsg) {
-            console.error('No git directory found above ' + path)
-            process.exitCode = 1
-            return false
-          }
-          throw err
+      .then(gitInfo => {
+        console.log('%j', gitInfo)
+      })
+      .catch(err => {
+        if (err.message === GitInfo.noGitDirectoryMsg) {
+          console.error('No git directory found above ' + path)
+          process.exitCode = 1
+          return
         }
-      )
+        reportError(err)
+      })
   })
 
 program
@@ -103,7 +115,10 @@ program
       return
     }
     dnsTxt('meta.' + domain) // TODO better error handling
-      .done((meta) => console.log('%j', meta))
+      .then(meta => {
+        console.log('%j', meta)
+      })
+      .catch(reportError)
   })
 
 // noinspection JSCheckFunctionSignatures
@@ -121,23 +136,23 @@ program
     const gitBasePath = path || process.cwd()
     DnsMeta
       .nextDnsMeta(domain, new Date(), gitBasePath) // rejected if not save
-      .done(
-        (meta) => console.log('%j', meta),
-        (err) => {
-          // TODO serial already >> 99, no internet, …
-          if (err.message === GitInfo.noGitDirectoryMsg) {
-            console.error('No git directory found above ' + path)
-            process.exitCode = 1
-            return false
-          }
-          if (err.message === DnsMeta.workingCopyNotSaveMsg) {
-            console.error('The working copy is not save (uncommitted changes, not pushed, …)')
-            process.exitCode = 1
-            return false
-          }
-          throw err
+      .then(meta => {
+        console.log('%j', meta)
+      })
+      .catch(err => {
+        // TODO serial already >> 99, no internet, …
+        if (err.message === GitInfo.noGitDirectoryMsg) {
+          console.error('No git directory found above ' + path)
+          process.exitCode = 1
+          return
         }
-      )
+        if (err.message === DnsMeta.workingCopyNotSaveMsg) {
+          console.error('The working copy is not save (uncommitted changes, not pushed, …)')
+          process.exitCode = 1
+          return
+        }
+        reportError(err)
+      })
   })
 
 program
@@ -150,19 +165,17 @@ program
     GitInfo
       .highestGitDirPath(gitBasePath)
       .then(gitPath => tagGitRepo(gitPath, tagName))
-      .done(
-        () => {
-          console.log('%j', { tag: tagName })
-        },
-        err => {
-          if (err.message === tagGitRepo.couldNotCreateTagMsg) {
-            console.error('Could not create the tag on the git repository. Does it already exist?')
-            process.exitCode = 1
-            return false
-          }
-          throw err
+      .then(() => {
+        console.log('%j', { tag: tagName })
+      })
+      .catch(err => {
+        if (err.message === tagGitRepo.couldNotCreateTagMsg) {
+          console.error('Could not create the tag on the git repository. Does it already exist?')
+          process.exitCode = 1
+          return
         }
-      )
+        reportError(err)
+      })
   })
 
 program.parse(process.argv)
