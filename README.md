@@ -20,15 +20,15 @@ work. This repository is therefor, apart from being a collection of [Terraform] 
 `node_modules/` folder next to the script, or in one of its ancestor folders, before [Terraform] can use the
 modules in `> terraform plan` or `> terraform apply`.
 
-This is done by running (preferred) `> yarn` or (legacy) `> npm install` in the project that uses these modules.
+This is done by running `> npm install` in the project that uses these modules.
 
-For this to work, this collection of [Terraform] modules / [npm] / [yarn] package must itself be loaded in the
-[Terraform] configuration in which it is used via `> yarn` (preferred) or `> npm install` (legacy). These commands 
+For this to work, this collection of [Terraform] modules / [npm] package must itself be loaded in the
+[Terraform] configuration in which it is used via `> npm install`. These commands 
 work recursively.
 
-This is done by making the configuration in which these modules are used an [npm] / [yarn] package itself, with this 
+This is done by making the configuration in which these modules are used an [npm] package itself, with this 
 collection of [Terraform] modules defined as a development dependency in its `package.json`. Once
-`> yarn` (preferred) or `> npm install` (legacy) is executed, these modules will be available in
+`> npm install` is executed, these modules will be available in
 `node_modules/terraform-ppwcode-modules/`. To create an instance of a module `MODULE_NAME` then, the [Terraform]
 configuration has to refer to it via a relative path, like this:
  
@@ -37,17 +37,8 @@ configuration has to refer to it via a relative path, like this:
         source = "./node_modules/terraform-ppwcode-modules/MODULE_NAME"
     }
 
-_Note to the [Terraform] maintainers: go with the flow, and promote [npm] / [yarn] as the primary method to distribute
+_Note to the [Terraform] maintainers: go with the flow, and promote [npm] as the primary method to distribute
 modules._
-
-
-
-
-// TODO
-=======
-
- `@ppwcode/node-gitinfo` should be updated asap, to use a more recent version of nodegit (because there
- is no pre-build binary for the latest node of the older version).
 
 
 [Terraform]: https://peopleware.atlassian.net/wiki/x/CwAvBg
