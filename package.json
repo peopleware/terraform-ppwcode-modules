@@ -34,6 +34,7 @@
     "moment": "^2.22.1",
     "pad": "^2.0.3",
     "pkginfo": "^0.4.1",
+    "promise-all": "^1.0.0",
     "q": "^1.5.1"
   },
   "devDependencies": {

@@ -19,6 +19,7 @@ const SoaSerial = require('./SoaSerial')
 const Contract = require('@toryt/contracts-iii')
 const Q = require('q')
 const moment = require('moment')
+const all = require('promise-all')
 
 class DnsMeta {
   get invariants () {
@@ -127,7 +128,7 @@ DnsMeta.nextDnsMeta = new Contract({
   ],
   exception: [() => false]
 }).implementation(function (domain, at, path) {
-  return Q.object({
+  return all({
     soaSerial: SoaSerial.nextSoaSerial(domain, at), // TODO serial already >> 99
     gitInfo: GitInfo.createForHighestGitDir(path)
   })
