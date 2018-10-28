@@ -152,7 +152,7 @@ program
       .then(gitPath => tagGitRepo(gitPath, tagName))
       .done(
         () => {
-          console.log('%j', {tag: tagName})
+          console.log('%j', { tag: tagName })
         },
         err => {
           if (err.message === tagGitRepo.couldNotCreateTagMsg) {
