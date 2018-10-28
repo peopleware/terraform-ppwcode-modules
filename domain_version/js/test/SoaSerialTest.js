@@ -19,7 +19,7 @@
 const SoaSerial = require('../SoaSerial')
 const util = require('./_util')
 const moment = require('moment')
-const ConditionError = require('@toryt/contracts-iii/src/III/ConditionError')
+const ConditionError = require('@toryt/contracts-iv/lib/IV/ConditionError')
 
 const someMoments = [
   moment('20180108T142423.345Z'),

@@ -18,7 +18,7 @@ const moment = require('moment')
 const pad = require('pad')
 const Q = require('q')
 const dns = require('dns')
-const Contract = require('@toryt/contracts-iii')
+const Contract = require('@toryt/contracts-iv')
 
 class SoaSerial {
   get invariants () {

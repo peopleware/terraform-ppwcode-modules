@@ -18,7 +18,7 @@
 
 const Q = require('q')
 const dns = require('dns')
-const Contract = require('@toryt/contracts-iii')
+const Contract = require('@toryt/contracts-iv')
 
 /**
  * Promise for the key / value pairs in DNS TXT records for {@code fqdn}.
