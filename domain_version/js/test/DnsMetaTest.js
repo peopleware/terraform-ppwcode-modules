@@ -23,6 +23,7 @@ const proxyquire = require('proxyquire')
 const DnsMeta = proxyquire('../DnsMeta', { '@ppwcode/node-gitinfo/GitInfo': GitInfo })
 const sinon = require('sinon')
 const assert = require('assert')
+const moment = require('moment')
 
 // noinspection SpellCheckingInspection
 const aSha = 'b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b'
@@ -31,7 +32,8 @@ const anOriginUrl = 'git@GitHub:peopleware/terraform-ppwcode-modules.git'
 const aSerial = '2017061134'
 const someDomains = ['apple.com', 'google.com', 'does.not.exist']
 // noinspection MagicNumberJS
-const aMoment = new Date(2017, 5, 14, 9, 38, 23.345)
+const aDate = new Date(2017, 5, 14, 9, 38, 23.345)
+const aMoment = moment(aDate)
 const somePaths = [__filename, '/lala/land/over/the/rainbow']
 
 describe('DnsMeta', function () {
@@ -65,7 +67,7 @@ describe('DnsMeta', function () {
       DnsMeta.nextDnsMeta.contract.verifyPostconditions = false
     })
 
-    const at = aMoment
+    const at = aDate
     someDomains.forEach(function (domain) {
       somePaths.forEach(function (path) {
         it('should return a promise for "' + domain + '", at ' + at + ', for git above "' + path + '"', function () {
