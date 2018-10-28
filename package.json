@@ -46,10 +46,10 @@
   "nyc": {
     "check-coverage": true,
     "per-file": true,
-    "lines": 87,
-    "statements": 87,
-    "functions": 80,
-    "branches": 90,
+    "lines": 68,
+    "statements": 68,
+    "functions": 54,
+    "branches": 71,
     "reporter": [
       "html",
       "text"
