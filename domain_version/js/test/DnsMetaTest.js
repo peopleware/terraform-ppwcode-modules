@@ -20,7 +20,7 @@ const DnsMeta = require('../DnsMeta')
 const util = require('./_util')
 const SoaSerial = require('../SoaSerial')
 const GitInfo = require('@ppwcode/node-gitinfo/GitInfo')
-const Q = require('@ppwcode/node-gitinfo/q2')
+const Q = require('q')
 
 // noinspection SpellCheckingInspection
 const aSha = 'b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b'

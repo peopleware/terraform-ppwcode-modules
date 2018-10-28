@@ -17,7 +17,7 @@
 const GitInfo = require('@ppwcode/node-gitinfo/GitInfo')
 const SoaSerial = require('./SoaSerial')
 const Contract = require('@toryt/contracts-iii')
-const Q = require('@ppwcode/node-gitinfo/q2')
+const Q = require('q')
 const moment = require('moment')
 
 class DnsMeta {
