@@ -22,6 +22,7 @@ const GitInfo = require('@ppwcode/node-gitinfo/GitInfo')
 const proxyquire = require('proxyquire')
 const DnsMeta = proxyquire('../DnsMeta', { '@ppwcode/node-gitinfo/GitInfo': GitInfo })
 const sinon = require('sinon')
+const assert = require('assert')
 
 // noinspection SpellCheckingInspection
 const aSha = 'b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b'
@@ -114,9 +115,20 @@ describe('DnsMeta', function () {
       })
     })
 
-    /* TODO cover; can only be done with proxyquire, because we need a branch that is not precious
     it('fails when the working copy is not save', function () {
+      const stub = sinon.stub(GitInfo.prototype, 'isSave').get(function () { return false })
+      return DnsMeta.nextDnsMeta(someDomains[0], aMoment, __filename)
+        .then(
+          () => {
+            stub.restore()
+            assert.fail('should not be reached')
+          },
+          exc => {
+            stub.restore()
+            console.log(exc)
+            assert.strictEqual(exc.message, DnsMeta.workingCopyNotSaveMsg)
+          }
+        )
     })
-    */
   })
 })
