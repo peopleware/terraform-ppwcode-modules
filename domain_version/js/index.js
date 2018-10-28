@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 /**
  *    Copyright 2017 - 2018 PeopleWare n.v.
