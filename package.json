@@ -44,6 +44,16 @@
     "standard": "^12.0.1"
   },
   "nyc": {
+    "check-coverage": true,
+    "per-file": true,
+    "lines": 87,
+    "statements": 87,
+    "functions": 80,
+    "branches": 90,
+    "reporter": [
+      "html",
+      "text"
+    ],
     "exclude": [
       "**/test/**.js"
     ]
