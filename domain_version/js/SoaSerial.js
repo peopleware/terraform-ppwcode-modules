@@ -19,6 +19,8 @@ const pad = require('pad')
 const Q = require('q')
 const dns = require('dns')
 const Contract = require('@toryt/contracts-iv')
+const PromiseContract = require('@toryt/contracts-iv/lib/IV/PromiseContract')
+const util = require('./_util')
 
 class SoaSerial {
   get invariants () {
@@ -140,7 +142,7 @@ SoaSerial.constructorContract = new Contract({
         moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern),
     (at, sequenceNumber, result) => result.sequenceNumber === sequenceNumber
   ],
-  exception: [() => false]
+  exception: Contract.mustNotHappen
 })
 
 SoaSerial.yearPattern = 'YYYY'
@@ -177,7 +179,7 @@ SoaSerial.isASerial = new Contract({
     (candidate, result) =>
       !result || Number.parseInt(SoaSerial.detailedSerialRegExp.exec(candidate)[4]) <= SoaSerial.maxSequenceNumber
   ],
-  exception: [() => false]
+  exception: Contract.mustNotHappen
 }).implementation(function (candidate) {
   if (typeof candidate !== 'string' || !SoaSerial.detailedSerialRegExp.test(candidate)) {
     return false
@@ -209,7 +211,7 @@ SoaSerial.parse = new Contract({
     (serial, result) => result instanceof SoaSerial,
     (serial, result) => result.serial === serial
   ],
-  exception: [() => false]
+  exception: Contract.mustNotHappen
 }).implementation(function parse (serial) {
   const parts = SoaSerial.serialRegExp.exec(serial)
   return new SoaSerial(moment.utc(parts[1], SoaSerial.isoDateWithoutDashesPattern), Number.parseInt(parts[2]))
@@ -223,39 +225,22 @@ SoaSerial.parse = new Contract({
  * @param {string} domain - FQDN of the domain to get the SOA record of
  * @return {Promise<string>} Promise for the serial string in the SOA record of {@code domain}, retrieved via DNS
  */
-SoaSerial.currentSoaSerialString = new Contract({
+SoaSerial.currentSoaSerialString = new PromiseContract({
   pre: [
     (domain) => typeof domain === 'string'
   ],
   post: [
-    (domain, result) => Q.isPromiseAlike(result)
+    (domain, result) => typeof result === 'string',
+    (domain, result) => /^\d+$/.test(result)
     /* Contracts does not offer support for Promises yet */
   ],
-  exception: [() => false]
+  fastException: PromiseContract.mustNotHappen,
+  /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+     no DNS server can be contacted, … */
+  exception: util.exceptionIsAnError
 }).implementation(function currentSoaSerialString (domain) {
   return Q.denodeify(dns.resolveSoa)(domain)
     .then((soa) => '' + soa.serial)
-    .then(
-      new Contract({
-        pre: [
-          serial => typeof serial === 'string',
-          serial => /^\d+$/.test(serial)
-        ],
-        post: [(serial, result) => result === serial],
-        exception: [() => false]
-      }).implementation(serial => serial),
-      new Contract({
-        pre: [
-          () => true
-          /* domain does not exist, or there is no SOA record, or there is no internet connection, or
-                 no DNS server can be contacted, … */
-        ],
-        post: [() => false],
-        exception: [
-          (err1, err2) => err1 === err2
-        ]
-      }).implementation(err => { throw err })
-    )
 })
 
 /**
@@ -267,15 +252,17 @@ SoaSerial.currentSoaSerialString = new Contract({
  * @return {Promise<SoaSerial>} Promise for the SoaSerial, based on the serial string in the SOA record of
  *         {@code domain}, retrieved via DNS
  */
-SoaSerial.currentSoaSerial = new Contract({
+SoaSerial.currentSoaSerial = new PromiseContract({
   pre: [
     (domain) => typeof domain === 'string'
   ],
   post: [
-    (domain, result) => Q.isPromiseAlike(result)
-    /* Contracts does not offer support for Promises yet */
+    (domain, result) => result instanceof SoaSerial
   ],
-  exception: [() => false]
+  fastException: PromiseContract.mustNotHappen,
+  /* domain does not exist, or there is no SOA record, or there is no internet connection, or
+     no DNS server can be contacted, … */
+  exception: util.exceptionIsAnError
 }).implementation(function currentSoaSerial (domain) {
   return SoaSerial.currentSoaSerialString(domain)
     .then(serialString => {
@@ -284,26 +271,6 @@ SoaSerial.currentSoaSerial = new Contract({
       }
       return SoaSerial.parse(serialString)
     })
-    .then(
-      new Contract({
-        pre: [
-          soaSerial => soaSerial instanceof SoaSerial
-        ],
-        post: [(soaSerial, result) => result === soaSerial],
-        exception: [() => false]
-      }).implementation(soaSerial => soaSerial),
-      new Contract({
-        pre: [
-          () => true
-          /* domain does not exist, or there is no SOA record, or there is no internet connection, or
-           no DNS server can be contacted, or the SOA serial it is not in the form YYYYMMDDnn … */
-        ],
-        post: [() => false],
-        exception: [
-          (err1, err2) => err1 === err2
-        ]
-      }).implementation(err => { throw err })
-    )
 })
 
 /**
@@ -321,42 +288,24 @@ SoaSerial.currentSoaSerial = new Contract({
  * @return {Promise<SoaSerial>} Promise for an SoaSerial instance, that can be used at {@code at},
  *                              give the current state of the {@code domain} SOA in DNS
  */
-SoaSerial.nextSoaSerial = new Contract({
+SoaSerial.nextSoaSerial = new PromiseContract({
   pre: [
     (domain, at) => typeof domain === 'string',
     (domain, at) => at instanceof Date || moment.isMoment(at)
   ],
   post: [
-    (domain, at, result) => Q.isPromiseAlike(result)
-    /* Contracts does not offer support for Promises yet */
+    (domain, at, result) => result instanceof SoaSerial
   ],
-  exception: [() => false]
+  fastException: PromiseContract.mustNotHappen,
+  /* current sequence number is already at 99, and {@code at} is at the same
+     day in the UTC time zone as reflected by the current SOA serial, or {@code at} is before the
+     day reflected by the current SOA serial. */
+  exception: util.exceptionIsAnError
 }).implementation(function (domain, at) {
   return SoaSerial.currentSoaSerialString(domain)
     .then(
       (serial) => SoaSerial.serialRegExp.test(serial) ? SoaSerial.parse(serial).next(at) : new SoaSerial(at, 0),
       (ignore) => new SoaSerial(at, 0)
-    )
-    .then(
-      new Contract({
-        pre: [
-          soaSerial => soaSerial instanceof SoaSerial
-        ],
-        post: [(soaSerial, result) => result === soaSerial],
-        exception: [() => false]
-      }).implementation(soaSerial => soaSerial),
-      new Contract({
-        pre: [
-          () => true
-          /* current sequence number is already at 99, and {@code at} is at the same
-             day in the UTC time zone as reflected by the current SOA serial, or {@code at} is before the
-             day reflected by the current SOA serial. */
-        ],
-        post: [() => false],
-        exception: [
-          (err1, err2) => err1 === err2
-        ]
-      }).implementation(err => { throw err })
     )
 })
 

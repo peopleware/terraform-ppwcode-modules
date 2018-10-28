@@ -17,9 +17,10 @@
 const GitInfo = require('@ppwcode/node-gitinfo/GitInfo')
 const SoaSerial = require('./SoaSerial')
 const Contract = require('@toryt/contracts-iv')
-const Q = require('q')
+const PromiseContract = require('@toryt/contracts-iv/lib/IV/PromiseContract')
 const moment = require('moment')
 const all = require('promise-all')
+const util = require('./_util')
 
 class DnsMeta {
   get invariants () {
@@ -106,7 +107,7 @@ DnsMeta.constructorContract = new Contract({
     (sha, branch, repo, serial, result) => result.repo === repo,
     (sha, branch, repo, serial, result) => result.serial === serial
   ],
-  exception: [() => false]
+  exception: Contract.mustNotHappen
 })
 
 DnsMeta.workingCopyNotSaveMsg = 'WORKING COPY NOT SAVE'
@@ -116,7 +117,7 @@ DnsMeta.workingCopyNotSaveMsg = 'WORKING COPY NOT SAVE'
  * to be used at {@code at} for {@code domain}, and information about the highest git repository found above
  * {@code path}.
  */
-DnsMeta.nextDnsMeta = new Contract({
+DnsMeta.nextDnsMeta = new PromiseContract({
   pre: [
     (domain, at, path) => typeof domain === 'string',
     (domain, at, path) => at instanceof Date || moment.isMoment(at),
@@ -124,9 +125,12 @@ DnsMeta.nextDnsMeta = new Contract({
     (domain, at, path) => !!path
   ],
   post: [
-    (domain, at, path, result) => Q.isPromiseAlike(result)
+    (domain, at, path, result) => result instanceof DnsMeta,
+    (domain, at, path, result) =>
+      SoaSerial.parse(result.serial).serialStart === moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern)
   ],
-  exception: [() => false]
+  fastException: PromiseContract.mustNotHappen,
+  exception: util.exceptionIsAnError
 }).implementation(function (domain, at, path) {
   return all({
     soaSerial: SoaSerial.nextSoaSerial(domain, at), // TODO serial already >> 99
@@ -138,22 +142,6 @@ DnsMeta.nextDnsMeta = new Contract({
       }
       return new DnsMeta(result.gitInfo.sha, result.gitInfo.branch, result.gitInfo.originUrl, result.soaSerial.serial)
     })
-    .then(
-      new Contract({
-        pre: [
-          dnsMeta => dnsMeta instanceof DnsMeta,
-          dnsMeta =>
-            SoaSerial.parse(dnsMeta.serial).serialStart === moment(at).utc().format(SoaSerial.isoDateWithoutDashesPattern)
-        ],
-        post: [(dnsMeta, result) => result === dnsMeta],
-        exception: [() => false]
-      }).implementation(gitInfo => gitInfo),
-      new Contract({
-        pre: [(err) => err instanceof Error],
-        post: [() => false],
-        exception: [(err1, err2) => err1 === err2]
-      }).implementation(err => { throw err })
-    )
 })
 
 module.exports = DnsMeta

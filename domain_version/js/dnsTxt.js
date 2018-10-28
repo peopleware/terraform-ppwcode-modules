@@ -18,7 +18,8 @@
 
 const Q = require('q')
 const dns = require('dns')
-const Contract = require('@toryt/contracts-iv')
+const PromiseContract = require('@toryt/contracts-iv/lib/IV/PromiseContract')
+const util = require('./_util')
 
 /**
  * Promise for the key / value pairs in DNS TXT records for {@code fqdn}.
@@ -31,17 +32,18 @@ const Contract = require('@toryt/contracts-iv')
  * @param {string} fqdn - FQDN to get the TXT information of
  * @return {Promise<object>} Promise for an object containing all key value pairs found in the meta DNS record
  */
-const dnsTxt = new Contract({
+const dnsTxt = new PromiseContract({
   pre: [
     (fqdn) => typeof fqdn === 'string',
     (fqdn) => !!fqdn
   ],
   post: [
-    (fqdn, result) => Q.isPromiseAlike(result)
+    (fqdn, result) => result instanceof Object
   ],
-  exception: [
-    (fqdn, err) => err instanceof Error
-  ]
+  fastException: PromiseContract.mustNotHappen,
+  /* domain does not exist, or there is no TXT record, or there is no internet connection, or
+     no DNS server can be contacted, … */
+  exception: util.exceptionIsAnError
 }).implementation(function (fqdn) {
   return Q.denodeify(dns.resolveTxt)(fqdn)
     .then((allTxtRecords) => allTxtRecords.reduce(
@@ -55,24 +57,6 @@ const dnsTxt = new Contract({
       ),
       {}
     ))
-    .then(
-      new Contract({
-        pre: [txtMap => txtMap instanceof Object],
-        post: [(txtMap, result) => result === txtMap],
-        exception: [() => false]
-      }).implementation(txtMap => txtMap),
-      new Contract({
-        pre: [
-          () => true
-          /* domain does not exist, or there is no TXT record, or there is no internet connection, or
-           no DNS server can be contacted, … */
-        ],
-        post: [() => false],
-        exception: [
-          (err1, err2) => err1 === err2
-        ]
-      }).implementation(err => { throw err })
-    )
 })
 
 /* Note: it is unclear to this author what the difference is between key / value pairs in 1 TXT record, or in different
