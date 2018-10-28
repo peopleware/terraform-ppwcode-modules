@@ -20,7 +20,6 @@ const DnsMeta = require('../DnsMeta')
 const util = require('./_util')
 const SoaSerial = require('../SoaSerial')
 const GitInfo = require('@ppwcode/node-gitinfo/GitInfo')
-const Q = require('q')
 
 // noinspection SpellCheckingInspection
 const aSha = 'b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b'
@@ -55,6 +54,14 @@ describe('DnsMeta', function () {
     })
   })
   describe('nextDnsMeta', function () {
+    before(function () {
+      DnsMeta.nextDnsMeta.contract.verifyPostconditions = true
+    })
+
+    after(function () {
+      DnsMeta.nextDnsMeta.contract.verifyPostconditions = false
+    })
+
     const at = aMoment
     someDomains.forEach(function (domain) {
       somePaths.forEach(function (path) {
@@ -66,7 +73,7 @@ describe('DnsMeta', function () {
             .then(
               dnsMeta => {
                 console.log('%j', dnsMeta)
-                return Q.all([
+                return Promise.all([
                   SoaSerial
                     .nextSoaSerial(domain, at)
                     .then(soaSerial => {
@@ -104,5 +111,10 @@ describe('DnsMeta', function () {
         })
       })
     })
+
+    /* TODO cover; can only be done with proxyquire, because we need a branch that is not precious
+    it('fails when the working copy is not save', function () {
+    })
+    */
   })
 })
