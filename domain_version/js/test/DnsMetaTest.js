@@ -16,10 +16,12 @@
 
 /* eslint-env mocha */
 
-const DnsMeta = require('../DnsMeta')
 const util = require('./_util')
 const SoaSerial = require('../SoaSerial')
 const GitInfo = require('@ppwcode/node-gitinfo/GitInfo')
+const proxyquire = require('proxyquire')
+const DnsMeta = proxyquire('../DnsMeta', { '@ppwcode/node-gitinfo/GitInfo': GitInfo })
+const sinon = require('sinon')
 
 // noinspection SpellCheckingInspection
 const aSha = 'b557eb5aabebf72f84ae9750be2ad1b7b6b43a4b'
