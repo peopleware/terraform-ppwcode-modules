@@ -1,7 +1,5 @@
-#!/usr/local/bin/node
-
 /**
- *    Copyright 2017 PeopleWare n.v.
+ *    Copyright 2017 - 2018 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
