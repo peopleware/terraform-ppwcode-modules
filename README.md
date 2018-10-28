@@ -41,10 +41,56 @@ _Note to the [Terraform] maintainers: go with the flow, and promote [npm] as the
 modules._
 
 
+
+
+Compatibility
+=============
+
+This library is intended to be compatible with Node 6, 8, and 10.
+
+
+
+Development
+===========
+
+Node version
+------------
+
+Development is done in Node 10, via `nvm`.
+
+
+Compatibility
+-------------
+
+The code does not use `async` / `await`, which was introduced in Node 8.
+
+Also, we use `Q` as Promise library, instead of native Promises, since Node 6 does not yet support `util.promisify()`.
+We use `Q.nfcall` instead.
+
+
+Style
+-----
+
+[![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
+
+This code uses [Standard] coding style.
+
+
+
+TODO
+====
+
+Setup a CI
+----------
+
+Move to `ppwcode` team. Request access from Travis.
+Create parallel builds for Node 6, 8 10, and back tag.
+
+
 [Terraform]: https://peopleware.atlassian.net/wiki/x/CwAvBg
 [how to use modules]: https://www.terraform.io/docs/modules/usage.html
 [Terraform module sources]: https://www.terraform.io/docs/modules/sources.html
 [Node.js]: https://nodejs.org
 [Terraform external data source provider]: https://www.terraform.io/docs/providers/external/data_source.html
 [npm]: https://www.npmjs.com
-[yarn]: https://yarnpkg.com
+[Standard]: https://standardjs.com
