@@ -18,5 +18,14 @@ function exceptionIsAnErrorCondition () { return arguments[arguments.length - 2]
 
 module.exports = {
   exceptionIsAnErrorCondition: exceptionIsAnErrorCondition,
-  exceptionIsAnError: [exceptionIsAnErrorCondition]
+  exceptionIsAnError: [exceptionIsAnErrorCondition],
+
+  /**
+   * Take a Promise-like object, and turn it into a native Promise.
+   *
+   * This is introduced since Contracts requires native Promises.
+   */
+  realPromise: function (promiseLike) {
+    return new Promise((resolve, reject) => promiseLike.catch(exc => reject(exc)).then(result => resolve(result)))
+  }
 }

@@ -43,7 +43,7 @@ const dnsTxt = new PromiseContract({
      no DNS server can be contacted, … */
   exception: util.exceptionIsAnError
 }).implementation(function (fqdn) {
-  return Q.denodeify(dns.resolveTxt)(fqdn)
+  return util.realPromise(Q.denodeify(dns.resolveTxt)(fqdn))
     .then((allTxtRecords) => allTxtRecords.reduce(
       (acc, oneTxtRecord) => oneTxtRecord.reduce(
         (acc, str) => {
