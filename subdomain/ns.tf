@@ -31,9 +31,8 @@ resource "aws_route53_record" "ns_delegation" {
     "${aws_route53_zone.zone.name_servers.3}",
   ]
 
-  /* There seems to be no other way to communicate this list.
-     See example at
-     https://www.terraform.io/docs/providers/aws/r/route53_zone.html#name_servers */
+  # There seems to be no other way to communicate this list.
+  # See example at https://www.terraform.io/docs/providers/aws/r/route53_zone.html#name_servers
   ttl = "${var.ttl}"
 }
 
