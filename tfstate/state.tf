@@ -37,43 +37,43 @@ resource "aws_s3_bucket" "terraform_state" {
 resource "aws_s3_bucket_policy" "enforce_encrypted_state_files" {
   bucket = "${aws_s3_bucket.terraform_state.id}"
 
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "EnforceEncryptedStateFilesAndProhibitDelete",
-  "Statement": [
-    {
-      "Sid": "DenyIncorrectEncryptionHeader",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:PutObject",
-      "Resource": "${aws_s3_bucket.terraform_state.arn}/*",
-      "Condition": {
-        "StringNotEquals": {
-          "s3:x-amz-server-side-encryption": "AES256"
-        }
-      }
-    },
-    {
-      "Sid": "DenyUnEncryptedObjectUploads",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:PutObject",
-      "Resource": "${aws_s3_bucket.terraform_state.arn}/*",
-      "Condition": {
-        "Null": {
-          "s3:x-amz-server-side-encryption": "true"
-        }
-      }
-    },
-    {
-      "Sid": "ProhibitDelete",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:DeleteObject",
-      "Resource": "${aws_s3_bucket.terraform_state.arn}/*"
-    }
-  ]
+  policy = "${data.aws_iam_policy_document.enforce_encrypted_state_files.json}"
 }
-POLICY
+
+data "aws_iam_policy_document" "enforce_encrypted_state_files" {
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption"
+
+      values = [
+        "AES256",
+      ]
+    }
+  }
+
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
+
+    condition {
+      test     = "Null"
+      variable = "s3:x-amz-server-side-encryption"
+
+      values = [
+        "true",
+      ]
+    }
+  }
+
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:DeleteObject"]
+    resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
+  }
 }

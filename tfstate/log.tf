@@ -46,19 +46,13 @@ resource "aws_s3_bucket" "terraform_state_logging" {
 resource "aws_s3_bucket_policy" "prohibit-delete" {
   bucket = "${aws_s3_bucket.terraform_state_logging.id}"
 
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "ProhibitDelete",
-  "Statement": [
-    {
-      "Sid": "ProhibitDelete",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:DeleteObject",
-      "Resource": "${aws_s3_bucket.terraform_state_logging.arn}/*"
-    }
-  ]
+  policy = "${data.aws_iam_policy_document.prohibit-delete.json}"
 }
-POLICY
+
+data "aws_iam_policy_document" "prohibit-delete" {
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:DeleteObject"]
+    resources = ["${aws_s3_bucket.terraform_state_logging.arn}/*"]
+  }
 }
