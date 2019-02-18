@@ -51,7 +51,13 @@ resource "aws_s3_bucket_policy" "prohibit-delete" {
 
 data "aws_iam_policy_document" "prohibit-delete" {
   statement {
-    effect    = "Deny"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
     actions   = ["s3:DeleteObject"]
     resources = ["${aws_s3_bucket.terraform_state_logging.arn}/*"]
   }

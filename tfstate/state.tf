@@ -42,7 +42,13 @@ resource "aws_s3_bucket_policy" "enforce_encrypted_state_files" {
 
 data "aws_iam_policy_document" "enforce_encrypted_state_files" {
   statement {
-    effect    = "Deny"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
     actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
 
@@ -57,7 +63,13 @@ data "aws_iam_policy_document" "enforce_encrypted_state_files" {
   }
 
   statement {
-    effect    = "Deny"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
     actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
 
@@ -72,7 +84,13 @@ data "aws_iam_policy_document" "enforce_encrypted_state_files" {
   }
 
   statement {
-    effect    = "Deny"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
     actions   = ["s3:DeleteObject"]
     resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
   }
