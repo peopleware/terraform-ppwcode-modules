@@ -32,6 +32,14 @@ resource "aws_s3_bucket" "terraform_state" {
   lifecycle {
     prevent_destroy = true
   }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "enforce_encrypted_state_files" {
@@ -41,48 +49,6 @@ resource "aws_s3_bucket_policy" "enforce_encrypted_state_files" {
 }
 
 data "aws_iam_policy_document" "enforce_encrypted_state_files" {
-  statement {
-    effect = "Deny"
-
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
-
-    condition {
-      test     = "StringNotEquals"
-      variable = "s3:x-amz-server-side-encryption"
-
-      values = [
-        "AES256",
-      ]
-    }
-  }
-
-  statement {
-    effect = "Deny"
-
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
-
-    condition {
-      test     = "Null"
-      variable = "s3:x-amz-server-side-encryption"
-
-      values = [
-        "true",
-      ]
-    }
-  }
-
   statement {
     effect = "Deny"
 
