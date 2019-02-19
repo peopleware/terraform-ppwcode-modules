@@ -42,13 +42,13 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-resource "aws_s3_bucket_policy" "enforce_encrypted_state_files" {
+resource "aws_s3_bucket_policy" "deny_delete_state_files" {
   bucket = "${aws_s3_bucket.terraform_state.id}"
 
-  policy = "${data.aws_iam_policy_document.enforce_encrypted_state_files.json}"
+  policy = "${data.aws_iam_policy_document.deny_delete_state_files.json}"
 }
 
-data "aws_iam_policy_document" "enforce_encrypted_state_files" {
+data "aws_iam_policy_document" "deny_delete_state_files" {
   statement {
     effect = "Deny"
 
