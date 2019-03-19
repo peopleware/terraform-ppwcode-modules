@@ -1,5 +1,4 @@
-Standard DNS-SD Generic Service Types
-=====================================
+# Standard DNS-SD Generic Service Types
 
 Definition of DNS-SD generic service types of standard services as constants.
 
@@ -8,10 +7,10 @@ the domain. An actual DNS-SD service type is composed as `<GENERIC TYPE>.<DNS DO
 A DNS-SD generic service type typically has the form
 
     _<SUBTYPE>._sub._<TYPE>._<PROTOCOL>
-    
+
 `<PROTOCOL>` is generally `tcp`, or `udp` in limited specialized cases.
 
-For APIs, `<TYPE>` is `api`. For UI, it is `http`.    
+For APIs, `<TYPE>` is `api`. For UI, it is `http`.
 
 The generic service type for standard services is standardized here.
 

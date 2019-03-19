@@ -7,12 +7,13 @@ and the current UTC time, following [RFC 1912 section 2.2]:
 
 > The recommended syntax is YYYYMMDDnn (YYYY=year, MM=month, DD=day, nn=revision number).
 
-The meta information is 
-* information about the highest git repository this module is used in:
-  * `repo`: the URL of the `origin` remote,
-  * `sha`: the current SHA,
-  * `branch`: the name of the current branch,
-* `serial`: the serial used in the SOA record,
+The meta information is
+
+- information about the highest git repository this module is used in:
+  - `repo`: the URL of the `origin` remote,
+  - `sha`: the current SHA,
+  - `branch`: the name of the current branch,
+- `serial`: the serial used in the SOA record,
 
 and all the key / value keys found in the map input variable `additional_meta`.
 
@@ -26,8 +27,7 @@ is not clean, if the `branch` contains the string `"prod"`, `"staging"` or `"tes
 is done case-insensitive. In other branches, `meta` will contain an alphabetically sorted, comma-separated
 list of the names of all the files that are new, modified or deleted.
 
-Testing
-=======
+# Testing
 
 Testing is done using [Mocha] and [Toryt Contracts].
 
@@ -35,9 +35,8 @@ The tests can be run by executing
 
     > npm test
 
-[RFC 1464]: https://tools.ietf.org/html/rfc1464
-[RFC 6763 section 6]: https://tools.ietf.org/html/rfc6763#section-6
-[RFC 1912 section 2.2]: https://tools.ietf.org/html/rfc1912
-[Mocha]: https://mochajs.org
-[Toryt Contracts]: https://www.npmjs.com/package/@toryt/contracts-iv
-
+[rfc 1464]: https://tools.ietf.org/html/rfc1464
+[rfc 6763 section 6]: https://tools.ietf.org/html/rfc6763#section-6
+[rfc 1912 section 2.2]: https://tools.ietf.org/html/rfc1912
+[mocha]: https://mochajs.org
+[toryt contracts]: https://www.npmjs.com/package/@toryt/contracts-iv
