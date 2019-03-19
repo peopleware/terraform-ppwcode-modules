@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+# TODO: consider passing in providers
+# See https://www.terraform.io/docs/configuration-0-11/modules.html, Passing Providers Explicitly
+
 provider "aws" {
   alias   = "tls_certificate"
   region  = "${var.region}"
