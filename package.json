@@ -62,7 +62,7 @@
     ]
   },
   "scripts": {
-    "pretest": "npm-check || exit 0",
+    "pretest": "npm-check -i prettier-standard || exit 0",
     "test": "standard && nyc mocha domain_version/js/test/**",
     "preversion": "npm-check && standard && nyc mocha domain_version/js/test/**"
   }
