@@ -46,6 +46,10 @@ Almost any change will create a new certificate, and delete the existing one. Th
 after the new one is created, which makes it possible to switch the certificate that is used by a resource with zero
 down time.
 
+## Terraform version
+
+This module requires Terraform 0.12.
+
 ## Issue
 
 There is an issue with the creation of the proofs for an undetermined number of FQDNS.
