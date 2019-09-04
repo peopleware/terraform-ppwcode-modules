@@ -18,7 +18,7 @@ resource "aws_acm_certificate" "main" {
   provider = "aws.tls_certificate"
 
   domain_name               = "${local.main_fqdn}"
-  subject_alternative_names = [local.alternate_fqdns]
+  subject_alternative_names = local.alternate_fqdns
   validation_method         = "DNS"
 
   tags = {
