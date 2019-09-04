@@ -39,7 +39,5 @@ resource "aws_acm_certificate_validation" "tls_certificate" {
 
   certificate_arn = "${aws_acm_certificate.main.arn}"
 
-  validation_record_fqdns = [
-    "${aws_route53_record.proof.*.fqdn}",
-  ]
+  validation_record_fqdns = aws_route53_record.proof.*.fqdn
 }
