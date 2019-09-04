@@ -21,7 +21,7 @@ resource "aws_acm_certificate" "main" {
   subject_alternative_names = ["${local.alternate_fqdns}"]
   validation_method         = "DNS"
 
-  tags {
+  tags = {
     environment             = "${var.environment}"
     terraform-configuration = "${var.terraform-configuration}"
     terraform-workspace     = "${terraform.workspace}"
