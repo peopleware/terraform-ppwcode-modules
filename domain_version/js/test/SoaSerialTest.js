@@ -190,10 +190,15 @@ describe('SoaSerial', function () {
     someDomains.forEach(function (domain) {
       it('should return a promise for "' + domain + '"', function () {
         return SoaSerial.currentSoaSerialString(domain)
+          .then(serial => {
+            console.log(`success: ${serial}`)
+            return true
+          })
           .catch(err => {
             if (err instanceof ConditionError) {
               throw err
             }
+            console.log(`failure: ${err}`)
             return true
           })
       })
