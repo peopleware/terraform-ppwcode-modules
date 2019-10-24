@@ -40,12 +40,16 @@ resource "aws_route53_record" "meta" {
   records = ["${join("\"\"", formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs)))}"]
 }
 
+# Tags the git repo with the calculated and executed serial, under `serial/${domain_name}/SERIAL
+# The domain name is necessary in the tag for when this module is used more than once in the same configuration,
+# for different domains. Otherwise, both uses would try to apply the same tag to the git repo. The second application
+# attempt would fail.
 data "external" "tag" {
   program = [
     "node",
     "${path.module}/js/index.js",
     "tag",
-    "serial/${data.external.calculated_meta.result.serial}",
+    "serial/${domain_name}/${data.external.calculated_meta.result.serial}",
   ]
 
   depends_on = ["aws_route53_record.meta"]
