@@ -59,6 +59,7 @@ const notSomeSerials = [
 ]
 
 const someDomains = [
+  'apple.com',
   'microsoft.com',
   'google.com',
   'ppwcode.org',
@@ -218,6 +219,7 @@ describe('SoaSerial', function () {
         const result = SoaSerial.currentSoaSerial(domain)
         return result
           .then(soaSerial => {
+            console.log(`success: ${JSON.stringify(soaSerial)}`)
             return SoaSerial.currentSoaSerialString(domain).then(serial => {
               if (soaSerial.serial !== serial) {
                 throw new Error(
@@ -231,6 +233,7 @@ describe('SoaSerial', function () {
             if (err instanceof ConditionError) {
               throw err
             }
+            console.log(`failure: ${err}`)
             return true
           })
       })
