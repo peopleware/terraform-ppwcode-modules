@@ -1,6 +1,6 @@
 {
   "name": "@ppwcode/terraform-ppwcode-modules",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "A number of general Terraform modules",
   "keywords": [
     "Terraform",
