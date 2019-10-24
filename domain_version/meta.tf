@@ -49,7 +49,7 @@ data "external" "tag" {
     "node",
     "${path.module}/js/index.js",
     "tag",
-    "serial/${domain_name}/${data.external.calculated_meta.result.serial}",
+    "serial/${var.domain_name}/${data.external.calculated_meta.result.serial}",
   ]
 
   depends_on = ["aws_route53_record.meta"]
