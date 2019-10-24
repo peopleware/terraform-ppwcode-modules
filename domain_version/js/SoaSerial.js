@@ -291,7 +291,7 @@ SoaSerial.currentSoaSerial = new PromiseContract({
   exception: util.exceptionIsAnError
 }).implementation(function currentSoaSerial (domain) {
   return SoaSerial.currentSoaSerialString(domain).then(serialString => {
-    if (!SoaSerial.serialRegExp.test(serialString)) {
+    if (!SoaSerial.isASerial(serialString)) {
       throw new Error('The serial of the domain is not in the form YYYYMMDDnn')
     }
     return SoaSerial.parse(serialString)
@@ -327,7 +327,7 @@ SoaSerial.nextSoaSerial = new PromiseContract({
 }).implementation(function (domain, at) {
   return SoaSerial.currentSoaSerialString(domain).then(
     serial =>
-      SoaSerial.serialRegExp.test(serial)
+      SoaSerial.isASerial(serial)
         ? SoaSerial.parse(serial).next(at)
         : new SoaSerial(at, 0),
     ignore => new SoaSerial(at, 0)
