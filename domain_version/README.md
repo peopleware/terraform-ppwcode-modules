@@ -22,7 +22,9 @@ All the meta information is offered in the output map `I-meta_payload`.
 The highest git repository this module is used in, is tagged with `serial/DOMAIN_NAME/<META.serial>`.
 The `DOMAIN_NAME` is included in the tag to make it possible to use this module in a configuration
 more than once, for different domains. Otherwise, all uses would try to apply the same tag to the repo,
-and all but the first attempts would fail. _This program does not push the tag._
+and all but the first attempts would fail. Depending on versions, an FQDN received from AWS might or
+might not end with a trailing dot `"."`. We remove the dot from `DOMAIN_NAME`, if it occurs.
+_This program does not push the tag._
 
 Planning or applying this module will fail if the highest git repository this module is used in,
 is not clean, if the `branch` contains the string `"prod"`, `"staging"` or `"test"`. The comparison

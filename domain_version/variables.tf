@@ -22,7 +22,7 @@ variable "zone_id" {
 variable "domain_name" {
   description = <<EOF
 Name of the DNS domain which is controlled by the hosted zone we are defining the version of.
-Don't add a final '.'. We do.
+Can end or not with a trailing dot. We take care of that.
 EOF
 
   type = "string"
