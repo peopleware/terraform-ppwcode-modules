@@ -30,7 +30,7 @@
   "dependencies": {
     "@ppwcode/node-gitinfo": "^2.2.6",
     "@toryt/contracts-iv": "^4.0.5",
-    "commander": "^3.0.2",
+    "commander": "^4.0.1",
     "moment": "^2.24.0",
     "pad": "^3.2.0",
     "pkginfo": "^0.4.1",
