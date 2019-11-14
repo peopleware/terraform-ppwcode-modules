@@ -19,7 +19,7 @@ data "external" "calculated_meta" {
     "node",
     "${path.module}/js/index.js",
     "next-meta",
-    "${var.domain_name}",
+    "${local.clean_domain_name}",
   ]
 }
 
@@ -34,7 +34,7 @@ data "null_data_source" "meta" {
  */
 resource "aws_route53_record" "meta" {
   zone_id = "${var.zone_id}"
-  name    = "meta.${var.domain_name}"
+  name    = "meta.${local.clean_domain_name}"
   type    = "TXT"
   ttl     = "${var.ttl}"
   records = ["${join("\"\"", formatlist("%s=%s", keys(data.null_data_source.meta.inputs), values(data.null_data_source.meta.inputs)))}"]
@@ -44,12 +44,14 @@ resource "aws_route53_record" "meta" {
 # The domain name is necessary in the tag for when this module is used more than once in the same configuration,
 # for different domains. Otherwise, both uses would try to apply the same tag to the git repo. The second application
 # attempt would fail.
+# Depending on versions, an FQDN received from AWS might or might not end with a trailing dot `"."`.
+# We remove the dot from `${domain_name}`, if it occurs.
 data "external" "tag" {
   program = [
     "node",
     "${path.module}/js/index.js",
     "tag",
-    "serial/${var.domain_name}/${data.external.calculated_meta.result.serial}",
+    "serial/${local.clean_domain_name}/${data.external.calculated_meta.result.serial}",
   ]
 
   depends_on = ["aws_route53_record.meta"]
