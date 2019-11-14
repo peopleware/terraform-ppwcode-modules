@@ -15,8 +15,8 @@
  */
 
 locals {
-  # Depending on versions, an FQDN received from AWS might or might not end with a training dot ".".
-  # We remove the dot, if if occurs.
+  # Depending on versions, an FQDN received from AWS might or might not end with a trailing dot `"."`.
+  # We remove the dot, if it occurs.
   main_fqdn = "${replace(var.main_fqdn, "/[.]$/", "")}"
 
   alternate_fqdns = "${compact(
