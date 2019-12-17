@@ -1,5 +1,5 @@
 /**
- *    Copyright 2017 PeopleWare n.v.
+ *    Copyright 2017 - 2019 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,33 @@
  */
 
 output "I-logging_bucket" {
-  value = "${aws_s3_bucket.terraform_state_logging.bucket}"
+  value = aws_s3_bucket.terraform_state_logging.bucket
 }
 
 output "I-logging_bucket_id" {
-  value = "${aws_s3_bucket.terraform_state_logging.id}"
+  value = aws_s3_bucket.terraform_state_logging.id
 }
 
 output "I-logging_bucket_arn" {
-  value = "${aws_s3_bucket.terraform_state_logging.arn}"
+  value = aws_s3_bucket.terraform_state_logging.arn
 }
 
 output "I-state_bucket" {
-  value = "${aws_s3_bucket.terraform_state.bucket}"
+  value = aws_s3_bucket.terraform_state.bucket
 }
 
 output "I-state_bucket_id" {
-  value = "${aws_s3_bucket.terraform_state.id}"
+  value = aws_s3_bucket.terraform_state.id
 }
 
 output "I-state_bucket_arn" {
-  value = "${aws_s3_bucket.terraform_state.arn}"
+  value = aws_s3_bucket.terraform_state.arn
 }
 
 output "I-lock_table_id" {
-  value = "${aws_dynamodb_table.terraform_statelock.id}"
+  value = aws_dynamodb_table.terraform_statelock.id
 }
 
 output "I-lock_table_arn" {
-  value = "${aws_dynamodb_table.terraform_statelock.arn}"
+  value = aws_dynamodb_table.terraform_statelock.arn
 }

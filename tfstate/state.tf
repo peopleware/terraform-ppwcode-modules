@@ -1,5 +1,5 @@
 /**
- *    Copyright 2017 PeopleWare n.v.
+ *    Copyright 2017 - 2019 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "${var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)}"
-  region = "${var.region}"
+  bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
+  region = var.region
   acl    = "private"
 
   versioning {
@@ -24,10 +24,10 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 
   logging {
-    target_bucket = "${aws_s3_bucket.terraform_state_logging.id}"
+    target_bucket = aws_s3_bucket.terraform_state_logging.id
   }
 
-  tags = "${var.tags}"
+  tags = var.tags
 
   lifecycle {
     prevent_destroy = true
@@ -43,9 +43,9 @@ resource "aws_s3_bucket" "terraform_state" {
 }
 
 resource "aws_s3_bucket_policy" "deny_delete_state_files" {
-  bucket = "${aws_s3_bucket.terraform_state.id}"
+  bucket = aws_s3_bucket.terraform_state.id
 
-  policy = "${data.aws_iam_policy_document.deny_delete_state_files.json}"
+  policy = data.aws_iam_policy_document.deny_delete_state_files.json
 }
 
 data "aws_iam_policy_document" "deny_delete_state_files" {

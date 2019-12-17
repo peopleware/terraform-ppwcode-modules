@@ -1,4 +1,6 @@
-Root of an organisation's [Terraform] definition.
+# Root of an organisation's Terraform definition.
+
+**Requires [Terraform] > `0.12`.**
 
 **This configuration does not follow the ppwcode conventions completely.**
 
@@ -8,7 +10,7 @@ and the DynamoDB table that guards against concurrent modification, it does not 
 this configuration guarded against concurrent modification. **In this case, the state file should be consistently
 committed to the git repository.**
 
-# Structure
+## Structure
 
 This [Terraform] configuration uses the [ppwcode conventions][terraform] as much as possible.
 
@@ -25,7 +27,7 @@ This module should only be used once for an organisation, and represents a produ
 Dependent configurations would not be able to use a separate root infrastructure to store their remote state,
 since the reference to the remote state cannot be interpolated in [Terraform].
 
-# Using the bucket as remote state
+## Using the bucket as remote state
 
 This module only defines the infrastructure needed by other, functionally meaningful, [Terraform] configurations.
 Those should configure their `remote_state` to be stored in the S3 bucket managed by this module, and to
@@ -58,7 +60,7 @@ You can use the outputs of a configuration `<CONFIGURATION_NAME>` configured thi
       backend = "s3"
       config {
         bucket      = "tfstate.<ORGANISATION_NAME>"
-        environment = "${terraform.env}"
+        environment = terraform.env
         key         = "<CONFIGURATION_NAME>.tfstate"
         region      = "<REGION>"
       }
@@ -69,19 +71,19 @@ You should consider whether the `environment` value is appropriate to your use c
 This works only if you also included an _aws provider definition_ that has access to the remote state bucket
 and DynamoDB table defined by this module. Most often, it will be the same profile as above:
 
-provider "aws" {
-region = "<REGION>"
-profile = "<PROFILE>"
-}
+    provider "aws" {
+      region = "<REGION>"
+      profile = "<PROFILE>"
+    }
 
 See [Using S3 as a Terraform backend].
 
-# Getting started
+## Getting started
 
 The infrastructure is defined using [Terraform].
 See [Getting started with a Terraform configuration].
 
-# Notes for further work
+## Notes for further work
 
 [IAM Policy for KMS-Encrypted Remote Terraform State in S3](https://keita.blog/2017/02/21/iam-policy-for-kms-encrypted-remote-terraform-state-in-s3/)
 claims to show a policy to enable KMS-Encrypted Remote Terraform State. It does not explain anything however. Is there

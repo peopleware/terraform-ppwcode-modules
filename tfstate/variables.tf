@@ -1,5 +1,5 @@
 /**
- *    Copyright 2017 PeopleWare n.v.
+ *    Copyright 2017 - 2019 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 variable "organisation_name" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Identification of the organisation whose infrastructure this will be the root of.
@@ -25,7 +25,7 @@ DESCRIPTION
 }
 
 variable "prefix" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Optional prefix of this structure, e.g., "v2". This makes it possible to create a new structure
@@ -37,7 +37,7 @@ DESCRIPTION
 }
 
 variable "region" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Identification of the region you want to deploy the Terraform meta-infrastructure in.
@@ -48,11 +48,10 @@ DESCRIPTION
 }
 
 variable "tags" {
-  type = "map"
+  type = map(string)
 
   description = <<DESCRIPTION
 Tags that are added to created resources (buckets) where possible.
-Note that tags are not supported for DynamoDB tables.
 The default is an empty map.
 DESCRIPTION
 

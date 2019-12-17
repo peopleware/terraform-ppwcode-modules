@@ -1,5 +1,5 @@
 /**
- *    Copyright 2017 PeopleWare n.v.
+ *    Copyright 2017 - 2019 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 
 resource "aws_s3_bucket" "terraform_state_logging" {
-  bucket = "${var.prefix == "" ? format("tfstate-log.%s", var.organisation_name) : format("%s.tfstate-log.%s", var.prefix, var.organisation_name)}"
-  region = "${var.region}"
+  bucket = var.prefix == "" ? format("tfstate-log.%s", var.organisation_name) : format("%s.tfstate-log.%s", var.prefix, var.organisation_name)
+  region = var.region
   acl    = "log-delivery-write"
 
   versioning {
     enabled = false
   }
 
-  tags = "${var.tags}"
+  tags = var.tags
 
   lifecycle {
     prevent_destroy = true
@@ -48,13 +48,13 @@ resource "aws_s3_bucket" "terraform_state_logging" {
      outweigh the storage cost.
    */
 
-  // TODO small file hypothesis needs to be validate
+  // TODO small file hypothesis needs to be validated
 }
 
 resource "aws_s3_bucket_policy" "prohibit-delete" {
-  bucket = "${aws_s3_bucket.terraform_state_logging.id}"
+  bucket = aws_s3_bucket.terraform_state_logging.id
 
-  policy = "${data.aws_iam_policy_document.prohibit-delete.json}"
+  policy = data.aws_iam_policy_document.prohibit-delete.json
 }
 
 data "aws_iam_policy_document" "prohibit-delete" {

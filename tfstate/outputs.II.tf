@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-// https://github.com/hashicorp/terraform/issues/12877#issuecomment-289920798
-resource "aws_dynamodb_table" "terraform_statelock" {
-  name         = var.prefix == "" ? format("tfstate-lock.%s", var.organisation_name) : format("%s.tfstate-lock.%s", var.prefix, var.organisation_name)
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
+output "II-logging_bucket" {
+  value = {
+    id  = aws_s3_bucket.terraform_state_logging.id
+    arn = aws_s3_bucket.terraform_state_logging.arn
   }
+}
 
-  lifecycle {
-    prevent_destroy = true
+output "II-state_bucket" {
+  value = {
+    id  = aws_s3_bucket.terraform_state.id
+    arn = aws_s3_bucket.terraform_state.arn
   }
+}
 
-  tags = var.tags
+output "II-lock_table" {
+  value = {
+    id  = aws_dynamodb_table.terraform_statelock.id
+    arn = aws_dynamodb_table.terraform_statelock.arn
+  }
 }
