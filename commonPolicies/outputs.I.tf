@@ -28,6 +28,10 @@ output "I-iam-self_manage_MFA" {
   value = aws_iam_policy.iam-self_manage_MFA.arn
 }
 
+output "I-tfstate-readwrite_nodelete_nor_change" {
+  value = aws_iam_policy.tfstate-readwrite_nodelete_nor_change.arn
+}
+
 output "I-actions-s3" {
   value = {
     buckets-describe            = local.actions-s3-buckets-describe

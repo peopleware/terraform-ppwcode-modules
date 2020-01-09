@@ -12,4 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# There are no variables in this module
+variable "tfstate-bucket-arn" {
+  type        = string
+  description = "ARN of the tfstate bucket to allow limited access to (read and write, but not delete nor change)."
+}
+
+variable "tfstate-table-arn" {
+  type        = string
+  description = "ARN of the tfstate DynamoDB table to allow limited access to (read and write, but not delete nor change)."
+}
+
+variable "tfstate-log_bucket-arn" {
+  type        = string
+  description = "ARN of the tfstate log bucket to allow limited access to (read and write, but not delete nor change)."
+}
