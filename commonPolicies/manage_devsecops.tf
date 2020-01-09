@@ -55,8 +55,9 @@ data "aws_iam_policy_document" "manage_devsecops" {
     actions = concat(
       local.actions-iam-read,
       [
-        "route53:Get*",
-        "route53:List*",
+        "*Get*",
+        "*List*",
+        "route53:TestDNSAnswer",
       ]
     )
     resources = ["*"]
