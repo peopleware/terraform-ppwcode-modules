@@ -4,6 +4,15 @@
 # This cannot be defined in the project that defines the tfstate infrastructure, because that is a bootstrap
 # configuration.
 
+
+locals {
+  arn-bucket-prefix      = "arn:aws:s3:::"
+  arn-dynamodb-prefix    = "arn:aws:dynamodb:${var.tfstate-table-region}:${data.aws_caller_identity.current.account_id}:table/"
+  tfstate-bucket-arn     = "${local.arn-bucket-prefix}${var.tfstate-bucket-name}"
+  tfstate-table-arn      = "${local.arn-dynamodb-prefix}${var.tfstate-table-name}"
+  tfstate-log_bucket-arn = "${local.arn-bucket-prefix}${var.tfstate-log_bucket-name}"
+}
+
 data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # allow buckets describe
   statement {
@@ -16,8 +25,8 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Allow"
     actions = local.actions-s3-bucket-describe
     resources = [
-      var.tfstate-bucket-arn,
-      var.tfstate-log_bucket-arn
+      local.tfstate-bucket-arn,
+      local.tfstate-log_bucket-arn
     ]
   }
   # prohibit tfstate buckets create, delete and config change
@@ -25,8 +34,8 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Deny"
     actions = local.actions-s3-bucket-define
     resources = [
-      var.tfstate-bucket-arn,
-      var.tfstate-log_bucket-arn
+      local.tfstate-bucket-arn,
+      local.tfstate-log_bucket-arn
     ]
   }
   # allow tfstate buckets objects read / write, no delete or config change
@@ -34,8 +43,8 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Allow"
     actions = local.actions-s3-objects-readwrite_no_delete
     resources = [
-      "${var.tfstate-bucket-arn}/*",
-      "${var.tfstate-log_bucket-arn}/*"
+      "${local.tfstate-bucket-arn}/*",
+      "${local.tfstate-log_bucket-arn}/*"
     ]
   }
   # prohibit tfstate buckets objects delete and config change
@@ -43,8 +52,8 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Deny"
     actions = local.actions-s3-bucket-objects-delete_changeconfig
     resources = [
-      "${var.tfstate-bucket-arn}/*",
-      "${var.tfstate-log_bucket-arn}/*"
+      "${local.tfstate-bucket-arn}/*",
+      "${local.tfstate-log_bucket-arn}/*"
     ]
   }
   # allow tables describe
@@ -58,8 +67,8 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Allow"
     actions = local.actions-dynamodb-items-readwrite
     resources = [
-      var.tfstate-table-arn,
-      "${var.tfstate-table-arn}/index/*"
+      local.tfstate-table-arn,
+      "${local.tfstate-table-arn}/index/*"
     ]
   }
   # allow tfstate table stream read
@@ -67,7 +76,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Allow"
     actions = local.actions-dynamodb-stream-read
     resources = [
-      "${var.tfstate-table-arn}/stream/*"
+      "${local.tfstate-table-arn}/stream/*"
     ]
   }
   # prohibit tfstate table delete and config change
@@ -75,7 +84,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
     effect  = "Deny"
     actions = local.actions-dynamodb-table-define
     resources = [
-      var.tfstate-table-arn
+      local.tfstate-table-arn
     ]
   }
 }

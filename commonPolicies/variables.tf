@@ -12,17 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "tfstate-bucket-arn" {
+variable "tfstate-bucket-name" {
   type        = string
-  description = "ARN of the tfstate bucket to allow limited access to (read and write, but not delete nor change)."
+  description = "Name of the tfstate bucket to allow limited access to (read and write, but not delete nor change)."
 }
 
-variable "tfstate-table-arn" {
+variable "tfstate-table-name" {
   type        = string
-  description = "ARN of the tfstate DynamoDB table to allow limited access to (read and write, but not delete nor change)."
+  description = "Name of the tfstate DynamoDB table to allow limited access to (read and write, but not delete nor change)."
 }
 
-variable "tfstate-log_bucket-arn" {
+variable "tfstate-table-region" {
   type        = string
-  description = "ARN of the tfstate log bucket to allow limited access to (read and write, but not delete nor change)."
+  description = "Region in which the tfstate DynamoDB table `tfstate-table-name` is defined."
+}
+
+variable "tfstate-log_bucket-name" {
+  type        = string
+  description = "Name of the tfstate log bucket to allow limited access to (read and write, but not delete nor change)."
 }
