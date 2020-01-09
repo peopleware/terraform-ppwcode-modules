@@ -32,6 +32,14 @@ output "I-tfstate-readwrite_nodelete_nor_change" {
   value = aws_iam_policy.tfstate-readwrite_nodelete_nor_change.arn
 }
 
+output "I-group-humans" {
+  value = {
+    path = aws_iam_group.humans.path
+    name = aws_iam_group.humans.name
+    arn  = aws_iam_group.humans.arn
+  }
+}
+
 output "I-actions-dynamodb" {
   value = {
     tables-describe = local.actions-dynamodb-tables-describe
