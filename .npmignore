@@ -4,3 +4,4 @@ domain_version/js/test/**
 .gitignore
 .nvmrc
 How_to_publish.md
+coverage
