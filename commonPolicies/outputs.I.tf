@@ -15,3 +15,7 @@
 output "I-billing-view" {
   value = aws_iam_policy.billing-view.arn
 }
+
+output "I-iam-read" {
+  value = aws_iam_policy.iam-read.arn
+}
