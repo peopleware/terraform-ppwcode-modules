@@ -40,6 +40,14 @@ output "I-group-humans" {
   }
 }
 
+output "I-group-devsecops" {
+  value = {
+    path = aws_iam_group.devsecops.path
+    name = aws_iam_group.devsecops.name
+    arn  = aws_iam_group.devsecops.arn
+  }
+}
+
 output "I-actions-dynamodb" {
   value = {
     tables-describe = local.actions-dynamodb-tables-describe
