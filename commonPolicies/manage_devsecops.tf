@@ -4,7 +4,7 @@
 
 # https://docs.aws.amazon.com/IAM/latest/UserGuide/list_iam.html
 
-data "aws_iam_policy_document" "iam-manage_devsecops" {
+data "aws_iam_policy_document" "manage_devsecops" {
   statement {
     # devsecops members can manage other human users and CI users
     effect = "Allow"
@@ -35,9 +35,8 @@ data "aws_iam_policy_document" "iam-manage_devsecops" {
       "iam:DeleteGroupPolicy",
     ]
     resources = [
-      # MUDO define groups here, and use by reference
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:group/humans",
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:group/devsecops",
+      aws_iam_group.humans.arn,
+      aws_iam_group.devsecops.arn
     ]
   }
   statement {
@@ -118,11 +117,11 @@ data "aws_iam_policy_document" "iam-manage_devsecops" {
   }
 }
 
-resource "aws_iam_policy" "iam-manage_devsecops" {
+resource "aws_iam_policy" "manage_devsecops" {
   name = "IamManageDevsecops"
   path = "/ppwcode/" # NOT /devsecops/
 
   description = "Can read everything, manage humans and devsecops, manage certificates and define devsecops roles."
 
-  policy = data.aws_iam_policy_document.iam-manage_devsecops.json
+  policy = data.aws_iam_policy_document.manage_devsecops.json
 }

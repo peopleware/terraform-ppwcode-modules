@@ -32,6 +32,10 @@ output "I-tfstate-readwrite_nodelete_nor_change" {
   value = aws_iam_policy.tfstate-readwrite_nodelete_nor_change.arn
 }
 
+output "I-manage_devsecops" {
+  value = aws_iam_policy.manage_devsecops.arn
+}
+
 output "I-group-humans" {
   value = {
     path = aws_iam_group.humans.path
