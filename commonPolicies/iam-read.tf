@@ -19,11 +19,7 @@ data "aws_iam_policy_document" "iam-read" {
   statement {
     effect = "Allow"
 
-    actions = [
-      "iam:Get*",
-      "iam:List*",
-      "iam:Generate*",
-    ]
+    actions = local.actions-iam-read
 
     resources = ["*"]
   }

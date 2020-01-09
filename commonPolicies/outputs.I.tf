@@ -32,6 +32,22 @@ output "I-tfstate-readwrite_nodelete_nor_change" {
   value = aws_iam_policy.tfstate-readwrite_nodelete_nor_change.arn
 }
 
+output "I-actions-dynamodb" {
+  value = {
+    tables-describe = local.actions-dynamodb-tables-describe
+    table-define    = local.actions-dynamodb-table-define
+    items-readwrite = local.actions-dynamodb-items-readwrite
+    index-read      = local.actions-dynamodb-index-read
+    stream-read     = local.actions-dynamodb-stream-read
+  }
+}
+
+output "I-actions-iam" {
+  value = {
+    read = local.actions-iam-read
+  }
+}
+
 output "I-actions-s3" {
   value = {
     buckets-describe            = local.actions-s3-buckets-describe
@@ -42,12 +58,3 @@ output "I-actions-s3" {
   }
 }
 
-output "I-actions-dynamodb" {
-  value = {
-    tables-describe = local.actions-dynamodb-tables-describe
-    table-define    = local.actions-dynamodb-table-define
-    items-readwrite = local.actions-dynamodb-items-readwrite
-    index-read      = local.actions-dynamodb-index-read
-    stream-read     = local.actions-dynamodb-stream-read
-  }
-}
