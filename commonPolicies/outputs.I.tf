@@ -23,3 +23,7 @@ output "I-iam-read" {
 output "I-iam-self_manage_credentials" {
   value = aws_iam_policy.iam-self_manage_credentials.arn
 }
+
+output "I-iam-self_manage_MFA" {
+  value = aws_iam_policy.iam-self_manage_MFA.arn
+}
