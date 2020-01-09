@@ -37,3 +37,13 @@ output "I-actions-s3" {
     objects-delete_changeconfig = local.actions-s3-bucket-objects-delete_changeconfig
   }
 }
+
+output "I-actions-dynamodb" {
+  value = {
+    tables-describe = local.actions-dynamodb-tables-describe
+    table-define    = local.actions-dynamodb-table-define
+    items-readwrite = local.actions-dynamodb-items-readwrite
+    index-read      = local.actions-dynamodb-index-read
+    stream-read     = local.actions-dynamodb-stream-read
+  }
+}
