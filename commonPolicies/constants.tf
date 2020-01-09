@@ -12,14 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "I-billing-view" {
-  value = aws_iam_policy.billing-view.arn
-}
+data "aws_caller_identity" "current" {}
 
-output "I-iam-read" {
-  value = aws_iam_policy.iam-read.arn
-}
-
-output "I-iam-self_manage_credentials" {
-  value = aws_iam_policy.iam-self_manage_credentials.arn
+locals {
+  current_human_user = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/human/$${aws:username}"
 }
