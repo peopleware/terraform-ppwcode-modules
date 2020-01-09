@@ -27,3 +27,13 @@ output "I-iam-self_manage_credentials" {
 output "I-iam-self_manage_MFA" {
   value = aws_iam_policy.iam-self_manage_MFA.arn
 }
+
+output "I-actions-s3" {
+  value = {
+    buckets-describe            = local.actions-s3-buckets-describe
+    bucket-define               = local.actions-s3-bucket-define
+    bucket-describe             = local.actions-s3-bucket-describe
+    objects-readwrite_no_delete = local.actions-s3-objects-readwrite_no_delete
+    objects-delete_changeconfig = local.actions-s3-bucket-objects-delete_changeconfig
+  }
+}
