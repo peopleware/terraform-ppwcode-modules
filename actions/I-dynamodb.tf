@@ -31,7 +31,7 @@ output "I-dynamodb-tables-describe" {
 }
 
 # resource: <table_arn>
-output "I-dynamodb-actions-dynamodb-table-define" {
+output "I-dynamodb-table-define" {
   value = [
     "dynamodb:CreateTable",
     "dynamodb:DeleteTable",
@@ -43,7 +43,7 @@ output "I-dynamodb-actions-dynamodb-table-define" {
 }
 
 # resource: <table_arn>
-output "I-dynamodb-actions-dynamodb-items-readwrite" {
+output "I-dynamodb-items-readwrite" {
   value = [
     "dynamodb:BatchGetItem",
     "dynamodb:BatchWriteItem",
@@ -60,7 +60,7 @@ output "I-dynamodb-actions-dynamodb-items-readwrite" {
 }
 
 # resource: index (<table_arn>/index/*)
-output "I-dynamodb-actions-dynamodb-index-read" {
+output "I-dynamodb-index-read" {
   value = [
     "dynamodb:Query",
     "dynamodb:Scan",
@@ -68,7 +68,7 @@ output "I-dynamodb-actions-dynamodb-index-read" {
 }
 
 # resource: stream (<table_arn>/stream/*)
-output "I-dynamodb-actions-dynamodb-stream-read" {
+output "I-dynamodb-stream-read" {
   value = [
     "dynamodb:DescribeStream",
     "dynamodb:GetRecords",
