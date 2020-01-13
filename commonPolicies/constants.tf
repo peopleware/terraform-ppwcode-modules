@@ -17,3 +17,7 @@ data "aws_caller_identity" "current" {}
 locals {
   current_human_user = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/human/$${aws:username}"
 }
+
+module "actions" {
+  source = "../actions"
+}
