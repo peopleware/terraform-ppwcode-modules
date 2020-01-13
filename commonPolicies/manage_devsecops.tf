@@ -53,8 +53,8 @@ data "aws_iam_policy_document" "manage_devsecops" {
     effect = "Allow"
     # TODO add Get* and List* (and other read only permissions) for all services we use
     actions = concat(
-      local.actions-iam-read,
-      local.actions-s3-buckets-describe, # not Get* / List*
+      module.actions.I-iam-read,
+      module.actions.I-s3-buckets-describe, # not Get* / List*
       [
         "acm:Get*",
         "acm:List*",

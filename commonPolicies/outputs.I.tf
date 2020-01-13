@@ -54,27 +54,27 @@ output "I-group-devsecops" {
 
 output "I-actions-dynamodb" {
   value = {
-    tables-describe = local.actions-dynamodb-tables-describe
-    table-define    = local.actions-dynamodb-table-define
-    items-readwrite = local.actions-dynamodb-items-readwrite
-    index-read      = local.actions-dynamodb-index-read
-    stream-read     = local.actions-dynamodb-stream-read
+    tables-describe = module.actions.I-dynamodb-tables-describe
+    table-define    = module.actions.I-dynamodb-table-define
+    items-readwrite = module.actions.I-dynamodb-items-readwrite
+    index-read      = module.actions.I-dynamodb-index-read
+    stream-read     = module.actions.I-dynamodb-stream-read
   }
 }
 
 output "I-actions-iam" {
   value = {
-    read = local.actions-iam-read
+    read = module.actions.I-iam-read
   }
 }
 
 output "I-actions-s3" {
   value = {
-    buckets-describe            = local.actions-s3-buckets-describe
-    bucket-define               = local.actions-s3-bucket-define
-    bucket-describe             = local.actions-s3-bucket-describe
-    objects-readwrite_no_delete = local.actions-s3-objects-readwrite_no_delete
-    objects-delete_changeconfig = local.actions-s3-bucket-objects-delete_changeconfig
+    buckets-describe            = module.actions.I-s3-buckets-describe
+    bucket-define               = module.actions.I-s3-bucket-define
+    bucket-describe             = module.actions.I-s3-bucket-describe
+    objects-readwrite_no_delete = module.actions.I-s3-objects-readwrite_no_delete
+    objects-delete_changeconfig = module.actions.I-s3-bucket-objects-delete_changeconfig
   }
 }
 

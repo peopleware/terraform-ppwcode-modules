@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "iam-read" {
   statement {
     effect = "Allow"
 
-    actions = local.actions-iam-read
+    actions = module.actions.I-iam-read
 
     resources = ["*"]
   }

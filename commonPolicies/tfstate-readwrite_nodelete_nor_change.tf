@@ -17,13 +17,13 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # allow buckets describe
   statement {
     effect    = "Allow"
-    actions   = local.actions-s3-buckets-describe
+    actions   = module.actions.I-s3-buckets-describe
     resources = ["*"]
   }
   # allow tfstate buckets describe
   statement {
     effect  = "Allow"
-    actions = local.actions-s3-bucket-describe
+    actions = module.actions.I-s3-bucket-describe
     resources = [
       local.tfstate-bucket-arn,
       local.tfstate-log_bucket-arn
@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # prohibit tfstate buckets create, delete and config change
   statement {
     effect  = "Deny"
-    actions = local.actions-s3-bucket-define
+    actions = module.actions.I-s3-bucket-define
     resources = [
       local.tfstate-bucket-arn,
       local.tfstate-log_bucket-arn
@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # allow tfstate buckets objects read / write, no delete or config change
   statement {
     effect  = "Allow"
-    actions = local.actions-s3-objects-readwrite_no_delete
+    actions = module.actions.I-s3-objects-readwrite_no_delete
     resources = [
       "${local.tfstate-bucket-arn}/*",
       "${local.tfstate-log_bucket-arn}/*"
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # prohibit tfstate buckets objects delete and config change
   statement {
     effect  = "Deny"
-    actions = local.actions-s3-bucket-objects-delete_changeconfig
+    actions = module.actions.I-s3-bucket-objects-delete_changeconfig
     resources = [
       "${local.tfstate-bucket-arn}/*",
       "${local.tfstate-log_bucket-arn}/*"
@@ -59,13 +59,13 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # allow tables describe
   statement {
     effect    = "Allow"
-    actions   = local.actions-dynamodb-tables-describe
+    actions   = module.actions.I-dynamodb-tables-describe
     resources = ["*"]
   }
   # allow tfstate table read / write and index read
   statement {
     effect  = "Allow"
-    actions = local.actions-dynamodb-items-readwrite
+    actions = module.actions.I-dynamodb-items-readwrite
     resources = [
       local.tfstate-table-arn,
       "${local.tfstate-table-arn}/index/*"
@@ -74,7 +74,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # allow tfstate table stream read
   statement {
     effect  = "Allow"
-    actions = local.actions-dynamodb-stream-read
+    actions = module.actions.I-dynamodb-stream-read
     resources = [
       "${local.tfstate-table-arn}/stream/*"
     ]
@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
   # prohibit tfstate table delete and config change
   statement {
     effect  = "Deny"
-    actions = local.actions-dynamodb-table-define
+    actions = module.actions.I-dynamodb-table-define
     resources = [
       local.tfstate-table-arn
     ]
