@@ -5,3 +5,4 @@ domain_version/js/test/**
 .nvmrc
 How_to_publish.md
 coverage
+.terraform
