@@ -181,3 +181,7 @@ used in all Terraform configurations aimed at administrator users.
 
 If some devsecops users also require administrator privileges, it makes sense for these people to have to separate
 users, with a different profile in `~/.aws/credentials`.
+
+## Policies
+
+Policies defined in this module have path `/ppwcode/*`.
