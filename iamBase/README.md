@@ -187,3 +187,12 @@ users, with a different profile in `~/.aws/credentials`.
 ## Policies
 
 Policies defined in this module have path `/ppwcode/*`.
+
+## Note on IAM resource names
+
+In AWS, many IAM resources have a name and an optional path. Note that the _name_ is used on its own in many references,
+and thus must be unique on its own. In many uses, the _path_ is merely an organizing concept for human users, without
+technical meaning.
+
+This means a/o you cannot define your own groups `humans`, `devsecops`, or `administrators` when you use this module,
+even with a different path than `/ppwcode/`.
