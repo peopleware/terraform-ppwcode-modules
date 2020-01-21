@@ -12,31 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "I-billing-view" {
+output "II-billing-view" {
   value = aws_iam_policy.billing-view.arn
 }
 
-output "I-iam-read" {
+output "II-iam-read" {
   value = aws_iam_policy.iam-read.arn
 }
 
-output "I-iam-self_manage_credentials" {
+output "II-iam-self_manage_credentials" {
   value = aws_iam_policy.iam-self_manage_credentials.arn
 }
 
-output "I-iam-self_manage_MFA" {
+output "II-iam-self_manage_MFA" {
   value = aws_iam_policy.iam-self_manage_MFA.arn
 }
 
-output "I-tfstate-readwrite_nodelete_nor_change" {
+output "II-tfstate-readwrite_nodelete_nor_change" {
   value = aws_iam_policy.tfstate-readwrite_nodelete_nor_change.arn
 }
 
-output "I-manage_devsecops" {
+output "II-manage_devsecops" {
   value = aws_iam_policy.manage_devsecops.arn
 }
 
-output "I-group-humans" {
+output "II-group-humans" {
   value = {
     path = aws_iam_group.humans.path
     name = aws_iam_group.humans.name
@@ -44,37 +44,10 @@ output "I-group-humans" {
   }
 }
 
-output "I-group-devsecops" {
+output "II-group-devsecops" {
   value = {
     path = aws_iam_group.devsecops.path
     name = aws_iam_group.devsecops.name
     arn  = aws_iam_group.devsecops.arn
   }
 }
-
-output "I-actions-dynamodb" {
-  value = {
-    tables-describe = module.actions.I-dynamodb-tables-describe
-    table-define    = module.actions.I-dynamodb-table-define
-    items-readwrite = module.actions.I-dynamodb-items-readwrite
-    index-read      = module.actions.I-dynamodb-index-read
-    stream-read     = module.actions.I-dynamodb-stream-read
-  }
-}
-
-output "I-actions-iam" {
-  value = {
-    read = module.actions.I-iam-read
-  }
-}
-
-output "I-actions-s3" {
-  value = {
-    buckets-describe            = module.actions.I-s3-buckets-describe
-    bucket-define               = module.actions.I-s3-bucket-define
-    bucket-describe             = module.actions.I-s3-bucket-describe
-    objects-readwrite_no_delete = module.actions.I-s3-objects-readwrite_no_delete
-    objects-delete_changeconfig = module.actions.I-s3-bucket-objects-delete_changeconfig
-  }
-}
-
