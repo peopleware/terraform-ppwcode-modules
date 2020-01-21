@@ -176,6 +176,8 @@ This configuration defines a group `/ppwcode/administrators`. Administrators sho
       ]
     }
 
+The group has the canned policy `arn:aws:iam::aws:policy/AdministratorAccess`.
+
 Administrator users should create a profile in `~/.aws/credentials` with name `<ACCOUNT ALIAS>-admin`. This profile is
 used in all Terraform configurations aimed at administrator users.
 
