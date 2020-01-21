@@ -21,6 +21,7 @@ data "aws_iam_policy_document" "billing-view" {
       "budgets:ViewBudget",
       "budgets:ModifyBudget",
       "cur:*",
+      "route53domains:ViewBilling"
     ]
     resources = ["*"]
   }

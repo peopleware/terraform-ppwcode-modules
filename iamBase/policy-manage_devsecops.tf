@@ -99,6 +99,8 @@ data "aws_iam_policy_document" "manage_devsecops" {
         "route53:Get*",
         "route53:List*",
         "route53:TestDNSAnswer",
+        // must be managed manually in the console - no Terraform support
+        "route53domains:*",
         "s3:Get*",
         "s3:List*",
         "sns:List*",

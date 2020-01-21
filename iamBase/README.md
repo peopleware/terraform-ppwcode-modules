@@ -64,11 +64,12 @@ The group `/ppwcode/devsecops` gives members privileges
 - to assume roles
 - to manage human and ci users (i.e., users with path `/human/` or `/ci`), to be able to help colleagues
 - to manage members and policies of the groups `/ppwcode/humans` and `/ppwcode/devsecops`
-- to manage certificates in ACM
 - to manage roles to assume, i.e.,
   - to manage policies with path `/devsecops/`
   - to manage roles with path `/devsecops/`
   - to assume roles with path `/devsecops/`
+- to manage certificates in ACM
+- to manage domain registrations
 
 When defining `/devsecops/` roles, it is important to follow the following idiom.
 Roles require an _assume role policy_, that expresses who can assume the rule from the standpoint of the role. We want
