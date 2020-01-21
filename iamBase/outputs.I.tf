@@ -12,31 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "II-billing-view" {
+output "I-billing-view" {
   value = aws_iam_policy.billing-view.arn
 }
 
-output "II-iam-read" {
+output "I-iam-read" {
   value = aws_iam_policy.iam-read.arn
 }
 
-output "II-iam-self_manage_credentials" {
+output "I-iam-self_manage_credentials" {
   value = aws_iam_policy.iam-self_manage_credentials.arn
 }
 
-output "II-iam-self_manage_MFA" {
+output "I-iam-self_manage_MFA" {
   value = aws_iam_policy.iam-self_manage_MFA.arn
 }
 
-output "II-tfstate-readwrite_nodelete_nor_change" {
+output "I-tfstate-readwrite_nodelete_nor_change" {
   value = aws_iam_policy.tfstate-readwrite_nodelete_nor_change.arn
 }
 
-output "II-manage_devsecops" {
+output "I-manage_devsecops" {
   value = aws_iam_policy.manage_devsecops.arn
 }
 
-output "II-group-humans" {
+output "I-group-humans" {
   value = {
     path = aws_iam_group.humans.path
     name = aws_iam_group.humans.name
@@ -44,10 +44,18 @@ output "II-group-humans" {
   }
 }
 
-output "II-group-devsecops" {
+output "I-group-devsecops" {
   value = {
     path = aws_iam_group.devsecops.path
     name = aws_iam_group.devsecops.name
     arn  = aws_iam_group.devsecops.arn
+  }
+}
+
+output "I-group-administrators" {
+  value = {
+    path = aws_iam_group.administrators.path
+    name = aws_iam_group.administrators.name
+    arn  = aws_iam_group.administrators.arn
   }
 }
