@@ -23,9 +23,23 @@ output "I-dynamodb-tables-describe" {
     "dynamodb:DescribeReservedCapacity",
     "dynamodb:DescribeReservedCapacityOfferings",
     "dynamodb:ListTables",
+    "dynamodb:ListGlobalTables",
     "dynamodb:ListBackups",
-    "dynamodb:DescribeTimeToLive",
     "dynamodb:ListStreams",
+    "dynamodb:ListTagsOfResource",
+  ]
+}
+
+# resource: <table_arn>
+output "I-dynamodb-table-describe" {
+  value = [
+    "dynamodb:DescribeTable",
+    "dynamodb:DescribeContinuousBackups",
+    "dynamodb:DescribeContributorInsights",
+    "dynamodb:DescribeGlobalTable",
+    "dynamodb:DescribeGlobalTableSettings",
+    "dynamodb:DescribeTableReplicaAutoScaling",
+    "dynamodb:DescribeTimeToLive",
     "dynamodb:ListTagsOfResource",
   ]
 }
@@ -36,7 +50,33 @@ output "I-dynamodb-table-define" {
     "dynamodb:CreateTable",
     "dynamodb:DeleteTable",
     "dynamodb:UpdateTable",
+    "dynamodb:CreateTableReplica",
+    "dynamodb:DeleteTableReplica",
+    "dynamodb:CreateGlobalTable",
+    "dynamodb:UpdateGlobalTable",
+    "dynamodb:UpdateGlobalTableSettings",
     "dynamodb:CreateBackup",
+    "dynamodb:RestoreTableFromBackup",
+    "dynamodb:RestoreTableToPointInTime",
+    "dynamodb:UpdateContinuousBackups",
+    "dynamodb:UpdateContributorInsights",
+    "dynamodb:UpdateTableReplicaAutoScaling",
+    "dynamodb:UpdateTimeToLive",
+    "dynamodb:TagResource",
+    "dynamodb:UntagResource"
+  ]
+}
+
+# resource: <table_arn>/backup/*
+output "I-dynamodb-backup-describe" {
+  value = [
+    "dynamodb:DescribeBackup",
+  ]
+}
+
+# resource: <table_arn>/backup/*
+output "I-dynamodb-backup-define" {
+  value = [
     "dynamodb:DeleteBackup",
     "dynamodb:RestoreTableFromBackup",
   ]
@@ -47,6 +87,7 @@ output "I-dynamodb-items-readwrite" {
   value = [
     "dynamodb:BatchGetItem",
     "dynamodb:BatchWriteItem",
+    "dynamodb:ConditionCheckItem",
     "dynamodb:DeleteItem",
     "dynamodb:DescribeTable",
     "dynamodb:GetItem",
@@ -78,8 +119,6 @@ output "I-dynamodb-stream-read" {
 
 # NOTE: cannot deny, because it is global
 #       - "dynamodb:PurchaseReservedCapacityOfferings"
-#       - "dynamodb:TagResource"
-#       - "dynamodb:UntagResource"
 
 
 # NOTE: documented, but not recognized by AWS:
