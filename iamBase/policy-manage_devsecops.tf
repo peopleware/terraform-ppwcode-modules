@@ -172,6 +172,17 @@ data "aws_iam_policy_document" "manage_devsecops" {
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/devsecops/*",
     ]
   }
+  statement {
+    # devsecops users can assume automated-test roles
+    effect = "Allow"
+    actions = [
+      # allow users to assume these roles
+      "sts:AssumeRole",
+    ]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/automated-test/*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "manage_devsecops" {
