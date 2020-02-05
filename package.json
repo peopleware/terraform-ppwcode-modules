@@ -30,7 +30,7 @@
   "dependencies": {
     "@ppwcode/node-gitinfo": "^2.3.0",
     "@toryt/contracts-iv": "^4.0.7",
-    "commander": "^4.1.0",
+    "commander": "^4.1.1",
     "moment": "^2.24.0",
     "pad": "^3.2.0",
     "pkginfo": "^0.4.1",
@@ -38,7 +38,7 @@
     "q": "^1.5.1"
   },
   "devDependencies": {
-    "mocha": "^7.0.0",
+    "mocha": "^7.0.1",
     "npm-check": "^5.7.0",
     "nyc": "^15.0.0",
     "prettier-standard": "^16.1.0",
