@@ -183,6 +183,16 @@ data "aws_iam_policy_document" "manage_devsecops" {
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/automated-test/*",
     ]
   }
+  statement {
+    # devsecops users can invoke any Lambda in the account (so they can do test calls, remote, or in the console)
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "arn:aws:lambda:*:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "manage_devsecops" {
