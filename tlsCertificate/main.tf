@@ -17,14 +17,14 @@
 resource "aws_acm_certificate" "main" {
   provider = "aws.tls_certificate"
 
-  domain_name               = "${local.main_fqdn}"
+  domain_name               = local.main_fqdn
   subject_alternative_names = local.alternate_fqdns
   validation_method         = "DNS"
 
   tags = {
-    environment             = "${var.environment}"
-    terraform-configuration = "${var.terraform-configuration}"
-    terraform-workspace     = "${terraform.workspace}"
+    environment             = var.environment
+    terraform-configuration = var.terraform-configuration
+    terraform-workspace     = terraform.workspace
   }
 
   depends_on = ["aws_route53_record.caa"]
@@ -37,7 +37,7 @@ resource "aws_acm_certificate" "main" {
 resource "aws_acm_certificate_validation" "tls_certificate" {
   provider = "aws.tls_certificate"
 
-  certificate_arn = "${aws_acm_certificate.main.arn}"
+  certificate_arn = aws_acm_certificate.main.arn
 
   validation_record_fqdns = aws_route53_record.proof.*.fqdn
 }

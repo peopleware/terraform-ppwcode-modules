@@ -15,11 +15,11 @@
  */
 
 resource "aws_route53_record" "caa" {
-  count   = "${length(local.all_domains)}"
-  zone_id = "${var.zone_id}"
-  name    = "${local.all_domains[count.index]}"
+  count   = length(local.all_domains)
+  zone_id = var.zone_id
+  name    = local.all_domains[count.index]
   type    = "CAA"
-  ttl     = "${local.caa-ttl}"
+  ttl     = local.caa-ttl
 
   # See
   # - https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#CAAFormat

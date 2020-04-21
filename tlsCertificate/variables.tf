@@ -72,7 +72,7 @@ DESCRIPTION
 }
 
 variable "alternate_fqdns" {
-  type = list
+  type = list(string)
 
   description = <<DESCRIPTION
 List of alternate domain names for which the certificate is issued. Mandatory, but can be empty.

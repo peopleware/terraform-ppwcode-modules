@@ -30,18 +30,13 @@ resource "aws_route53_record" "proof" {
   #      _plan_ phase, and this can continue.
   #      The bug reports refer to this as using the `--target` attribute, the intention being of first creating the CAA
   #      and certificate request separately, with --target, and then the rest.
-  count = "${length(local.all_domains)}"
+  count = length(local.all_domains)
 
-  zone_id = "${var.zone_id}"
-  name    = "${lookup(aws_acm_certificate.main.domain_validation_options[count.index],
-                      "resource_record_name")}"
-
-  type = "${lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_type")}"
-
-  ttl = "${local.proof-ttl}"
-
+  zone_id = var.zone_id
+  name    = lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_name")
+  type    = lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_type")
+  ttl     = local.proof-ttl
   records = [
-    "${lookup(aws_acm_certificate.main.domain_validation_options[count.index],
-              "resource_record_value")}",
+    lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_value"),
   ]
 }

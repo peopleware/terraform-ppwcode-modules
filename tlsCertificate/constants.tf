@@ -17,24 +17,24 @@
 locals {
   # Depending on versions, an FQDN received from AWS might or might not end with a trailing dot `"."`.
   # We remove the dot, if it occurs.
-  main_fqdn = "${replace(var.main_fqdn, "/[.]$/", "")}"
+  main_fqdn = replace(var.main_fqdn, "/[.]$/", "")
 
-  alternate_fqdns = "${compact(
+  alternate_fqdns = compact(
     split(
       ",",
       replace(
         replace(
-          join(",",compact(var.alternate_fqdns)),
+          join(",", compact(var.alternate_fqdns)),
           "/[.],/",
           ","
         ),
-      "/[.]$/",
-      ""
+        "/[.]$/",
+        ""
       )
     )
-  )}"
+  )
 
-  all_domains = "${concat(list(local.main_fqdn), local.alternate_fqdns)}"
+  all_domains = concat(list(local.main_fqdn), local.alternate_fqdns)
   caa-ttl     = 900
   proof-ttl   = 5
 }

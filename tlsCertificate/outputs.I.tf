@@ -15,13 +15,13 @@
  */
 
 output "I-id" {
-  value = "${aws_acm_certificate.main.id}"
+  value = aws_acm_certificate.main.id
 }
 
 output "I-arn" {
-  value = "${aws_acm_certificate.main.arn}"
+  value = aws_acm_certificate.main.arn
 }
 
 output "I-fqdn" {
-  value = "${aws_acm_certificate.main.domain_name}"
+  value = aws_acm_certificate.main.domain_name
 }
