@@ -15,7 +15,7 @@
  */
 
 variable "terraform-configuration" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Identifier of the terraform configuration that defines these resources. Used in tags to cross-reference the resource
@@ -24,7 +24,7 @@ DESCRIPTION
 }
 
 variable "environment" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Id of the environment for which this certificate is used (e.g., "production", or "devaccept").
@@ -33,7 +33,7 @@ DESCRIPTION
 }
 
 variable "zone_id" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Id of the hosted zone in which CAA and TXT records can be made for all the domain names of the certificate.
@@ -42,7 +42,7 @@ DESCRIPTION
 }
 
 variable "region" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Region where to define the certificate.
@@ -53,7 +53,7 @@ DESCRIPTION
 }
 
 variable "profile" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Profile to use when defining the certificate in `region`.
@@ -62,7 +62,7 @@ DESCRIPTION
 }
 
 variable "main_fqdn" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Main domain name for which the certificate is issued. Mandatory.
@@ -72,7 +72,7 @@ DESCRIPTION
 }
 
 variable "alternate_fqdns" {
-  type = "list"
+  type = list
 
   description = <<DESCRIPTION
 List of alternate domain names for which the certificate is issued. Mandatory, but can be empty.
