@@ -1,5 +1,5 @@
 /**
- *    Copyright 2016-2017 PeopleWare n.v.
+ *    Copyright 2016-2020 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 variable "short-name" {
   // TODO rename to short_name
-  type = "string"
+  type = string
 
   description = <<EOF
 The short name of the subdomain. The FQDN of the subdomain is
@@ -26,7 +26,7 @@ EOF
 
 variable "parent-domain-name" {
   // TODO rename to parent_domain-fqdn
-  type = "string"
+  type = string
 
   description = <<EOF
 FQDN of the parent domain.  The FQDN of the subdomain is
@@ -36,7 +36,7 @@ EOF
 
 variable "parent-domain-zone_id" {
   // TODO rename to parent_domain-zone_id
-  type = "string"
+  type = string
 
   description = <<EOF
 AWS zone id of the zone that controls the parent domain.
@@ -45,7 +45,7 @@ EOF
 }
 
 variable "description" {
-  type = "string"
+  type = string
 
   description = <<EOF
 Textual description of the hosted zone. AWS Route53 specific field.
@@ -53,7 +53,7 @@ EOF
 }
 
 variable "ttl" {
-  type = "string"
+  type = string
 
   description = <<EOF
 TTL in s of the NS and SOA records in the zone of the parent domain for this subdomain.
@@ -63,11 +63,11 @@ EOF
 }
 
 variable "additional_meta" {
-  type = "map"
+  type = map(string)
 
   description = <<EOF
 Map with additional meta-information about the domain. This information will be added to the payload of the TXT
-records meta.${var.domain_name}, following https://tools.ietf.org/html/rfc1464, besides calculated meta-information.
+records meta.$${var.domain_name}, following https://tools.ietf.org/html/rfc1464, besides calculated meta-information.
 The default is an empty map. Entries in this map overwrite calculated entries. Values must be strings.
 EOF
 
@@ -75,7 +75,7 @@ EOF
 }
 
 variable "tags" {
-  type = "map"
+  type = map(string)
 
   description = <<EOF
 Map of tags that will be attached to the AWS hosted zone for this subdomain.

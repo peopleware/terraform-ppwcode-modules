@@ -1,5 +1,5 @@
 /**
- *    Copyright 2016-2017 PeopleWare n.v.
+ *    Copyright 2016-2020 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 
 output "I-zone_id" {
-  value = "${aws_route53_zone.zone.zone_id}"
+  value = aws_route53_zone.zone.zone_id
 }
 
 output "I-fqdn" {
-  value = "${aws_route53_zone.zone.name}"
+  value = aws_route53_zone.zone.name
 }
 
 /**
  * The full meta payload as a map, including the serial.
  */
 output "I-meta_payload" {
-  value = "${module.version.I-meta_payload}"
+  value = module.version.I-meta_payload
 }

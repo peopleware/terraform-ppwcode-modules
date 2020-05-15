@@ -1,5 +1,5 @@
 /**
- *    Copyright 2016-2017 PeopleWare n.v.
+ *    Copyright 2016-2020 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,15 +30,15 @@
 
 resource "aws_route53_zone" "zone" {
   name    = "${var.short-name}.${var.parent-domain-name}"
-  comment = "${var.description}"
-  tags    = "${var.tags}"
+  comment = var.description
+  tags    = var.tags
 }
 
 module "version" {
   source          = "../domain_version"
-  zone_id         = "${aws_route53_zone.zone.zone_id}"
-  domain_name     = "${aws_route53_zone.zone.name}"
-  ns-domain_name  = "${aws_route53_zone.zone.name_servers.0}"
-  additional_meta = "${var.additional_meta}"
-  ttl             = "${var.ttl}"
+  zone_id         = aws_route53_zone.zone.zone_id
+  domain_name     = aws_route53_zone.zone.name
+  ns-domain_name  = aws_route53_zone.zone.name_servers[0]
+  additional_meta = var.additional_meta
+  ttl             = var.ttl
 }
