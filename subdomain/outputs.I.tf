@@ -23,8 +23,8 @@ output "I-fqdn" {
 }
 
 /**
- * The full meta payload as a map, including the serial.
+ * The full meta payload as a map.
  */
 output "I-meta_payload" {
-  value = module.version.I-meta_payload
+  value = var.additional_meta
 }

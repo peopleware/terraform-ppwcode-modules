@@ -41,5 +41,7 @@ resource "aws_route53_record" "meta_ns" {
   name    = "meta-ns-${aws_route53_zone.zone.name}"
   type    = "TXT"
   ttl     = var.ttl
-  records = [formatlist("%s=%s", keys(module.version.I-meta_payload), values(module.version.I-meta_payload))]
+  records = [
+    join("\"\"", formatlist("%s=%s", keys(var.additional_meta), values(var.additional_meta)))
+  ]
 }
