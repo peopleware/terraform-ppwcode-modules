@@ -1,3 +1,19 @@
+# domain_version
+
+**This module is deprecated. Please stop using it, and remove dependencies. This module
+will be removed in a next major version.**
+
+This module attempted to automatically add meta-information in a TXT record to a hosted zone,
+and to automatically update a hosted zone's SOA record.
+
+Nodejs was used for the automation, because it is platform independent. Deeper, this has a dependency
+on a git-wrapper library that proves to be difficult to keep up-to-date.
+
+This setup proved too difficult to stabilize, and maintain. Since there is no functional need for this
+in most cases, the effort is not worth it.
+
+# Documentation
+
 Controls the SOA record of a domain, which should contain a serial,
 and adds a meta TXT record with meta information about the zone as payload in the format
 specified by [RFC 1464] and [RFC 6763 section 6].
