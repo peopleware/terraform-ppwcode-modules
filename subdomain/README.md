@@ -1,6 +1,6 @@
 # Notice
 
-This module used to depend on [`domain_version`], which is now deprecated. [`domain_version`] automatically maintained
+This module used to depend on `domain_version`, which is no longer supported. `domain_version` automatically maintained
 TXT record with meta information, and the subdomain's SOA record.
 
 Since version `7.n.n`, the TXT meta record only contains the information supplied in the variable `additional_meta`,
@@ -14,6 +14,4 @@ Users should add repository information (which was added automatically to the TX
 desired.
 
 In a later version, we might add support for the SOA record back in here, but then without
-a dependency on [`domain_version`] and, indirectly, JavaScript.
-
-[`domain_version`]: domain_version
+a dependency on `domain_version` and, indirectly, JavaScript.
