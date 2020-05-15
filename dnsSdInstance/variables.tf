@@ -15,7 +15,7 @@
  */
 
 variable "domain-zone_id" {
-  type = "string"
+  type = string
 
   description = <<EOF
 AWS zone id of the zone that controls the domain in which the service instance operates.
@@ -23,7 +23,7 @@ EOF
 }
 
 variable "domain-name" {
-  type = "string"
+  type = string
 
   description = <<EOF
 FQDN of the domain in which the service instance operates. This must be the domain controlled
@@ -32,7 +32,7 @@ EOF
 }
 
 variable "protocol" {
-  type = "string"
+  type = string
 
   description = <<EOF
 Protocol of the service type. 'tcp' (default) or 'udp'.
@@ -42,7 +42,7 @@ EOF
 }
 
 variable "type" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Main service type identification. The starting dash is added automatically. For APIs, use type "api",
@@ -55,7 +55,7 @@ DESCRIPTION
 }
 
 variable "subtype" {
-  type = "string"
+  type = string
 
   description = <<DESCRIPTION
 Optional subtype of the service type. The starting dash is added always (by convention). Not used to create resources,
@@ -69,7 +69,7 @@ DESCRIPTION
 }
 
 variable "instance" {
-  type = "string"
+  type = string
 
   /* http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DomainNameFormat.html
      Formatting Domain Names for Hosted Zones and Resource Record Sets
@@ -85,7 +85,7 @@ EOF
 }
 
 variable "host" {
-  type = "string"
+  type = string
 
   description = <<EOF
 FQDN of where the service instance is hosted.
@@ -93,7 +93,7 @@ EOF
 }
 
 variable "port" {
-  type = "string"
+  type = string
 
   description = <<EOF
 Port at which the service instance is hosted at the $${var.host}. Default is 443 (https).
@@ -103,7 +103,7 @@ EOF
 }
 
 variable "priority" {
-  type = "string"
+  type = string
 
   description = <<EOF
 Priority of this service instance among it's peers. Default 0.
@@ -113,7 +113,7 @@ EOF
 }
 
 variable "weight" {
-  type = "string"
+  type = string
 
   description = <<EOF
 Weight of this service instance among it's peers with the same priority. Default 0.
@@ -123,7 +123,7 @@ EOF
 }
 
 variable "details" {
-  type = "map"
+  type = map(string)
 
   description = <<EOF
 Details about the service instance. Should at least contain a value for the key 'textvers',
@@ -137,7 +137,7 @@ EOF
 }
 
 variable "ttl" {
-  type = "string"
+  type = string
 
   description = <<EOF
 TTL in s of the PTR, SRV and TXT records.

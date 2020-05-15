@@ -15,20 +15,20 @@
  */
 
 output "I-zone_id" {
-  value = "${var.domain-zone_id}"
+  value = var.domain-zone_id
 }
 
 locals {
   I_instanceInfo = {
-    type     = "${local.main_type}"
-    instance = "${aws_route53_record.srv.name}"
-    host     = "${var.host}"
-    port     = "${var.port}"
-    priority = "${var.priority}"
-    weight   = "${var.weight}"
+    type     = local.main_type
+    instance = aws_route53_record.srv.name
+    host     = var.host
+    port     = var.port
+    priority = var.priority
+    weight   = var.weight
   }
 }
 
 output "I-instance" {
-  value = "${merge(local.fullDetails, local.I_instanceInfo)}"
+  value = merge(local.fullDetails, local.I_instanceInfo)
 }

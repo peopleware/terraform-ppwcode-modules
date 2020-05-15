@@ -21,27 +21,27 @@ locals {
 
   sd-oauth2_certificate_endpoint = {
     type         = "api"
-    subtype      = "${local.sd_subtype-oauth2_certificate_endpoint}"
-    generic_type = "${format("_%s._sub._api._tcp", local.sd_subtype-oauth2_certificate_endpoint)}"
+    subtype      = local.sd_subtype-oauth2_certificate_endpoint
+    generic_type = format("_%s._sub._api._tcp", local.sd_subtype-oauth2_certificate_endpoint)
   }
 
   sd-oauth2_token_endpoint = {
     type         = "api"
-    subtype      = "${local.sd_subtype-oauth2_token_endpoint}"
-    generic_type = "${format("_%s._sub._api._tcp", local.sd_subtype-oauth2_token_endpoint)}"
+    subtype      = local.sd_subtype-oauth2_token_endpoint
+    generic_type = format("_%s._sub._api._tcp", local.sd_subtype-oauth2_token_endpoint)
   }
 
   sd-oauth2_authorization = {
     type         = "http"
-    subtype      = "${local.sd_subtype-oauth2_authorization}"
-    generic_type = "${format("_%s._sub._http._tcp", local.sd_subtype-oauth2_authorization)}"
+    subtype      = local.sd_subtype-oauth2_authorization
+    generic_type = format("_%s._sub._http._tcp", local.sd_subtype-oauth2_authorization)
   }
 }
 
 output "I-oauth2" {
   value = {
-    certificate_endpoint = "${local.sd-oauth2_certificate_endpoint}"
-    token_endpoint       = "${local.sd-oauth2_token_endpoint}"
-    authorization        = "${local.sd-oauth2_authorization}"
+    certificate_endpoint = local.sd-oauth2_certificate_endpoint
+    token_endpoint       = local.sd-oauth2_token_endpoint
+    authorization        = local.sd-oauth2_authorization
   }
 }

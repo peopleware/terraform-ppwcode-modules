@@ -15,22 +15,22 @@
  */
 
 output "II-zone_id" {
-  value = "${var.domain-zone_id}"
+  value = var.domain-zone_id
 }
 
 locals {
   II_instanceInfo = {
-    type         = "${trimspace(var.type)}"
-    subtype      = "${trimspace(var.subtype)}"
-    generic_type = "${var.subtype == "" ? format("_%s._%s", trimspace(var.type), trimspace(var.protocol)) : format("_%s._sub._%s._%s", trimspace(var.subtype), trimspace(var.type), trimspace(var.protocol))}"
-    instance     = "${aws_route53_record.srv.name}"
-    host         = "${var.host}"
-    port         = "${var.port}"
-    priority     = "${var.priority}"
-    weight       = "${var.weight}"
+    type         = trimspace(var.type)
+    subtype      = trimspace(var.subtype)
+    generic_type = var.subtype == "" ? format("_%s._%s", trimspace(var.type), trimspace(var.protocol)) : format("_%s._sub._%s._%s", trimspace(var.subtype), trimspace(var.type), trimspace(var.protocol))
+    instance     = aws_route53_record.srv.name
+    host         = var.host
+    port         = var.port
+    priority     = var.priority
+    weight       = var.weight
   }
 }
 
 output "II-instance" {
-  value = "${merge(local.fullDetails, local.II_instanceInfo)}"
+  value = merge(local.fullDetails, local.II_instanceInfo)
 }

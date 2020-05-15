@@ -31,25 +31,25 @@
 
 data "null_data_source" "extra_details" {
   inputs = {
-    at = "${timestamp()}"
+    at = timestamp()
   }
 }
 
 locals {
   main_type   = "_${trimspace(var.type)}._${trimspace(var.protocol)}.${trimspace(var.domain-name)}"
   instance    = "${trimspace(var.instance)}.${local.main_type}"
-  fullDetails = "${merge(var.details, data.null_data_source.extra_details.inputs)}"
+  fullDetails = merge(var.details, data.null_data_source.extra_details.inputs)
 }
 
 resource "aws_route53_record" "srv" {
-  zone_id = "${var.domain-zone_id}"
-  name    = "${local.instance}"
+  zone_id = var.domain-zone_id
+  name    = local.instance
   type    = "SRV"
-  ttl     = "${var.ttl}"
+  ttl     = var.ttl
 
   records = [
     // "0 +" coerces to number
-    "${format("%d %d %d %s", 0 + var.priority, 0 + var.weight, 0 + var.port, var.host)}",
+    format("%d %d %d %s", 0 + var.priority, 0 + var.weight, 0 + var.port, var.host),
   ]
 }
 
@@ -58,10 +58,10 @@ resource "aws_route53_record" "srv" {
  * See HowtoDefineMultiStringTXTRecords.md
  */
 resource "aws_route53_record" "txt" {
-  zone_id = "${var.domain-zone_id}"
-  name    = "${local.instance}"
+  zone_id = var.domain-zone_id
+  name    = local.instance
   type    = "TXT"
-  ttl     = "${var.ttl}"
+  ttl     = var.ttl
 
-  records = ["${join("\"\"", formatlist("%s=%s", keys(local.fullDetails), values(local.fullDetails)))}"]
+  records = [join("\"\"", formatlist("%s=%s", keys(local.fullDetails), values(local.fullDetails)))]
 }

@@ -1,7 +1,7 @@
 variable "short-name" {
-  type = "string"
+  type = string
 }
 
 variable "domain" {
-  type = "string"
+  type = string
 }

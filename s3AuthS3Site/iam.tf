@@ -10,13 +10,13 @@ variable "user_path" {
 
 resource aws_iam_user "IAM_USER" {
   name          = "s3auth_${aws_s3_bucket.BUCKET.bucket}"
-  path          = "${var.user_path}"
+  path          = var.user_path
   force_destroy = true
 }
 
 resource "aws_iam_user_policy" "IAM_USER_POLICY" {
   name = "s3auth_${aws_s3_bucket.BUCKET.bucket}"
-  user = "${aws_iam_user.IAM_USER.name}"
+  user = aws_iam_user.IAM_USER.name
 
   policy = <<EOF
 {
@@ -34,13 +34,13 @@ EOF
 }
 
 resource "aws_iam_access_key" "ACCESS_KEY" {
-  user = "${aws_iam_user.IAM_USER.name}"
+  user = aws_iam_user.IAM_USER.name
 }
 
 output "KEY" {
-  value = "${aws_iam_access_key.ACCESS_KEY.id}"
+  value = aws_iam_access_key.ACCESS_KEY.id
 }
 
 output "SECRET" {
-  value = "${aws_iam_access_key.ACCESS_KEY.secret}"
+  value = aws_iam_access_key.ACCESS_KEY.secret
 }
