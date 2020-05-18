@@ -15,7 +15,7 @@
  */
 
 resource "aws_acm_certificate" "main" {
-  provider = "aws.tls_certificate"
+  provider = aws.tls_certificate
 
   domain_name               = local.main_fqdn
   subject_alternative_names = local.alternate_fqdns
@@ -35,7 +35,7 @@ resource "aws_acm_certificate" "main" {
 }
 
 resource "aws_acm_certificate_validation" "tls_certificate" {
-  provider = "aws.tls_certificate"
+  provider = aws.tls_certificate
 
   certificate_arn = aws_acm_certificate.main.arn
 
