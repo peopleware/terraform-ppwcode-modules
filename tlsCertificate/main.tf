@@ -27,7 +27,7 @@ resource "aws_acm_certificate" "main" {
     terraform-workspace     = terraform.workspace
   }
 
-  depends_on = ["aws_route53_record.caa"]
+  depends_on = [aws_route53_record.caa]
 
   lifecycle {
     create_before_destroy = true
