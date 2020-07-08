@@ -10,19 +10,19 @@
  */
 
 variable "short-name" {
-  type = "string"
+  type = string
 }
 
 variable "domain" {
-  type = "string"
+  type = string
 }
 
 variable "zone_id" {
-  type = "string"
+  type = string
 }
 
 variable "index_document" {
-  type    = "string"
+  type    = string
   default = "index.html"
 }
 
