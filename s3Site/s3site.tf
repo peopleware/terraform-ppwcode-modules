@@ -38,26 +38,25 @@ resource "aws_s3_bucket" "BUCKET" {
     enabled = false
   }
 
-  policy = <<EOT
-{
-  "Id": "Policy1380877762691",
-  "Statement": [
-    {
-      "Sid": "Stmt1380877761162",
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.short-name}.${var.domain}/*",
-      "Principal": {
-        "AWS": [
-          "*"
-        ]
-      }
-    }
-  ]
+
+  policy = data.aws_iam_policy_document.BUCKET.json
 }
-EOT
+
+data "aws_iam_policy_document" "BUCKET" {
+  statement {
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.short-name}.${var.domain}/*",
+    ]
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
 }
 
 resource "aws_route53_record" "DOMAIN_NAME" {
