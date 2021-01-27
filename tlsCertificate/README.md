@@ -50,7 +50,9 @@ down time.
 
 This module requires Terraform 0.12.
 
-## Issue
+## Issues
+
+### Creation of the proofs for an undetermined number of FQDNS
 
 There is an issue with the creation of the proofs for an undetermined number of FQDNS.
 See [terraform-provider-aws#6557](https://github.com/terraform-providers/terraform-provider-aws/issues/6557).
@@ -71,3 +73,13 @@ certificate request separately, with `--target`, and then the rest.
 This does however negate the lifecycle `create_before_destroy = true` setting of the certificate request. Inbetween the
 2 runs, there is no issued certificate.
 `
+### Random order of some results being returned by AWS
+
+There is an issue for this module, regarding to the random order of some results being returned by AWS after an API
+change.
+
+This module needs to be changed slightly.
+
+See [terraform-provider-aws#8531](https://github.com/hashicorp/terraform-provider-aws/issues/8531#issuecomment-663562156).
+
+This might also resolve the previous issue.
