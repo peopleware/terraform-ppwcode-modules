@@ -16,7 +16,6 @@
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
-  region = var.region
   acl    = "private"
 
   versioning {

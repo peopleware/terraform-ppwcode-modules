@@ -16,7 +16,6 @@
 
 resource "aws_s3_bucket" "terraform_state_logging" {
   bucket = var.prefix == "" ? format("tfstate-log.%s", var.organisation_name) : format("%s.tfstate-log.%s", var.prefix, var.organisation_name)
-  region = var.region
   acl    = "log-delivery-write"
 
   versioning {

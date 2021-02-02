@@ -36,17 +36,6 @@ DESCRIPTION
   default = ""
 }
 
-variable "region" {
-  type = string
-
-  description = <<DESCRIPTION
-Identification of the region you want to deploy the Terraform meta-infrastructure in.
-The default is "eu-west-1".
-DESCRIPTION
-
-  default = "eu-west-1"
-}
-
 variable "tags" {
   type = map(string)
 

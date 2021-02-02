@@ -16,7 +16,6 @@ This [Terraform] configuration uses the [ppwcode conventions][terraform] as much
 
 The resource names of this module are calculated based on the input `organisation_name`. The actual names are
 in the output.
-The input `region` defines in which AWS region the infrastructure is created.
 The created resources are tagged with the key / value pairs provided in the `tags` input variable.
 
 - `state.tf` defines the S3 bucket that holds the [Terraform] remote state
@@ -47,7 +46,7 @@ A functionally meaningful configuration `<CONFIGURATION_NAME>` does that by incl
     }
 
 - `<ORGANISATION_NAME>` **must** be the `organisation_name` you used as input when you used this module.
-- `<REGION>` **must** be the `region` you used as input when you used this module.
+- `<REGION>` **must** be the `region` that was configured in the AWS provider when you used this module.
 - `<CONFIGURATION_NAME>` _should_ match the name of the configuration, i.e., the name of the git repository it
   is defined in.
 - `<PROFILE>` **must** be the name you used in [`~/.aws/credentials`][aws credentials] to identify your AWS account
