@@ -8,9 +8,9 @@ domain names must be defined in the same Route53 DNS hosted zone, whose id must 
 
 ## Details
 
-- **CAA**: First, DNS `CAA` records are created for all of the given FQDNS in the hosted zone referred to by `zone_id`.
+- **CAA**: First, DNS `CAA` records are created for all the given FQDNS in the hosted zone referred to by `zone_id`.
 
-  This signals to certificate authorities which authorities are allowed to create certificates for these FQDNs.
+  This signals to certificate authorities if they are allowed to create certificates for these FQDNs.
   We only allow AWS to do so.
 
 - **certificate request**: Then, a certificate request is created with ACM, in the AWS region given by the value of
@@ -25,8 +25,6 @@ domain names must be defined in the same Route53 DNS hosted zone, whose id must 
 
 - **proof**: ACM requires us to proof that we own the given FQDNs. We do this by adding secrets in DNS in the hosted
   zone referred to by `zone_id` for each of the FQDNs.
-
-  _**NOTE:** There is a possible issue with this step, which this module tries to work around. See below._
 
 - **wait:** Finally, this module waits for the certificate to be issued, and returns it's `id` and `arn`.
 
@@ -44,42 +42,8 @@ lifetime of the certificate.
 
 Almost any change will create a new certificate, and delete the existing one. The existing certificate is only deleted
 after the new one is created, which makes it possible to switch the certificate that is used by a resource with zero
-down time.
+downtime.
 
 ## Terraform version
 
-This module requires Terraform 0.12.
-
-## Issues
-
-### Creation of the proofs for an undetermined number of FQDNS
-
-There is an issue with the creation of the proofs for an undetermined number of FQDNS.
-See [terraform-provider-aws#6557](https://github.com/terraform-providers/terraform-provider-aws/issues/6557).
-
-A workaround for `count` is to use the length of `local.all_domains`, which should be the same. That works for the
-count, and then the name, type, and records values are "computed".
-
-This works if a delta has the same number of domain names, or goes to less domain names, when a new certificate request
-is made. It does not work if a change is made to more domain names. Then we get `index <N> out of range for list aws_acm_certificate.main.domain_validation_options`. The reason is that Terraform wants to determine the size of the
-list during it's plan phase, before the certificate request is actually created, and uses the list it knows at that
-time. This is simply wrong.
-
-A solution is to apply in 2 phases, first creating the certificate request, and in a second run, the proofs.
-
-The bug reports refer to this as using the `--target` attribute, the intention being of first creating the CAA and
-certificate request separately, with `--target`, and then the rest.
-
-This does however negate the lifecycle `create_before_destroy = true` setting of the certificate request. Inbetween the
-2 runs, there is no issued certificate.
-`
-### Random order of some results being returned by AWS
-
-There is an issue for this module, regarding to the random order of some results being returned by AWS after an API
-change.
-
-This module needs to be changed slightly.
-
-See [terraform-provider-aws#8531](https://github.com/hashicorp/terraform-provider-aws/issues/8531#issuecomment-663562156).
-
-This might also resolve the previous issue.
+This module requires Terraform 1.1.2.

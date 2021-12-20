@@ -16,27 +16,19 @@
 
 # prove ownership
 resource "aws_route53_record" "proof" {
-  # NOTE There is an issue with this count.
-  #      See https://github.com/terraform-providers/terraform-provider-aws/issues/6557
-  #      -
-  #      A workaround for `count` is to use the length of `local.tls_certificte-all_domains`, which should be the
-  #      same. That works for the count, and then the name, type, and records values are "computed". This works if a
-  #      change has the same number of domain names, and if a change goes to less domain names, when a new certificate
-  #      request is made. It does not work if a change is made to more domain names. Then we get 'index <N> out of
-  #      range for list aws_acm_certificate.tlsCertificate.domain_validation_options'.
-  #      -
-  #      A solution in most cases is to comment out these 2 resources, and apply, and then, in a second run, apply
-  #      these 2 resources. Then `aws_acm_certificate.tlsCertificate.domain_validation_options` does exist in the
-  #      _plan_ phase, and this can continue.
-  #      The bug reports refer to this as using the `--target` attribute, the intention being of first creating the CAA
-  #      and certificate request separately, with --target, and then the rest.
-  count = length(local.all_domains)
+  for_each = {
+    for dvo in aws_acm_certificate.main.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
   zone_id = var.zone_id
-  name    = lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_name")
-  type    = lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_type")
+  name    = each.value.name
+  type    = each.value.type
   ttl     = local.proof-ttl
   records = [
-    lookup(aws_acm_certificate.main.domain_validation_options[count.index], "resource_record_value"),
+    each.value.record
   ]
 }

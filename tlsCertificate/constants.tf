@@ -34,7 +34,7 @@ locals {
     )
   )
 
-  all_domains = concat(list(local.main_fqdn), local.alternate_fqdns)
+  all_domains = concat([local.main_fqdn], local.alternate_fqdns)
   caa-ttl     = 900
   proof-ttl   = 5
 }
