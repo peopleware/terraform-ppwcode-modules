@@ -28,7 +28,6 @@ variable "index_document" {
 
 resource "aws_s3_bucket" "BUCKET" {
   bucket = "${var.short-name}.${var.domain}"
-  acl    = "public-read"
 
   policy = data.aws_iam_policy_document.BUCKET.json
 }
@@ -47,6 +46,11 @@ resource "aws_s3_bucket_website_configuration" "BUCKET" {
   index_document {
     suffix = var.index_document
   }
+}
+
+resource "aws_s3_bucket_acl" "BUCKET" {
+  bucket = aws_s3_bucket.BUCKET.id
+  acl    = "public-read"
 }
 
 data "aws_iam_policy_document" "BUCKET" {

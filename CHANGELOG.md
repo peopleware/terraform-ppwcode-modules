@@ -2,6 +2,12 @@
 
 ## 9
 
+### 9.3
+
+#### 9.3.0
+
+- Update s3site to use `aws_s3_bucket_acl`
+
 ### 9.2
 
 #### 9.2.0
