@@ -41,7 +41,7 @@ resource "aws_s3_bucket_versioning" "BUCKET" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "example" {
+resource "aws_s3_bucket_website_configuration" "BUCKET" {
   bucket = aws_s3_bucket.BUCKET.bucket
 
   index_document {
