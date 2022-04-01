@@ -7,6 +7,7 @@
 #### 9.3.0
 
 - Update s3site to use `aws_s3_bucket_acl`
+- Update s3site to use `aws_s3_bucket_policy`
 
 ### 9.2
 
