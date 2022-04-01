@@ -34,12 +34,15 @@ resource "aws_s3_bucket" "BUCKET" {
     index_document = var.index_document
   }
 
-  versioning {
-    enabled = false
-  }
-
-
   policy = data.aws_iam_policy_document.BUCKET.json
+}
+
+resource "aws_s3_bucket_versioning" "BUCKET" {
+  bucket = aws_s3_bucket.BUCKET.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 data "aws_iam_policy_document" "BUCKET" {
