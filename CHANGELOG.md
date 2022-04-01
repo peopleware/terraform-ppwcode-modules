@@ -2,6 +2,12 @@
 
 ## 9
 
+### 9.4
+
+#### 9.4.0
+
+- Fix s3site versioning: suspend instead of enable
+
 ### 9.3
 
 #### 9.3.0
