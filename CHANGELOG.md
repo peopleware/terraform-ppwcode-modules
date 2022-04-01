@@ -2,6 +2,13 @@
 
 ## 9
 
+### 9.2
+
+#### 9.2.0
+
+- Update s3site to use `aws_s3_bucket_website_configuration`
+
+
 ### 9.1
 
 #### 9.1.0

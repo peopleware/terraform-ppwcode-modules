@@ -30,10 +30,6 @@ resource "aws_s3_bucket" "BUCKET" {
   bucket = "${var.short-name}.${var.domain}"
   acl    = "public-read"
 
-  website {
-    index_document = var.index_document
-  }
-
   policy = data.aws_iam_policy_document.BUCKET.json
 }
 
@@ -42,6 +38,14 @@ resource "aws_s3_bucket_versioning" "BUCKET" {
 
   versioning_configuration {
     status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_website_configuration" "example" {
+  bucket = aws_s3_bucket.BUCKET.bucket
+
+  index_document {
+    suffix = var.index_document
   }
 }
 
