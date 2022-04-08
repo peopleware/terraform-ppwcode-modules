@@ -11,19 +11,6 @@ resource "aws_s3_bucket_versioning" "BUCKET" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "BUCKET" {
-  bucket = aws_s3_bucket.BUCKET.bucket
-
-  index_document {
-    suffix = var.index_document
-  }
-}
-
-resource "aws_s3_bucket_acl" "BUCKET" {
-  bucket = aws_s3_bucket.BUCKET.id
-  acl    = "public-read"
-}
-
 resource "aws_s3_bucket_policy" "BUCKET" {
   bucket = aws_s3_bucket.BUCKET.id
   policy = data.aws_iam_policy_document.BUCKET.json
@@ -40,7 +27,7 @@ data "aws_iam_policy_document" "BUCKET" {
     ]
 
     principals {
-      identifiers = ["*"]
+      identifiers = [aws_cloudfront_origin_access_identity.IDENTITY.iam_arn]
       type        = "AWS"
     }
   }

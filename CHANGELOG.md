@@ -1,5 +1,11 @@
 # Versions
 
+### 10.0
+
+#### 10.0.0
+
+- Rework s3site to use Cloudfront instead of website confguration
+
 ## 9
 
 ### 9.4
