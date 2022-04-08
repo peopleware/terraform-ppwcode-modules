@@ -4,6 +4,10 @@
 
 ### 10.0
 
+#### 10.1.0
+
+- Add s3site `required_providers`
+
 #### 10.0.0
 
 - Rework s3site to use Cloudfront instead of website configuration
