@@ -1,10 +1,12 @@
 # Versions
 
+### 10
+
 ### 10.0
 
 #### 10.0.0
 
-- Rework s3site to use Cloudfront instead of website confguration
+- Rework s3site to use Cloudfront instead of website configuration
 
 ## 9
 
