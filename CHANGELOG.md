@@ -4,6 +4,10 @@
 
 ### 10.1
 
+#### 10.1.1
+
+- Fix s3site acm validation route53 config
+
 #### 10.1.0
 
 - Add s3site `required_providers`
