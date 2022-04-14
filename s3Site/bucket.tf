@@ -11,6 +11,11 @@ resource "aws_s3_bucket_versioning" "BUCKET" {
   }
 }
 
+resource "aws_s3_bucket_acl" "BUCKET" {
+  bucket = aws_s3_bucket.BUCKET.id
+  acl    = "private"
+}
+
 resource "aws_s3_bucket_policy" "BUCKET" {
   bucket = aws_s3_bucket.BUCKET.id
   policy = data.aws_iam_policy_document.BUCKET.json

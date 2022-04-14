@@ -1,5 +1,13 @@
 # Versions
 
+### 11
+
+### 11.0
+
+#### 11.0.0
+
+- Set s3site bucket acl to private
+
 ### 10
 
 ### 10.2
