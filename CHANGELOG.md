@@ -9,6 +9,7 @@
 - Update tfstate to use `aws_s3_bucket_versioning`
 - Update tfstate to use `aws_s3_bucket_acl`
 - Update tfstate to use `aws_s3_bucket_server_side_encryption_configuration`
+- Update tfstate to use `aws_s3_bucket_logging`
 
 ### 11.0
 

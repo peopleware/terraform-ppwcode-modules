@@ -17,15 +17,17 @@
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
 
-  logging {
-    target_bucket = aws_s3_bucket.terraform_state_logging.id
-  }
-
   tags = var.tags
 
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_s3_bucket_logging" "terraform_state" {
+  bucket        = aws_s3_bucket.terraform_state.id
+  target_bucket = aws_s3_bucket
+  target_prefix = ""
 }
 
 resource "aws_s3_bucket_versioning" "terraform_state" {
