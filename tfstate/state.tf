@@ -18,10 +18,6 @@ resource "aws_s3_bucket" "terraform_state" {
   bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
   acl    = "private"
 
-  versioning {
-    enabled = true
-  }
-
   logging {
     target_bucket = aws_s3_bucket.terraform_state_logging.id
   }
@@ -38,6 +34,14 @@ resource "aws_s3_bucket" "terraform_state" {
         sse_algorithm = "AES256"
       }
     }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 

@@ -18,10 +18,6 @@ resource "aws_s3_bucket" "terraform_state_logging" {
   bucket = var.prefix == "" ? format("tfstate-log.%s", var.organisation_name) : format("%s.tfstate-log.%s", var.prefix, var.organisation_name)
   acl    = "log-delivery-write"
 
-  versioning {
-    enabled = false
-  }
-
   tags = var.tags
 
   lifecycle {
@@ -48,6 +44,14 @@ resource "aws_s3_bucket" "terraform_state_logging" {
    */
 
   // TODO small file hypothesis needs to be validated
+}
+
+resource "aws_s3_bucket_versioning" "terraform_state_logging" {
+  bucket = aws_s3_bucket.terraform_state_logging.id
+
+  versioning_configuration {
+    status = "Suspended"
+  }
 }
 
 resource "aws_s3_bucket_policy" "prohibit-delete" {

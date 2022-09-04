@@ -2,6 +2,12 @@
 
 ### 11
 
+### 11.1
+
+#### 11.1.0
+
+- Update tfstate to use `aws_s3_bucket_versioning`
+
 ### 11.0
 
 #### 11.0.0
