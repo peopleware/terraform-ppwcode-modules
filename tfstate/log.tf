@@ -23,14 +23,6 @@ resource "aws_s3_bucket" "terraform_state_logging" {
     prevent_destroy = true
   }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-
   /* We considered setting up object lifecycle management to automatically move
      older logs to STANDARD_IA (infrequent access) or GLACIER storage class
      (e.g., after one year). This does not make sense, however, because the separate
@@ -56,6 +48,15 @@ resource "aws_s3_bucket_versioning" "terraform_state_logging" {
 resource "aws_s3_bucket_acl" "terraform_state_logging" {
   bucket = aws_s3_bucket.terraform_state_logging.id
   acl    = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_logging" {
+  bucket = aws_s3_bucket.terraform_state_logging.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "prohibit-delete" {
