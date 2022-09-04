@@ -16,7 +16,6 @@
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
-  acl    = "private"
 
   logging {
     target_bucket = aws_s3_bucket.terraform_state_logging.id
@@ -43,6 +42,11 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_s3_bucket_acl" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_policy" "deny_delete_state_files" {

@@ -7,6 +7,7 @@
 #### 11.1.0
 
 - Update tfstate to use `aws_s3_bucket_versioning`
+- Update tfstate to use `aws_s3_bucket_acl`
 
 ### 11.0
 

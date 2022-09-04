@@ -16,7 +16,6 @@
 
 resource "aws_s3_bucket" "terraform_state_logging" {
   bucket = var.prefix == "" ? format("tfstate-log.%s", var.organisation_name) : format("%s.tfstate-log.%s", var.prefix, var.organisation_name)
-  acl    = "log-delivery-write"
 
   tags = var.tags
 
@@ -52,6 +51,11 @@ resource "aws_s3_bucket_versioning" "terraform_state_logging" {
   versioning_configuration {
     status = "Suspended"
   }
+}
+
+resource "aws_s3_bucket_acl" "terraform_state_logging" {
+  bucket = aws_s3_bucket.terraform_state_logging.id
+  acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_policy" "prohibit-delete" {
