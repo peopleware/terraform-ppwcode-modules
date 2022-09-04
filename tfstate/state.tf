@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "terraform_state" {
 
 resource "aws_s3_bucket_logging" "terraform_state" {
   bucket        = aws_s3_bucket.terraform_state.id
-  target_bucket = aws_s3_bucket
+  target_bucket = aws_s3_bucket.terraform_state_logging.id
   target_prefix = ""
 }
 

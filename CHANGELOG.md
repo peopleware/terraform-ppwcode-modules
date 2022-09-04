@@ -4,6 +4,10 @@
 
 ### 11.1
 
+#### 11.1.1
+
+- Fix typo in tfstate state config file
+
 #### 11.1.0
 
 - Update tfstate to use `aws_s3_bucket_versioning`
