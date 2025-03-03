@@ -99,6 +99,27 @@ output "I-s3-objects-readwrite_no_delete" {
 }
 
 # resource: <bucket_arn>/*
+output "I-s3-bucket-objects-changeconfig" {
+  value = [
+    "s3:DeleteObjectTagging",
+    "s3:DeleteObjectVersion",
+    "s3:DeleteObjectVersionTagging",
+    "s3:PutObjectAcl",
+    "s3:PutObjectVersionAcl",
+    "s3:RestoreObject",
+    "s3:ObjectOwnerOverrideToBucketOwner",
+    "s3:ReplicateDelete",
+  ]
+}
+
+# resource: <bucket_arn>/*
+output "I-s3-bucket-objects-delete" {
+  value = [
+    "s3:DeleteObject",
+  ]
+}
+
+# resource: <bucket_arn>/*
 output "I-s3-bucket-objects-delete_changeconfig" {
   value = [
     "s3:DeleteObject",

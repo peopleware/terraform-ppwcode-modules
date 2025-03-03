@@ -47,13 +47,30 @@ data "aws_iam_policy_document" "tfstate-readwrite_nodelete_nor_change" {
       "${local.tfstate-log_bucket-arn}/*"
     ]
   }
-  # prohibit tfstate buckets objects delete and config change
+  # prohibit tfstate buckets objects config change
   statement {
     effect  = "Deny"
-    actions = module.actions.I-s3-bucket-objects-delete_changeconfig
+    actions = module.actions.I-s3-bucket-objects-changeconfig
     resources = [
       "${local.tfstate-bucket-arn}/*",
       "${local.tfstate-log_bucket-arn}/*"
+    ]
+  }
+  # prohibit delete of tfstate buckets objects that represent state files or log files
+  statement {
+    effect  = "Deny"
+    actions = module.actions.I-s3-bucket-objects-delete
+    resources = [
+      "${local.tfstate-bucket-arn}/*.tfstate",
+      "${local.tfstate-log_bucket-arn}/*"
+    ]
+  }
+  # allow delete of tfstate buckets objects that represent lock files
+  statement {
+    effect  = "Allow"
+    actions = module.actions.I-s3-bucket-objects-delete
+    resources = [
+      "${local.tfstate-bucket-arn}/*.tfstate.tflock",
     ]
   }
   # allow tables describe
