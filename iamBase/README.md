@@ -58,9 +58,13 @@ limitations make no sense.
 The group `/ppwcode/devsecops` gives members privileges
 
 - to read _everything_ in the account, and
-- to read and write (but not delete) objects in the S3 bucket configured as the Terraform `tfstate` backend for the
-  account, and read, write and delete records in the DynamoDB table configured as the state lock mechanism for the
-  Terraform backend
+- `tfstate`:
+  - to read and write (but not delete) objects that represent state files in the S3 bucket configured as the Terraform
+    `tfstate` backend for the account,
+  - to read, write, and delete objects that represent lock files in the S3 bucket configured as the Terraform
+    `tfstate` backend for the account, 
+  - and read, write and delete records in the DynamoDB table configured as the state lock mechanism for the
+    Terraform backend
 - to assume roles
 - to manage human and ci users (i.e., users with path `/human/` or `/ci`), to be able to help colleagues
 - to manage members and policies of the groups `/ppwcode/humans` and `/ppwcode/devsecops`
@@ -70,6 +74,15 @@ The group `/ppwcode/devsecops` gives members privileges
   - to assume roles with path `/devsecops/`
 - to manage certificates in ACM
 - to manage domain registrations
+
+
+Terraform v.1.11.0 introduces a new [state locking mechanism]. Using a DynamoDB table for state locking is deprecated.
+For the time being:
+
+> To support migration from older versions of Terraform that only support DynamoDB-based locking, the S3 and
+> DynamoDB arguments can be configured simultaneously.
+
+_**TODO:** Remove permissions to handle a DynamoDB table for state locking. This will be an incompatible change._
 
 When defining `/devsecops/` roles, it is important to follow the following idiom.
 Roles require an _assume role policy_, that expresses who can assume the rule from the standpoint of the role. We want
@@ -197,3 +210,5 @@ technical meaning.
 
 This means a/o you cannot define your own groups `humans`, `devsecops`, or `administrators` when you use this module,
 even with a different path than `/ppwcode/`.
+
+[state locking mechanism]: https://developer.hashicorp.com/terraform/language/backend/s3#state-locking
