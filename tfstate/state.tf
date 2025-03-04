@@ -1,5 +1,5 @@
 /**
- *    Copyright 2017 - 2019 PeopleWare n.v.
+ *    Copyright 2017 - 2025 PeopleWare n.v.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-module "actions" {
-  source = "../actions"
-}
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
