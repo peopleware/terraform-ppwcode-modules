@@ -1,6 +1,6 @@
 # Root of an organisation's Terraform definition.
 
-**Requires [Terraform] > `0.12`.**
+**Requires [Terraform] > `1.11`.**
 
 **This configuration does not follow the ppwcode conventions completely.**
 
@@ -9,6 +9,15 @@ for [Terraform] operation. Because this configuration defines the S3 bucket that
 and the DynamoDB table that guards against concurrent modification, it does not itself have remote state, nor is
 this configuration guarded against concurrent modification. **In this case, the state file should be consistently
 committed to the git repository.**
+
+Terraform v.1.11.0 introduces a new [state locking mechanism]. Using a DynamoDB table for state locking is deprecated.
+For the time being:
+
+> To support migration from older versions of Terraform that only support DynamoDB-based locking, the S3 and
+> DynamoDB arguments can be configured simultaneously.
+
+_**TODO:** Remove the DynamoDB table._
+
 
 ## Structure
 
@@ -41,6 +50,8 @@ A functionally meaningful configuration `<CONFIGURATION_NAME>` does that by incl
         region         = "<REGION>"
         profile        = "<PROFILE>"
         encrypt        = true
+        use_lockfile   = true
+        # TODO: remove `dynamodb_table` entry; this is deprecated (https://developer.hashicorp.com/terraform/language/backend/s3#state-locking)
         dynamodb_table = "tfstate-lock.<ORGANISATION_NAME>"
       }
     }
@@ -92,3 +103,4 @@ a good reason to use this over
 [getting started with a terraform configuration]: https://peopleware.atlassian.net/wiki/x/p4zhC
 [aws credentials]: https://peopleware.atlassian.net/wiki/x/RoAWBg
 [using s3 as a terraform backend]: https://www.terraform.io/docs/backends/types/s3.html
+[state locking mechanism]: https://developer.hashicorp.com/terraform/language/backend/s3#state-locking
