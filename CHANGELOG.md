@@ -2,12 +2,28 @@
 
 ### 11
 
+### 11.3
+
+#### 11.3.0
+
+- `tfstate`
+  - Allow users to delete `….tfstate.tflock` files from the `tfstate-bucket`.
+
+    This is necessary to be able to use the new
+    [state locking mechanism](https://developer.hashicorp.com/terraform/language/backend/s3#state-locking) introduced
+    in Terraform `v1.11.0`. Using a DynamoDB table for state locking is deprecated. For the time being:
+
+    > To support migration from older versions of Terraform that only support DynamoDB-based locking, the S3 and
+    > DynamoDB arguments can be configured simultaneously.
+
+    _**TODO:** Remove DynamoDB table for state locking. This will be an incompatible change._
+
 ### 11.2
 
 #### 11.2.0
 
 - `iamBase`
-  - Allow `devsecops` users to delete `….tfstate.tflock` files in the `tfstate-bucket`.
+  - Allow `devsecops` users to delete `….tfstate.tflock` files from the `tfstate-bucket`.
     
     This is necessary to be able to use the new
     [state locking mechanism](https://developer.hashicorp.com/terraform/language/backend/s3#state-locking) introduced
