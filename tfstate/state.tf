@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+module "actions" {
+  source = "../actions"
+}
+
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.prefix == "" ? format("tfstate.%s", var.organisation_name) : format("%s.tfstate.%s", var.prefix, var.organisation_name)
 
@@ -52,13 +56,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
   }
 }
 
-resource "aws_s3_bucket_policy" "deny_delete_state_files" {
-  bucket = aws_s3_bucket.terraform_state.id
-
-  policy = data.aws_iam_policy_document.deny_delete_state_files.json
-}
-
 data "aws_iam_policy_document" "deny_delete_state_files" {
+  # prohibit tfstate buckets objects config change
   statement {
     effect = "Deny"
 
@@ -67,7 +66,30 @@ data "aws_iam_policy_document" "deny_delete_state_files" {
       identifiers = ["*"]
     }
 
-    actions   = ["s3:DeleteObject"]
+    actions   = module.actions.I-s3-bucket-objects-changeconfig
     resources = ["${aws_s3_bucket.terraform_state.arn}/*"]
   }
+
+  # Prohibit delete of tfstate buckets objects that represent state files.
+  # tfstate buckets objects that represent lock files may be deleted, but we cannot specify that here,
+  # because we would need to allow that then for all principals. Also, we cannot deny deletion of any files except lock
+  # files, because the ARN syntax has no way to express that.
+  statement {
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = module.actions.I-s3-bucket-objects-delete
+    resources = ["${aws_s3_bucket.terraform_state.arn}/*.tfstate"]
+  }
 }
+
+resource "aws_s3_bucket_policy" "deny_delete_state_files" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  policy = data.aws_iam_policy_document.deny_delete_state_files.json
+}
+
