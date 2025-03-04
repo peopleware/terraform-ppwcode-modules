@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+module "actions" {
+  source = "../actions"
+}
+
 resource "aws_s3_bucket" "terraform_state_logging" {
   bucket = var.prefix == "" ? format("tfstate-log.%s", var.organisation_name) : format("%s.tfstate-log.%s", var.prefix, var.organisation_name)
 
@@ -59,12 +63,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_l
   }
 }
 
-resource "aws_s3_bucket_policy" "prohibit-delete" {
-  bucket = aws_s3_bucket.terraform_state_logging.id
-
-  policy = data.aws_iam_policy_document.prohibit-delete.json
-}
-
 data "aws_iam_policy_document" "prohibit-delete" {
   statement {
     effect = "Deny"
@@ -74,7 +72,13 @@ data "aws_iam_policy_document" "prohibit-delete" {
       identifiers = ["*"]
     }
 
-    actions   = ["s3:DeleteObject"]
+    actions   = module.actions.I-s3-bucket-objects-delete_changeconfig
     resources = ["${aws_s3_bucket.terraform_state_logging.arn}/*"]
   }
+}
+
+resource "aws_s3_bucket_policy" "prohibit-delete" {
+  bucket = aws_s3_bucket.terraform_state_logging.id
+
+  policy = data.aws_iam_policy_document.prohibit-delete.json
 }
