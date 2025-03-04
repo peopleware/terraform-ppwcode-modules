@@ -75,7 +75,6 @@ The group `/ppwcode/devsecops` gives members privileges
 - to manage certificates in ACM
 - to manage domain registrations
 
-
 Terraform v.1.11.0 introduces a new [state locking mechanism]. Using a DynamoDB table for state locking is deprecated.
 For the time being:
 
